@@ -1,6 +1,6 @@
 import { Component, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Bookmark, Manifest } from '../types/manifest'
-import { isUsable, loadManifest } from '../services/manifest'
+import { CASES, currentCase, isUsable, loadManifest, STATUS_LABEL } from '../services/manifest'
 import { buildStory } from '../data/story'
 import { LeftPanel, type EvidenceView } from '../components/layout/LeftPanel'
 import { MapView, type MapStatus } from '../components/map/MapView'
@@ -74,6 +74,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const shownLayer = layerVisible ? active : undefined
   const detail = (aboutId && byId(aboutId)) || active
   const bookmark = m.bookmarks.find((b) => b.id === bookmarkId)
+  const provisional = /provisional|preliminary/i.test(active?.productMaturity ?? '')
 
   const selectLayer = (id: string) => { setActiveId(id); setOverlayId(''); setShowMask(false); setLayerVisible(true); setAboutId(null) }
 
@@ -103,6 +104,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const goStory = (i: number) => {
     const s = story[i]
     setStoryStep(i)
+    setPanel(null)
     selectLayer(s.layerId)
     setReferenceIds(s.references)
     const b = m.bookmarks.find((x) => x.id === s.bookmarkId)
@@ -114,16 +116,32 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   return (
     <div className={`app ${panel ? `show-${panel}` : ''} ${storyStep !== null ? 'story-on' : ''}`}>
       <header className="topbar">
-        <div className="brand"><strong>GAIA CascadeLens</strong><span>Following Earth's movement, one radar observation at a time.</span></div>
+        <div className="brand">
+          <span className="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="#fff" strokeWidth="2.2" /><path d="M15 15l5 5" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg></span>
+          <span className="brand-text"><strong>CascadeLens</strong><span>by Team GAIA</span></span>
+        </div>
+        <label className="case-pill"><i aria-hidden="true" /><span className="sr-only">Case study</span>
+          <select value={currentCase().id} onChange={(e) => { window.location.search = `?case=${e.target.value}` }}>
+            {CASES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
+        </label>
+        {story.length > 0 && (
+          <div className="modes" role="group" aria-label="Mode">
+            <button className={storyStep !== null ? 'on' : ''} aria-pressed={storyStep !== null} onClick={() => storyStep === null && goStory(0)}>Guided story</button>
+            <button className={storyStep === null ? 'on' : ''} aria-pressed={storyStep === null} onClick={() => setStoryStep(null)}>Explore</button>
+          </div>
+        )}
         <div className="top-actions">
-          <button className="mobile-only" aria-expanded={panel === 'left'} onClick={() => setPanel(panel === 'left' ? null : 'left')}>{group?.label ?? 'Controls'}</button>
+          {provisional && <span className="badge amber" title={active?.productMaturity}>Provisional data</span>}
+          <button className="mobile-only" aria-expanded={panel === 'left'} onClick={() => setPanel(panel === 'left' ? null : 'left')}>Layers</button>
           <button className="mobile-only" aria-expanded={panel === 'right'} onClick={() => setPanel(panel === 'right' ? null : 'right')}>Details</button>
-          <span className={`map-state map-${mapStatus.state}`} role="status">{mapStatus.state === 'error' ? 'Map source failed' : mapStatus.state === 'loading' ? 'Loading map data' : 'Map ready'}</span>
+          <span className={`badge map-state map-${mapStatus.state}`} role="status">{mapStatus.state === 'error' ? 'Map source failed' : mapStatus.state === 'loading' ? 'Loading map data' : 'Map ready'}</span>
         </div>
       </header>
       {m.fixture && <p className="fixture-banner">{m.fixtureLabel ?? 'SYNTHETIC TEST FIXTURE. These values are invented for software testing and are not satellite data.'}</p>}
 
       <aside className="left" aria-label="Controls">
+        <div className="sheet-handle" aria-hidden="true" />
         <LeftPanel manifest={m} group={group} view={view} activeId={activeId} step={step} onStep={setStep} hasStory={story.length > 0} layerVisible={layerVisible} bookmarkId={bookmarkId} opacity={opacity} showTerrain={showTerrain} showMask={showMask} overlayId={overlayId}
           referenceIds={referenceIds} storyActive={storyStep !== null} onBookmark={goToBookmark} onGroup={selectGroup} onView={selectView} onLayer={selectLayer} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
           onMask={setShowMask} onOverlay={setOverlayId} onReference={(id, on) => setReferenceIds((r) => (on ? [...r, id] : r.filter((x) => x !== id)))} onAbout={showAbout} onStory={() => goStory(0)} />
@@ -138,24 +156,38 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
         {mapStatus.state === 'error' && <p className="map-alert" role="alert">{mapStatus.message}</p>}
         {!covered && <p className="map-notice" role="status">No geographic coverage: {active?.name} has no data in this view.</p>}
         <Legend layer={shownLayer} references={references} />
-        <Credits layers={[terrain, shownLayer, ...references]} />
+        <div className="map-foot">
+          <Credits layers={[terrain, shownLayer, ...references]} />
+          <p className="signature">Made by <strong>Team GAIA</strong></p>
+        </div>
       </main>
 
-      <aside className="right" aria-label="Scientific interpretation">
-        {storyStep !== null ? <StoryPanel steps={story} index={storyStep} onGo={goStory} onExit={() => setStoryStep(null)} /> : (
+      {storyStep !== null && (
+        <div className="story-dock">
+          <StoryPanel steps={story} index={storyStep} manifest={m} onGo={goStory} onExit={() => setStoryStep(null)} />
+        </div>
+      )}
+
+      {storyStep === null && (
+        <aside className="right" aria-label="Scientific interpretation">
+          <div className="sheet-handle" aria-hidden="true" />
           <div className="panel-body">
-            <p className="eyebrow">{detail?.mission} {detail?.productType}</p>
-            <h2>{detail?.name}</h2>
+            <div className="badges">
+              <span className="badge teal">{detail?.mission} {detail?.productType}</span>
+              {detail && <span className={`badge status-${detail.status}`}>{STATUS_LABEL[detail.status]}</span>}
+            </div>
+            <h2 className="title">{detail?.name}</h2>
+            {detail && <p className="subtitle">{detail.measurementClass}</p>}
             {aboutId ? <button className="link" onClick={() => setAboutId(null)}>Back to {active?.name}</button> : (
-              <div className="tabs" role="tablist">
+              <div className="tabs underline" role="tablist">
                 <button role="tab" aria-selected={tab === 'about'} className={tab === 'about' ? 'on' : ''} onClick={() => setTab('about')}>Interpretation</button>
                 <button role="tab" aria-selected={tab === 'inspect'} className={tab === 'inspect' ? 'on' : ''} onClick={() => setTab('inspect')}>Inspector</button>
               </div>
             )}
-            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} /> : detail && <Interpretation layer={detail} />}
+            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
           </div>
-        )}
-      </aside>
+        </aside>
+      )}
     </div>
   )
 }

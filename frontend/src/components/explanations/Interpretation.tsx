@@ -1,7 +1,8 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
 import type { Layer } from '../../types/manifest'
-import { acquisitionLabel, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
+import { acquisitionLabel, isUsable, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
 import { explanationFor } from '../../data/explanations'
+import { Donut } from '../charts/Charts'
 
 function Histogram({ layer }: { layer: Layer }) {
   const h = layer.stats?.histogram
@@ -9,65 +10,99 @@ function Histogram({ layer }: { layer: Layer }) {
   const data = h.counts.map((count, i) => ({ value: Number(h.edges[i].toFixed(2)), count }))
   const unit = layer.displayDb ? 'dB' : `${unitLabel(layer.units)}${layer.displayRelative ? ', relative to frame median' : ''}`
   return (
-    <figure className="histogram">
+    <figure className="histogram card">
       <figcaption>Distribution of valid pixels{unit ? ` (${unit})` : ''}</figcaption>
       <ResponsiveContainer width="100%" height={84}>
         <BarChart data={data} margin={{ top: 4, right: 14, bottom: 0, left: 14 }} barCategoryGap={0}>
-          <XAxis dataKey="value" tick={{ fontSize: 10, fill: '#9ba8a3' }} tickLine={false} axisLine={false} interval={12} />
-          <Tooltip cursor={{ fill: 'rgba(255,255,255,.06)' }} contentStyle={{ background: '#182025', border: '1px solid #33404a', fontSize: 12 }} formatter={(v) => [Number(v).toLocaleString(), 'pixels']} labelFormatter={(v) => `from ${v}`} />
-          <Bar dataKey="count" fill="#7fd1c7" isAnimationActive={false} />
+          <XAxis dataKey="value" tick={{ fontSize: 10, fill: '#8e9c97' }} tickLine={false} axisLine={false} interval={12} />
+          <Tooltip cursor={{ fill: 'rgba(255,255,255,.06)' }} contentStyle={{ background: '#18232a', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: 12 }} formatter={(v) => [Number(v).toLocaleString(), 'pixels']} labelFormatter={(v) => `from ${v}`} />
+          <Bar dataKey="count" fill="#5fe0c9" isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </figure>
   )
 }
 
-export function Interpretation({ layer }: { layer: Layer }) {
+const RADAR = ['gunw', 'goff', 'gcov']
+
+// Both pies use only manifest figures: pixel fractions per frame, and the status of every radar layer.
+function AtAGlance({ layer, layers }: { layer: Layer; layers: Layer[] }) {
+  const pct = (x: number) => Math.round(x * 100)
+  const frames = layer.sources.filter((s) => s.validFraction !== undefined)
+  const radar = layers.filter((l) => l.mission === 'NISAR' && RADAR.includes(l.category))
+  const ready = radar.filter(isUsable).length
+  const notDownloaded = radar.filter((l) => l.status === 'catalogued').length
+  const other = radar.length - ready - notDownloaded
+  if (!frames.length && !radar.length) return null
+  return (
+    <section className="glance">
+      <h3 className="label">At a glance</h3>
+      {frames.map((s) => {
+        const valid = pct(s.validFraction!)
+        const masked = pct(s.maskedFraction ?? 0)
+        return (
+          <Donut key={s.granule} title={`Usable pixels${s.frame ? `, frame ${s.frame}` : ''}`} centre={`${valid}%`} note="%"
+            slices={[{ label: 'Valid', value: valid, color: 'var(--accent)' }, { label: 'Masked', value: masked, color: 'var(--amber)' }, { label: 'No data', value: Math.max(0, 100 - valid - masked), color: 'var(--grey)' }]} />
+        )
+      })}
+      {radar.length > 0 && (
+        <Donut title="Radar layers" centre={`${ready}/${radar.length}`}
+          slices={[{ label: 'Ready', value: ready, color: 'var(--accent)' }, { label: 'Not downloaded', value: notDownloaded, color: 'var(--coral)' }, ...(other ? [{ label: 'In preparation', value: other, color: 'var(--amber)' }] : [])]} />
+      )}
+    </section>
+  )
+}
+
+function Question({ q, a, open }: { q: string; a: string; open?: boolean }) {
+  return <details className="question" open={open}><summary><h3>{q}</h3></summary><p>{a}</p></details>
+}
+
+export function Interpretation({ layer, layers }: { layer: Layer; layers: Layer[] }) {
   const e = explanationFor(layer)
   const unit = layer.unitsNote ?? unitLabel(layer.units)
-  const coverage = layer.sources.filter((s) => s.validFraction !== undefined)
+  const tiles: [string, string][] = [
+    ['Observation', acquisitionLabel(layer)],
+    ...(layer.orbitDirection ? [['Orbit', `${layer.orbitDirection.toLowerCase()}, Track ${layer.track}, frames ${layer.frames.join('/')}`] as [string, string]] : []),
+    ...(unit ? [['Units', unit] as [string, string]] : []),
+    ...(layer.postingM ? [['Native posting', posting(layer)] as [string, string]] : []),
+    ['Status', STATUS_LABEL[layer.status]],
+  ]
   return (
     <>
       <dl className="facts">
-        <div><dt>Product</dt><dd>{layer.mission} {layer.productType}</dd></div>
-        <div><dt>Class</dt><dd>{layer.measurementClass}</dd></div>
-        <div><dt>Observation</dt><dd>{acquisitionLabel(layer)}</dd></div>
-        {layer.orbitDirection && <div><dt>Orbit</dt><dd>{layer.orbitDirection.toLowerCase()}, Track {layer.track}, frames {layer.frames.join('/')}</dd></div>}
-        {unit && <div><dt>Units</dt><dd>{unit}</dd></div>}
-        {layer.postingM && <div><dt>Native posting</dt><dd>{posting(layer)}</dd></div>}
-        {layer.crs && <div><dt>CRS</dt><dd>{layer.crs}</dd></div>}
-        <div><dt>Status</dt><dd>{STATUS_LABEL[layer.status]}</dd></div>
-        <div><dt>Maturity</dt><dd>{layer.productMaturity}</dd></div>
-        {coverage.map((s) => (
-          <div key={s.granule}>
-            <dt>Valid pixels{s.frame ? ` f${s.frame}` : ''}</dt>
-            <dd>{Math.round(s.validFraction! * 100)}%{s.maskedFraction ? `, ${Math.round(s.maskedFraction * 100)}% masked` : ''}</dd>
-          </div>
-        ))}
+        {tiles.map(([k, v]) => <div key={k} className={v.length > 40 ? 'wide' : undefined}><dt>{k}</dt><dd>{v}</dd></div>)}
       </dl>
       {layer.statusReason && <p className="notice">{layer.statusReason}</p>}
+      <AtAGlance layer={layer} layers={layers} />
       <Histogram layer={layer} />
-      <h3>What am I seeing?</h3><p>{e.what}</p>
-      <h3>What does it measure?</h3><p>{e.measures}</p>
-      <h3>What should I inspect?</h3><p>{e.inspect}</p>
-      <h3>What does it establish?</h3><p>{e.establishes}</p>
-      <h3>Limitations</h3>
-      <ul className="limits">{layer.limitations.map((t) => <li key={t}>{t}</li>)}</ul>
-      <h3>Source</h3>
-      <p className="attribution">{layer.attribution}</p>
-      {layer.page && <p className="attribution break">{layer.page}</p>}
-      {layer.sourceGranules.length > 0 && (
-        <details>
-          <summary>Source granules ({layer.sourceGranules.length})</summary>
-          <ul className="granules">{layer.sourceGranules.map((g) => <li key={g} className="break">{g}</li>)}</ul>
-        </details>
-      )}
-      {layer.processingHistory && (
-        <details>
-          <summary>Processing history</summary>
-          <pre className="break">{JSON.stringify(layer.processingHistory, null, 1)}</pre>
-        </details>
-      )}
+      <section className="questions">
+        <Question q="What am I seeing?" a={e.what} open />
+        <Question q="What does it measure?" a={e.measures} />
+        <Question q="What should I inspect?" a={e.inspect} />
+        <Question q="What does it establish?" a={e.establishes} />
+      </section>
+      <section className="callout">
+        <h3 className="label">Limits</h3>
+        <ul className="limits">{layer.limitations.map((t) => <li key={t}>{t}</li>)}</ul>
+      </section>
+      <section className="source">
+        <h3 className="label">Source</h3>
+        <p className="attribution">{layer.attribution}</p>
+        {layer.page && <p className="attribution break">{layer.page}</p>}
+        <p className="attribution">Product maturity: {layer.productMaturity}{layer.crs ? ` · ${layer.crs}` : ''}</p>
+        {layer.sourceGranules.length > 0 && (
+          <details>
+            <summary>Source granules ({layer.sourceGranules.length})</summary>
+            <ul className="granules">{layer.sourceGranules.map((g) => <li key={g} className="break">{g}</li>)}</ul>
+          </details>
+        )}
+        {layer.processingHistory && (
+          <details>
+            <summary>Processing history</summary>
+            <pre className="break">{JSON.stringify(layer.processingHistory, null, 1)}</pre>
+          </details>
+        )}
+      </section>
     </>
   )
 }

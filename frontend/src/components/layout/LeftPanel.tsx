@@ -1,5 +1,5 @@
 import type { Bookmark, Layer, Manifest, ObservationGroup } from '../../types/manifest'
-import { CASES, currentCase, formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
+import { formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
 
 export type EvidenceView = 'gunw' | 'goff' | 'gcov'
 
@@ -56,13 +56,17 @@ function GroupOption({ g, selected, onSelect }: { g: ObservationGroup; selected:
 
 function LayerRow({ layer, active, onSelect }: { layer: Layer; active: boolean; onSelect: () => void }) {
   const usable = isUsable(layer)
+  const stops = layer.legend?.stops
   return (
     <label className={`option compact ${active ? 'on' : ''} ${usable ? '' : 'locked'}`}>
       <input type="radio" name="layer" checked={active} disabled={!usable} onChange={onSelect} />
+      <i className="swatch" style={stops ? { background: `linear-gradient(90deg, ${stops.join(',')})` } : undefined} />
       <span>{layer.name}<small className={`status status-${layer.status}`}>{layer.category === 'gridded' && !usable ? layer.statusReason : STATUS_LABEL[layer.status]}</small></span>
     </label>
   )
 }
+
+const Play = () => <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor" /></svg>
 
 export function LeftPanel(p: Props) {
   const { manifest: m, group, view } = p
@@ -80,20 +84,21 @@ export function LeftPanel(p: Props) {
   const steps = active?.timeSteps
   return (
     <div className="panel-body">
-      <section>
-        <label className="select">Case study
-          <select value={currentCase().id} onChange={(e) => { window.location.search = `?case=${e.target.value}` }}>
-            {CASES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-          </select>
-        </label>
+      <section className="case-head">
+        <p className="label">Case study</p>
         <h2 className="case">{m.caseStudy.name}</h2>
-        <p className="muted">{p.hasStory ? 'Reported event' : 'Data date'}: {formatDate(m.caseStudy.eventDate)}. A retrospective evidence explorer, not a warning service.</p>
-        {p.hasStory && <button className="primary wide" onClick={p.onStory} disabled={p.storyActive}>Start the guided story</button>}
+        <p className="muted small">{p.hasStory ? 'Reported event' : 'Data date'}: {formatDate(m.caseStudy.eventDate)}. A retrospective evidence explorer, not a warning service.</p>
+        {p.hasStory && (
+          <div className="story-cta">
+            <p><strong>New here?</strong> Walk through the event in 4 steps.</p>
+            <button className="primary" onClick={p.onStory} disabled={p.storyActive}><Play />Start the guided story</button>
+          </div>
+        )}
       </section>
 
       <section>
-        <h3>Go to</h3>
-        <div className="chips">
+        <h3 className="label">Jump to</h3>
+        <div className="chips places">
           {m.bookmarks.map((b) => (
             <button key={b.id} title={b.basis} aria-pressed={p.bookmarkId === b.id} className={p.bookmarkId === b.id ? 'on' : ''} onClick={() => p.onBookmark(b)}>{b.name}</button>
           ))}
@@ -102,14 +107,14 @@ export function LeftPanel(p: Props) {
 
       {gridded.length > 0 && (
         <section>
-          <h3>Variables</h3>
+          <h3 className="label">Variables</h3>
           {gridded.map((l) => <LayerRow key={l.id} layer={l} active={l.id === p.activeId} onSelect={() => p.onLayer(l.id)} />)}
         </section>
       )}
 
       {group && <section>
-        <h3>Radar evidence</h3>
-        <div className="tabs" role="tablist" aria-label="Evidence view">
+        <h3 className="label">Radar evidence</h3>
+        <div className="tabs segmented" role="tablist" aria-label="Evidence view">
           {VIEWS.map((v) => (
             <button key={v.id} role="tab" aria-selected={view === v.id} title={v.hint} className={view === v.id ? 'on' : ''} onClick={() => p.onView(v.id)}>{v.label}</button>
           ))}
@@ -122,9 +127,9 @@ export function LeftPanel(p: Props) {
       </section>}
 
       <section>
-        <h3>Display</h3>
+        <h3 className="label">Display</h3>
         {terrain && <LayerRow layer={terrain} active={terrain.id === p.activeId} onSelect={() => p.onLayer(terrain.id)} />}
-        <label className="check"><input type="checkbox" checked={p.showTerrain} onChange={(e) => p.onTerrain(e.target.checked)} />Terrain background</label>
+        <label className="check switch"><input type="checkbox" checked={p.showTerrain} onChange={(e) => p.onTerrain(e.target.checked)} />Terrain background</label>
         {active && active.id !== terrain?.id && <label className="check"><input type="checkbox" checked={p.layerVisible} onChange={(e) => p.onLayerVisible(e.target.checked)} />Show {active.name}</label>}
         {active && active.id !== terrain?.id && (
           <label className="slider">Layer opacity <span>{Math.round(p.opacity * 100)}%</span>
@@ -148,8 +153,9 @@ export function LeftPanel(p: Props) {
       </section>
 
       {refs.length > 0 && <section>
-        <h3>Independent reference layers</h3>
-        <p className="muted small">Not NISAR measurements. Each keeps its own source and limits.</p>
+        <details className="refs" open>
+        <summary><span className="label">Reference layers</span><span className="count">{p.referenceIds.filter((id) => refs.some((r) => r.id === id)).length} of {refs.length} on</span></summary>
+        <p className="muted small">Independent sources, not NISAR measurements. Each keeps its own source and limits.</p>
         {missions.map((mission) => (
           <div key={mission}>
             <h4>{mission}</h4>
@@ -161,6 +167,7 @@ export function LeftPanel(p: Props) {
             ))}
           </div>
         ))}
+        </details>
       </section>}
     </div>
   )
