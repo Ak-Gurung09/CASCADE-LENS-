@@ -51,7 +51,7 @@ export function StoryPanel({ steps, index, manifest, onGo, onExit }: Props) {
         <span className="grow" />
         <button onClick={() => onGo(index - 1)} disabled={index === 0}>Back</button>
         {last ? <button className="primary" onClick={onExit}>Explore the map</button>
-          : <button className="primary" aria-label="Next" onClick={() => onGo(index + 1)}>Next: {steps[index + 1].title.replace(/^The /, 'the ')} →</button>}
+          : <button className="primary" onClick={() => onGo(index + 1)}>Next: {steps[index + 1].title.replace(/^The /, 'the ')} →</button>}
       </footer>
     </section>
   )

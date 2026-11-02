@@ -25,7 +25,7 @@ Report date: 2026-11-01.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
 - **No pre-event control pair** has been compared, so low coherence is not yet tested against the channel's normal state.
 - **No field validation** exists, and the data is Provisional.
-- **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave, not Firefox or Safari.
+- **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave, not Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
 - **The app cannot run from `index.html` directly.** Browsers block that, and the page now explains what to do.
 - **Not created:** a public repository, submission links or a hosted deployment.
 
@@ -84,15 +84,14 @@ python processing/scripts/prepare_landmet.py     19 layers: 12 sampleable, 7 una
 
 **Total: 156 automated tests passing.** The 19 real-build browser tests also passed against the final package, unzipped fresh and started through `Start CascadeLens.bat`, in both Microsoft Edge and Brave.
 
-| Performance, localhost, Edge | Result |
-|---|---|
-| Page load event | About 165 ms |
-| Map ready | 0.4–0.8 s |
-| First inspector sample | 0.2–0.3 s |
-| Later sample | 0.05–0.2 s |
-| JS heap | 20–22 MB |
+| Performance, 2026-11-02, packaged app in headless Edge | Before | After |
+|---|---|---|
+| Map ready | 0.89 s | 0.60 s |
+| Map ready, CPU slowed 4× | 3.83 s | 1.69 s |
+| Sample after a click | 0.11 s | 0.13 s |
+| First script file | 1.9 MB | 0.4 MB |
 
-These are localhost figures, not hosted or low-bandwidth measurements.
+These are medians of 3 localhost runs, not hosted or low-bandwidth measurements. Headless browsers draw the map in software, so compare the two columns rather than reading them as real-use times.
 
 ## Product files
 

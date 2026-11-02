@@ -19,13 +19,25 @@ CSP = "default-src 'self'; connect-src 'self'; img-src 'self' data: blob:; worke
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"  # Reuses one connection for many tiles instead of opening a new one for each
+    disable_nagle_algorithm = True  # Sends small tiles at once, instead of waiting to fill a packet
+
     # Windows' registry can map these wrongly, and browsers refuse scripts with the wrong type
     extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map, ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
                       ".json": "application/json", ".geojson": "application/json", ".tif": "image/tiff", ".png": "image/png", ".html": "text/html"}
 
+    def cache_rule(self):
+        path = self.path.split("?")[0]
+        if path.startswith("/assets/"):
+            return "public, max-age=31536000, immutable"  # Their names change whenever their content does
+        if path.startswith("/data/") and not path.endswith(".json"):
+            return "public, max-age=86400"
+        return "no-cache"  # The page and manifests: a new version shows on a normal reload
+
     def end_headers(self):
         self.send_header("Content-Security-Policy", CSP)
         self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Cache-Control", self.cache_rule())
         super().end_headers()
 
     def log_message(self, *args):
@@ -42,6 +54,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if start >= size or end < start:
             self.send_response(416)
             self.send_header("Content-Range", f"bytes */{size}")
+            self.send_header("Content-Length", "0")
             self.end_headers()
             return None
         length = end - start + 1
@@ -69,6 +82,7 @@ class _Limited:
 
 class Server(http.server.ThreadingHTTPServer):
     daemon_threads = True
+    request_queue_size = 64  # A map opens many connections at once
 
     def handle_error(self, request, client_address):
         pass  # Browsers drop connections when a tile is no longer needed. That is normal, not a fault

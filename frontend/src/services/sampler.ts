@@ -1,4 +1,4 @@
-import { fromUrl, type GeoTIFF, type GeoTIFFImage } from 'geotiff'
+import type { GeoTIFF, GeoTIFFImage } from 'geotiff'
 import proj4 from 'proj4'
 import type { Layer, RasterSource } from '../types/manifest'
 import { assetUrl, isUsable } from './manifest'
@@ -30,7 +30,7 @@ const VALID = 1
 const MASKED = 2
 
 export type Opener = (path: string) => Promise<GeoTIFF>
-const openRemote: Opener = (path) => fromUrl(assetUrl(path))
+const openRemote: Opener = async (path) => (await import('geotiff')).fromUrl(assetUrl(path)) // Loaded on the first click, not at startup
 
 interface OpenRaster { image: GeoTIFFImage; toRaster: (lng: number, lat: number) => [number, number] }
 
@@ -84,8 +84,7 @@ async function sampleSource(s: RasterSource, lng: number, lat: number, opener: O
   const { col, row } = pixelIndex(raster.image, x, y)
   if (col < 0 || row < 0 || col >= raster.image.getWidth() || row >= raster.image.getHeight())
     return { state: 'outside', message: MESSAGE.outside }
-  const value = await pixel(raster, row, col)
-  const validity = await pixel(await open(s.validity!, opener), row, col)
+  const [value, validity] = await Promise.all([pixel(raster, row, col), open(s.validity!, opener).then((v) => pixel(v, row, col))])
   const state = classify(value, validity)
   const stored = state === 'nodata' ? undefined : value
   return { state, value: stored, frame: s.frame, granule: s.granule, row, col, message: MESSAGE[state] }

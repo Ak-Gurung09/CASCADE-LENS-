@@ -142,7 +142,7 @@ describe('story', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Start the guided story' }))
     for (const title of ['1. The source', '2. The radar evidence', '3. The downstream corridor']) {
       expect(screen.getByRole('heading', { name: title })).toBeTruthy()
-      fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+      fireEvent.click(screen.getByRole('button', { name: /^Next/ }))
     }
     expect(screen.getByRole('heading', { name: '4. Scientific interpretation' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Explore the map' }))

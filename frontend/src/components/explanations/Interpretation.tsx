@@ -1,8 +1,10 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { lazy, memo, Suspense } from 'react'
 import type { Layer } from '../../types/manifest'
 import { acquisitionLabel, isUsable, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
 import { explanationFor } from '../../data/explanations'
 import { Donut } from '../charts/Charts'
+
+const HistogramChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.HistogramChart })))
 
 function Histogram({ layer }: { layer: Layer }) {
   const h = layer.stats?.histogram
@@ -12,13 +14,7 @@ function Histogram({ layer }: { layer: Layer }) {
   return (
     <figure className="histogram card">
       <figcaption>Distribution of valid pixels{unit ? ` (${unit})` : ''}</figcaption>
-      <ResponsiveContainer width="100%" height={84}>
-        <BarChart data={data} margin={{ top: 4, right: 14, bottom: 0, left: 14 }} barCategoryGap={0}>
-          <XAxis dataKey="value" tick={{ fontSize: 10, fill: '#8e9c97' }} tickLine={false} axisLine={false} interval={12} />
-          <Tooltip cursor={{ fill: 'rgba(255,255,255,.06)' }} contentStyle={{ background: '#18232a', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: 12 }} formatter={(v) => [Number(v).toLocaleString(), 'pixels']} labelFormatter={(v) => `from ${v}`} />
-          <Bar dataKey="count" fill="#5fe0c9" isAnimationActive={false} />
-        </BarChart>
-      </ResponsiveContainer>
+      <Suspense fallback={<div style={{ height: 84 }} />}><HistogramChart data={data} /></Suspense>
     </figure>
   )
 }
@@ -57,7 +53,7 @@ function Question({ q, a, open }: { q: string; a: string; open?: boolean }) {
   return <details className="question" open={open}><summary><h3>{q}</h3></summary><p>{a}</p></details>
 }
 
-export function Interpretation({ layer, layers }: { layer: Layer; layers: Layer[] }) {
+export const Interpretation = memo(function Interpretation({ layer, layers }: { layer: Layer; layers: Layer[] }) {
   const e = explanationFor(layer)
   const unit = layer.unitsNote ?? unitLabel(layer.units)
   const tiles: [string, string][] = [
@@ -105,4 +101,4 @@ export function Interpretation({ layer, layers }: { layer: Layer; layers: Layer[
       </section>
     </>
   )
-}
+})

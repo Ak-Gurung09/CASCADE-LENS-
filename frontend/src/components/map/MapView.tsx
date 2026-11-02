@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MlMap, Marker, NavigationControl, ScaleControl, setWorkerUrl, type GeoJSONSource, type LngLatBoundsLike, type StyleSpecification } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
-import 'maplibre-gl/dist/maplibre-gl.css'
 import type { Bounds, GranuleRecord, Layer } from '../../types/manifest'
 import { assetUrl } from '../../services/manifest'
 
@@ -96,6 +95,14 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
   useEffect(() => {
     if (!host.current) return
     const envelope = envelopeRef.current
+    // MapLibre fires these for every tile. Passing on only real changes stops the whole page redrawing each time.
+    let last: MapStatus | undefined
+    const report = (s: MapStatus) => {
+      if (s.state === last?.state && s.message === last?.message) return
+      if (s.state === 'ready' && last?.state === 'error') return // A failed layer must keep its warning: idle only means loading stopped
+      last = s
+      onStatusRef.current(s)
+    }
     const map = new MlMap({ container: host.current, style: STYLE, bounds: envelope as LngLatBoundsLike, fitBoundsOptions: { padding: 30 }, attributionControl: false, dragRotate: false, pitchWithRotate: false, renderWorldCopies: false })
     mapRef.current = map
     map.addControl(new NavigationControl({ showCompass: false }), 'top-right')
@@ -107,16 +114,16 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       map.addSource('footprints', { type: 'geojson', data: empty })
       map.addLayer({ id: 'footprints', type: 'line', source: 'footprints', paint: { 'line-color': '#7fd1c7', 'line-width': 1.5, 'line-opacity': 0.85 } })
       setReady(true)
-      onStatusRef.current({ state: 'ready' })
+      report({ state: 'ready' })
     })
     map.on('click', (e) => onPointRef.current([e.lngLat.lng, e.lngLat.lat]))
-    map.on('dataloading', () => onStatusRef.current({ state: 'loading' }))
-    map.on('idle', () => onStatusRef.current({ state: 'ready' }))
+    map.on('dataloading', () => report({ state: 'loading' }))
+    map.on('idle', () => report({ state: 'ready' }))
     map.on('error', (e) => {
       const err = e.error as Error & { status?: number }
       if (err?.status === 404) return // Sparse pyramids skip empty tiles
       const source = (e as unknown as { sourceId?: string }).sourceId
-      onStatusRef.current({ state: 'error', message: source ? `Could not load map source ${source}. ${err?.message ?? ''}` : (err?.message ?? 'Map error') })
+      report({ state: 'error', message: source ? `Could not load map source ${source}. ${err?.message ?? ''}` : (err?.message ?? 'Map error') })
     })
     if (import.meta.env.DEV) (window as unknown as { __clMap: MlMap }).__clMap = map
     return () => { map.remove(); mapRef.current = null; setReady(false) }
@@ -174,11 +181,12 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     for (const r of references) if (!map.getLayer(`ref-${r.id}`)) addReference(map, r)
     if (map.getLayer('footprints')) map.moveLayer('footprints')
     if (map.getLayer('study-envelope')) map.moveLayer('study-envelope')
+  }, [ready, references])
 
-    labels.current.forEach((m) => m.remove())
-    labels.current = []
-    const places = references.find((r) => r.vector?.type === 'label')
-    if (!places) return
+  const places = references.find((r) => r.vector?.type === 'label')
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map || !places) return
     let stale = false
     fetch(assetUrl(places.vector!.url))
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
@@ -192,8 +200,12 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
         })
       })
       .catch((e) => onStatusRef.current({ state: 'error', message: `Reference layer unavailable: ${places.name}. ${e.message}` }))
-    return () => { stale = true }
-  }, [ready, references])
+    return () => {
+      stale = true
+      labels.current.forEach((m) => m.remove())
+      labels.current = []
+    }
+  }, [ready, places])
 
   useEffect(() => {
     const src = mapRef.current?.getSource('footprints') as GeoJSONSource | undefined
@@ -216,7 +228,7 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     if (!focus || !ready) return
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // On a phone the story is a bottom sheet over the map, so frame the bookmark in the part still visible.
-    const sheet = document.querySelector('.story-on .right')?.getBoundingClientRect()
+    const sheet = window.matchMedia('(max-width: 980px)').matches ? document.querySelector('.story')?.getBoundingClientRect() : undefined
     const covered = sheet && sheet.top > 100 ? window.innerHeight - sheet.top : 0
     mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: { top: 40, left: 40, right: 40, bottom: 40 + covered }, duration: calm ? 0 : 900 })
   }, [focus, ready])

@@ -13,7 +13,7 @@ export function Donut({ title, slices, centre, note }: { title: string; slices: 
         <circle cx="40" cy="40" r={r} fill="none" stroke="var(--raised)" strokeWidth="11" />
         {slices.filter((s) => s.value > 0).map((s) => {
           const len = (s.value / total) * c
-          const el = <circle key={s.label} cx="40" cy="40" r={r} fill="none" stroke={s.color} strokeWidth="11" strokeDasharray={`${len} ${c - len}`} strokeDashoffset={-offset} transform="rotate(-90 40 40)" />
+          const el = <circle key={s.label} cx="40" cy="40" r={r} fill="none" stroke={s.color} strokeWidth="11" strokeDasharray={`${len} ${c - len}`} strokeDashoffset={c - offset} transform="rotate(-90 40 40)" />
           offset += len
           return el
         })}

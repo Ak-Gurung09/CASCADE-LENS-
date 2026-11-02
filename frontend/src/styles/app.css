@@ -1,7 +1,6 @@
 /* CascadeLens look: full-screen map, floating glass panels. Teal = ready/selected, coral = contrast, amber = provisional/limits. */
 :root {
   --night: #0a0f12;
-  --ink: #0a0f12;
   --panel: rgba(14, 20, 24, .9);
   --panel-solid: #0e1418;
   --raised: #18232a;
@@ -14,7 +13,6 @@
   --accent-ink: #062c26;
   --coral: #ff7f66;
   --amber: #f2c46b;
-  --warn: #f2c46b;
   --bad: #e5484d;
   --grey: #3a464d;
   --radius: 16px;
@@ -27,6 +25,7 @@
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; } /* Stops iPhones enlarging text when turned sideways */
 body { background: var(--night); color: var(--text); font: 14px/1.5 var(--sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, h4, p, ul, ol, dl, figure { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
@@ -38,7 +37,6 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 button.primary:hover:not(:disabled) { background: #7eeedb; }
 button.ghost { background: none; border-color: transparent; color: var(--muted); }
 button.link { background: none; border: 0; color: var(--accent); padding: 0; min-height: 0; text-decoration: underline; text-underline-offset: 2px; }
-button.wide { width: 100%; margin-top: 10px; }
 :focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -229,12 +227,11 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
 
 /* Guided story: a card docked at the bottom of the map. */
 .story-on .right { display: none; }
-.story-on .legend, .story-on .map-foot { bottom: 12px; }
 .story-on .legend { display: none; }
 .story-dock { position: absolute; z-index: 4; left: 352px; right: 250px; bottom: 12px; display: flex; justify-content: center; pointer-events: none; }
 .story-on .map-foot { right: 12px; max-width: 226px; }
 .story-on .maplibregl-ctrl-top-right { right: 12px !important; }
-.story { pointer-events: auto; width: min(760px, 100%); max-height: calc(100vh - 160px); overflow-y: auto; border-radius: 20px; padding: 18px 22px 16px; display: flex; flex-direction: column; gap: 12px; border-color: rgba(255, 127, 102, .25); }
+.story { pointer-events: auto; width: min(760px, 100%); max-height: calc(100dvh - 160px); overflow-y: auto; border-radius: 20px; padding: 18px 22px 16px; display: flex; flex-direction: column; gap: 12px; border-color: rgba(255, 127, 102, .25); }
 .progress { list-style: none; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
 .progress-step { width: 100%; background: none; border: 0; padding: 0; min-height: 0; text-align: left; display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--label); border-radius: 4px; }
 .progress-step i { height: 4px; border-radius: 2px; background: var(--grey); }
@@ -281,7 +278,8 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
   .case-pill, .modes, .badge.amber, .brand-text span { display: none; }
   .mobile-only { display: inline-block; white-space: nowrap; min-height: 38px; }
   .map-state { font-size: 0; padding: 6px; gap: 0; }
-  .left, .right { display: none; z-index: 6; top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 62vh; border-radius: 20px 20px 0 0; }
+  /* dvh follows the browser's own bars on phones, so the sheets are not cut off. */
+  .left, .right { display: none; z-index: 6; top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 62dvh; border-radius: 20px 20px 0 0; }
   .show-left .left, .show-right .right { display: block; }
   .sheet-handle { display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--grey); margin: 8px auto 0; }
   .legend { left: 8px; bottom: 44px; width: 200px; }
@@ -292,16 +290,14 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
   .maplibregl-ctrl-top-right { top: 108px !important; right: 0 !important; }
   .maplibregl-ctrl-bottom-left { left: 0 !important; bottom: 34px !important; }
   .story-dock { left: 0; right: 0; bottom: 0; }
-  .story { width: 100%; max-height: 64vh; border-radius: 20px 20px 0 0; padding: 14px 16px; }
+  .story { width: 100%; max-height: 64dvh; border-radius: 20px 20px 0 0; padding: 14px 16px; }
   .story h2 { font-size: 20px; }
   .story p { font-size: 13px; }
   .story-body.with-chart { grid-template-columns: 1fr; gap: 12px; }
-  .progress-step { font-size: 0; }
+  .progress-step { font-size: 0; padding: 14px 0; margin: -14px 0; } /* A bigger area to tap, with the bar drawn the same */
   .progress { position: sticky; top: -14px; margin: -14px -16px 0; padding: 14px 16px 8px; background: var(--panel-solid); z-index: 1; }
   .story footer { position: sticky; bottom: -14px; margin: 0 -16px -14px; padding: 10px 16px 14px; background: var(--panel-solid); }
-  .story-on .map-foot { bottom: auto; top: 66px; }
+  .story-on .map-foot { bottom: auto; top: 66px; max-width: 55%; }
   .story-on .maplibregl-ctrl-top-right { display: none; }
-  .story-on .place-chip { top: 70px; }
-  .story-on .map-foot { max-width: 55%; }
   .option, .check { min-height: 40px; }
 }

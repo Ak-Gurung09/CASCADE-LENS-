@@ -1,9 +1,9 @@
-import { Component, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Bookmark, Manifest } from '../types/manifest'
 import { CASES, currentCase, isUsable, loadManifest, STATUS_LABEL } from '../services/manifest'
 import { buildStory } from '../data/story'
 import { LeftPanel, type EvidenceView } from '../components/layout/LeftPanel'
-import { MapView, type MapStatus } from '../components/map/MapView'
+import type { MapStatus } from '../components/map/MapView'
 import { Legend } from '../components/legends/Legend'
 import { Credits } from '../components/legends/Credits'
 import { Inspector } from '../components/inspector/Inspector'
@@ -11,6 +11,10 @@ import { Interpretation } from '../components/explanations/Interpretation'
 import { StoryPanel } from '../components/story/StoryPanel'
 
 const TERRAIN = 'context:terrain'
+
+// The map library is most of the app's code. Starting its download here lets the panels appear without waiting for it.
+const mapCode = import('../components/map/MapView')
+const MapView = lazy(() => mapCode.then((m) => ({ default: m.MapView })))
 
 // WebGL can be unavailable or lost. The panels stay readable if the map cannot run.
 class MapBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
@@ -149,8 +153,10 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
 
       <main className="center">
         <MapBoundary>
-          <MapView envelope={m.caseStudy.searchEnvelope} terrain={terrain} showTerrain={showTerrain} active={shownLayer} overlay={overlay} showMask={showMask} opacity={opacity} references={references}
-            footprints={footprints} point={point} focus={focus} onPoint={(p) => { setPoint(p); setTab('inspect'); setAboutId(null) }} onStatus={setMapStatus} onCoverage={setCovered} />
+          <Suspense fallback={null}>
+            <MapView envelope={m.caseStudy.searchEnvelope} terrain={terrain} showTerrain={showTerrain} active={shownLayer} overlay={overlay} showMask={showMask} opacity={opacity} references={references}
+              footprints={footprints} point={point} focus={focus} onPoint={(p) => { setPoint(p); setTab('inspect'); setAboutId(null) }} onStatus={setMapStatus} onCoverage={setCovered} />
+          </Suspense>
         </MapBoundary>
         {bookmark && <p className="place-chip">{bookmark.name}</p>}
         {mapStatus.state === 'error' && <p className="map-alert" role="alert">{mapStatus.message}</p>}

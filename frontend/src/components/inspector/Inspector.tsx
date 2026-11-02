@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { lazy, memo, Suspense, useEffect, useState } from 'react'
 import type { Bookmark, Layer } from '../../types/manifest'
 import { acquisitionLabel, coordinates, isUsable, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
 import { samplePoint, type SampleResult } from '../../services/sampler'
+
+const DayLineChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.DayLineChart })))
 
 interface Sample { layer: Layer; result: SampleResult }
 
@@ -50,20 +51,12 @@ function DayChart({ layer, point }: { layer: Layer; point: [number, number] }) {
   return (
     <figure className="histogram day-chart">
       <figcaption>This location through the day (UTC){layer.units && layer.units !== '1' ? `, ${layer.units}` : ''}</figcaption>
-      <ResponsiveContainer width="100%" height={110}>
-        <LineChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: -18 }}>
-          <CartesianGrid stroke="#2c383f" vertical={false} />
-          <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9ba8a3' }} tickLine={false} axisLine={false} />
-          <YAxis domain={['auto', 'auto']} tick={{ fontSize: 10, fill: '#9ba8a3' }} tickLine={false} axisLine={false} width={46} />
-          <Tooltip contentStyle={{ background: '#182025', border: '1px solid #33404a', fontSize: 12 }} formatter={(v) => [Number(v).toFixed(2), layer.name]} labelFormatter={(v) => `${v}:00 UTC`} />
-          <Line type="monotone" dataKey="value" stroke="#7fd1c7" strokeWidth={2} dot={{ r: 2 }} connectNulls={false} isAnimationActive={false} />
-        </LineChart>
-      </ResponsiveContainer>
+      <Suspense fallback={<div style={{ height: 110 }} />}><DayLineChart data={data} name={layer.name} /></Suspense>
     </figure>
   )
 }
 
-export function Inspector({ layer, layers, point, bookmarks }: { layer: Layer | undefined; layers: Layer[]; point: [number, number] | null; bookmarks: Bookmark[] }) {
+export const Inspector = memo(function Inspector({ layer, layers, point, bookmarks }: { layer: Layer | undefined; layers: Layer[]; point: [number, number] | null; bookmarks: Bookmark[] }) {
   const [main, setMain] = useState<SampleResult | null>(null)
   const [quality, setQuality] = useState<Sample[]>([])
   const [busy, setBusy] = useState(false)
@@ -116,4 +109,4 @@ export function Inspector({ layer, layers, point, bookmarks }: { layer: Layer | 
       )}
     </div>
   )
-}
+})
