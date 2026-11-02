@@ -3,6 +3,7 @@ import { Map as MlMap, Marker, NavigationControl, ScaleControl, setWorkerUrl, ty
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { Bounds, GranuleRecord, Layer } from '../../types/manifest'
 import { assetUrl } from '../../services/manifest'
+import type { SimView } from '../../services/simulation'
 
 // MapLibre derives the worker path from its own module URL, which Vite's bundling moves.
 setWorkerUrl(new URL(workerUrl, document.baseURI).href)
@@ -21,6 +22,7 @@ interface Props {
   footprints: GranuleRecord[]
   point: [number, number] | null
   focus: { bounds: Bounds; nonce: number } | null
+  sim: SimView | null
   onPoint: (p: [number, number]) => void
   onStatus: (s: MapStatus) => void
   onCoverage: (covered: boolean) => void
@@ -78,10 +80,11 @@ function addReference(map: MlMap, l: Layer) {
   }
 }
 
-export function MapView({ envelope, terrain, showTerrain, active, overlay, showMask, opacity, references, footprints, point, focus, onPoint, onStatus, onCoverage }: Props) {
+export function MapView({ envelope, terrain, showTerrain, active, overlay, showMask, opacity, references, footprints, point, focus, sim, onPoint, onStatus, onCoverage }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MlMap | null>(null)
   const pointMarker = useRef<Marker | null>(null)
+  const simHead = useRef<Marker | null>(null)
   const labels = useRef<Marker[]>([])
   const [ready, setReady] = useState(false)
   const envelopeRef = useRef(envelope) // The map lives for the whole session: rebuilding it mid-render races its effects
@@ -183,6 +186,48 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     if (map.getLayer('study-envelope')) map.moveLayer('study-envelope')
   }, [ready, references])
 
+  // One source and a filter on each layer: moving a slider only changes the filters, so no geometry is sent again.
+  const simData = sim?.data
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    clear(map, 'sim-')
+    if (!simData) return
+    const source = 'sim-data'
+    map.addSource(source, { type: 'geojson', data: simData.features })
+    map.addLayer({ id: 'sim-route', type: 'line', source, filter: ['==', ['get', 'k'], 'c'], layout: { 'line-cap': 'round' }, paint: { 'line-color': '#fff', 'line-opacity': 0.35, 'line-width': 2 } })
+    map.addLayer({ id: 'sim-done', type: 'line', source, layout: { 'line-cap': 'round' }, paint: { 'line-color': '#5fe0c9', 'line-width': 4 } })
+    map.addLayer({ id: 'sim-lines', type: 'line', source, paint: { 'line-color': '#ff7f66', 'line-width': 2 } })
+    map.addLayer({ id: 'sim-points', type: 'circle', source, paint: { 'circle-color': '#ff7f66', 'circle-stroke-color': '#fff', 'circle-stroke-width': ['case', ['==', ['get', 'k'], 'p'], 1.5, 0], 'circle-radius': ['case', ['==', ['get', 'k'], 'p'], 5, 2.5] } })
+  }, [ready, simData])
+
+  const simMode = sim?.mode
+  const simKm = sim?.km
+  const simRise = sim?.rise
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map?.getLayer('sim-done') || simKm === undefined) return
+    const kinds = (list: string[]) => ['in', ['get', 'k'], ['literal', list]] as const
+    const reached = ['<=', ['get', 'km'], simKm] as const
+    const low = simMode === 'whatif' ? [['<=', ['get', 'h'], simRise]] : []
+    const filter = (list: string[]) => ['all', kinds(list), reached, ...low] as never
+    map.setFilter('sim-done', ['all', kinds(['c']), reached] as never)
+    map.setFilter('sim-lines', filter(simMode === 'whatif' ? ['r'] : ['a']))
+    map.setFilter('sim-points', filter(['b', 'p']))
+  }, [ready, simData, simMode, simKm, simRise])
+
+  useEffect(() => {
+    const map = mapRef.current
+    const at = simData && simKm !== undefined ? simData.path[simKm] : undefined
+    if (!ready || !map || !at) { simHead.current?.remove(); simHead.current = null; return }
+    if (!simHead.current) {
+      const el = document.createElement('div')
+      el.className = 'sim-head'
+      simHead.current = new Marker({ element: el }).setLngLat([at[0], at[1]]).addTo(map)
+    }
+    simHead.current.setLngLat([at[0], at[1]])
+  }, [ready, simData, simKm])
+
   const places = references.find((r) => r.vector?.type === 'label')
   useEffect(() => {
     const map = mapRef.current
@@ -228,9 +273,11 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     if (!focus || !ready) return
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // On a phone the story is a bottom sheet over the map, so frame the bookmark in the part still visible.
-    const sheet = window.matchMedia('(max-width: 980px)').matches ? document.querySelector('.story')?.getBoundingClientRect() : undefined
+    const phone = window.matchMedia('(max-width: 980px)').matches
+    const sheet = phone ? document.querySelector('.story')?.getBoundingClientRect() : undefined
     const covered = sheet && sheet.top > 100 ? window.innerHeight - sheet.top : 0
-    mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: { top: 40, left: 40, right: 40, bottom: 40 + covered }, duration: calm ? 0 : 900 })
+    const panels = !phone && document.querySelector('.sim-panel') // The whole path should clear the side panels and the top bar
+    mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: panels ? { top: 100, left: 360, right: 400, bottom: 40 } : { top: 40, left: 40, right: 40, bottom: 40 + covered }, duration: calm ? 0 : 900 })
   }, [focus, ready])
 
   return <div ref={host} className="map" role="application" aria-label="Rasuwa study area map. Click to inspect a location." data-testid="map" />

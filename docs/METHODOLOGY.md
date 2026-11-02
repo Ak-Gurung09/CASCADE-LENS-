@@ -106,3 +106,7 @@ If a science file cannot be retrieved, `prepare_previews.py` places the NISAR br
 ## Colour-only reference products
 
 The EOS-RS damage proxy GeoTIFF stores RGBA colours, with no underlying values. It is displayed as supplied and is never sampled, because a number recovered from a colour would be invented.
+
+## Simulations
+
+`prepare_simulation.py` builds one file, `simulation.json`. The path starts at the UNOSAT detachment zone, joins the barrier lakes with straight lines, then takes the cheapest route along the OSM rivers, preferring the named main stem, and is resampled to one point per kilometre. River level at each point is the lowest Copernicus DEM value within about 120 m, kept from rising downstream. Each UNOSAT building, UNOSAT road piece, OSM road piece and OSM place within 2 km of the path stores its nearest kilometre and its height above that river level. The app only filters on those two numbers. The radar explainer computes coherence with the textbook formula on invented cells. See [LIMITATIONS.md](LIMITATIONS.md).

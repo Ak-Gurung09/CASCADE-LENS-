@@ -111,6 +111,30 @@ test('completes the story with the outside world blocked', async ({ page }) => {
   expect(probe).toBe('blocked')
 })
 
+test('all three simulations run and stay labelled as illustrations', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  await open(page)
+  await page.getByRole('button', { name: 'Simulate' }).click()
+  const panel = page.locator('.sim-panel')
+  await expect(panel).toContainText('Illustration only')
+  await expect(page.locator('.sim-head')).toBeVisible()
+  await panel.getByRole('button', { name: 'Play' }).click()
+  await expect(panel).toContainText(/[1-9]\d* of 198 km/)
+  await panel.getByRole('button', { name: 'Pause' }).click()
+  await panel.getByRole('tab', { name: 'What-if flood' }).click()
+  await expect(panel).toContainText('not a forecast')
+  await expect(panel).toContainText('Places below the water')
+  await page.screenshot({ path: `${SHOTS}/simulate-whatif.png` })
+  await panel.getByRole('tab', { name: 'Radar explainer' }).click()
+  await expect(panel).toContainText('This model')
+  await expect(page.locator('.sim-head')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Exit simulation' }).click()
+  await expect(panel).toHaveCount(0)
+  await expect(page.getByRole('tab', { name: 'Interpretation' })).toBeVisible()
+  expect(errors).toEqual([])
+})
+
 test('a bookmark selects a named place and reads its real elevation', async ({ page }) => {
   await open(page)
   await page.getByRole('radio', { name: /Terrain elevation/ }).check()

@@ -74,4 +74,12 @@ Pair A's frames cover 80% of the Trishuli bookmark by footprint. Valid-pixel cov
 
 ## Not a forecasting system
 
-CascadeLens is retrospective. It has no predictive model, rainfall, geology, hydrology or ground sensors, and nothing in it has been calibrated or validated for prediction. It must not be used for warnings or safety decisions.
+CascadeLens is retrospective. It has no forecasting model, rainfall, geology, hydrology or ground sensors, and nothing in it has been calibrated or validated for prediction. The what-if simulation below is a rough illustration, not a forecast. It must not be used for warnings or safety decisions.
+
+## Simulations
+
+These are illustrations and contain no NISAR measurements.
+
+- **Flow replay:** the path is geometry, not a mapped flow line. It follows OSM rivers, and its first part joins the detachment zone, barrier lakes and upper Lende Khola with straight lines, because no channel is mapped there. The speed is invented, and nothing shows when the flow reached any place.
+- **What-if flood:** a feature counts as reached if its Copernicus DEM ground height is within the chosen rise above the nearest river point and within the chosen distance. It ignores water volume, speed, valley shape, sediment and the fall of a flood downstream, and it has not been compared with any real flood. The DEM has a 30 m grid and vertical error, so narrow gorges are poorly resolved. Only buildings UNOSAT mapped as affected are counted, so the app cannot say how many other buildings a flood would reach.
+- **Radar explainer:** a teaching model on invented ground. It is not NISAR processing, and its slider is not a measure of anything real.

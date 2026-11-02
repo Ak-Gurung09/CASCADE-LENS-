@@ -29,6 +29,7 @@ This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](
 
 - Interactive offline map with Copernicus DEM terrain, UNOSAT event layers, Sentinel-1 damage evidence, OSM geography and district boundaries.
 - Three geographic bookmarks and a four-step guided story.
+- A Simulate mode with a flow replay along the rivers, a what-if flood and a radar explainer. All three are labelled illustrations, and they are not forecasts.
 - Real NISAR phase, coherence, connected components, ionosphere screen and pixel offsets, with a labelled ionosphere-removed phase layer.
 - Observation-pair selection, with dates, tracks and frames verified from the files.
 - A measurement inspector that reads stored raster values, with quality alongside.
@@ -100,6 +101,12 @@ python processing/scripts/fetch_context.py
 
 ```bash
 python processing/scripts/prepare_context.py
+```
+
+To rebuild the Simulate mode's flow path:
+
+```bash
+python processing/scripts/prepare_simulation.py
 ```
 
 To add NISAR data (login needed, see [docs/DATA_ACQUISITION.md](docs/DATA_ACQUISITION.md)):

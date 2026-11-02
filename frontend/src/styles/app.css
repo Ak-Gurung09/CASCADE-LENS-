@@ -255,6 +255,29 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
 .bar-fill { height: 100%; border-radius: 5px; }
 .bar-row b { font: 500 12px var(--mono); color: var(--text); text-align: right; }
 
+/* Simulate: three tabs in a card where the right panel sits, so the map stays clear. */
+.sim-on .legend { display: none; }
+.sim-dock { position: absolute; z-index: 3; top: 80px; right: 12px; bottom: 12px; width: 368px; display: flex; flex-direction: column; }
+.sim-panel { width: 100%; max-height: 100%; border-radius: var(--radius); gap: 12px; padding: 14px 16px 10px; font-size: 13px; }
+.sim-panel p { font-size: 13px; }
+.sim-panel footer { margin-top: 0; }
+.sim-panel .story-body.with-chart { grid-template-columns: 1fr; gap: 12px; }
+.sim-controls { display: flex; align-items: center; gap: 12px; }
+.sim-sliders { display: flex; flex-direction: column; gap: 10px; }
+.profile { width: 100%; height: 56px; display: block; }
+.profile polyline { fill: none; stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.profile circle { fill: var(--coral); }
+.sat-track { width: 100%; height: 40px; display: block; overflow: hidden; }
+.sat-track line { stroke: var(--grey); stroke-width: 2; }
+.sat { fill: var(--text); animation: sat-pass 5s linear infinite; }
+.sat path { fill: var(--accent); opacity: .22; }
+@keyframes sat-pass { from { transform: translateX(-20px); } to { transform: translateX(320px); } }
+@media (prefers-reduced-motion: reduce) { .sat { animation: none; transform: translateX(150px); } }
+.cells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cells svg { display: block; width: 100%; border-radius: 6px; }
+.cells figcaption { font-size: 11.5px; color: var(--muted); margin-top: 4px; text-align: center; }
+.sim-head { width: 16px; height: 16px; border-radius: 50%; background: var(--coral); border: 2px solid #fff; box-shadow: 0 0 0 6px rgba(255, 127, 102, .3); pointer-events: none; }
+
 .splash { height: 100%; display: grid; place-content: center; gap: 8px; text-align: center; padding: 24px; }
 .splash h1 { font: 600 22px var(--display); }
 
@@ -265,7 +288,7 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
 /* Mid-size screens: narrower panels. */
 @media (max-width: 1280px) and (min-width: 981px) {
   .left { width: 290px; }
-  .right { width: 330px; }
+  .right, .sim-dock { width: 330px; }
   .legend, .place-chip, .map-alert, .story-dock { left: 314px; }
   .map-foot, .maplibregl-ctrl-top-right { right: 354px !important; }
   .modes button { padding: 5px 10px; }
@@ -294,6 +317,10 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
   .story h2 { font-size: 20px; }
   .story p { font-size: 13px; }
   .story-body.with-chart { grid-template-columns: 1fr; gap: 12px; }
+  .sim-dock { top: auto; left: 0; right: 0; bottom: 0; width: auto; }
+  .sim-panel { max-height: 64dvh; border-radius: 20px 20px 0 0; }
+  .sim-on .map-foot { bottom: auto; top: 66px; max-width: 55%; }
+  .sim-on .maplibregl-ctrl-top-right { display: none; }
   .progress-step { font-size: 0; padding: 14px 0; margin: -14px 0; } /* A bigger area to tap, with the bar drawn the same */
   .progress { position: sticky; top: -14px; margin: -14px -16px 0; padding: 14px 16px 8px; background: var(--panel-solid); z-index: 1; }
   .story footer { position: sticky; bottom: -14px; margin: 0 -16px -14px; padding: 10px 16px 14px; background: var(--panel-solid); }

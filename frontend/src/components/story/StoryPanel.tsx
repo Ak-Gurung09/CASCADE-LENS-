@@ -11,7 +11,7 @@ interface Props {
 }
 
 // Coherence inside the mapped extent against the ring around it, straight from the analysis file.
-function coherenceGroups(m: Manifest): BarGroup[] {
+export function coherenceGroups(m: Manifest): BarGroup[] {
   return Object.entries(m.analysis?.['pair-a']?.frames ?? {}).flatMap(([name, f]) => {
     const inside = f.zones['gunw-coherence']?.['mapped extent']?.median
     const outside = f.zones['gunw-coherence']?.['1 km ring outside extent']?.median

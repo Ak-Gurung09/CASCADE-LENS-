@@ -9,8 +9,12 @@ import { Credits } from '../components/legends/Credits'
 import { Inspector } from '../components/inspector/Inspector'
 import { Interpretation } from '../components/explanations/Interpretation'
 import { StoryPanel } from '../components/story/StoryPanel'
+import { SimPanel } from '../components/sim/SimPanel'
+import type { SimData, SimView } from '../services/simulation'
 
 const TERRAIN = 'context:terrain'
+const SIM_REFERENCES = ['ref:unosat-detachment', 'ref:unosat-lakes', 'ref:unosat-extent', 'ref:rivers', 'ref:places']
+const NO_FOOTPRINTS: Manifest['granules'] = []
 
 // The map library is most of the app's code. Starting its download here lets the panels appear without waiting for it.
 const mapCode = import('../components/map/MapView')
@@ -55,6 +59,8 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const [focus, setFocus] = useState<{ bounds: Bookmark['bounds']; nonce: number } | null>(null)
   const [point, setPoint] = useState<[number, number] | null>(null)
   const [storyStep, setStoryStep] = useState<number | null>(null)
+  const [simOn, setSimOn] = useState(false)
+  const [sim, setSim] = useState<SimView | null>(null)
   const [mapStatus, setMapStatus] = useState<MapStatus>({ state: 'loading' })
   const [covered, setCovered] = useState(true)
   const [panel, setPanel] = useState<'left' | 'right' | null>(null)
@@ -105,8 +111,28 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
     selectLayer(next?.id ?? TERRAIN)
   }
 
+  const exitSim = () => { setSimOn(false); setSim(null) }
+
+  const startSim = () => {
+    setStoryStep(null)
+    setPanel(null)
+    selectLayer(TERRAIN)
+    setReferenceIds(SIM_REFERENCES)
+    setBookmarkId(null)
+    setSimOn(true)
+  }
+
+  const frameSim = (d: SimData) => {
+    const lngs = d.path.map((p) => p[0])
+    const lats = d.path.map((p) => p[1])
+    setFocus({ bounds: [Math.min(...lngs), Math.min(...lats), Math.max(...lngs), Math.max(...lats)], nonce: Date.now() })
+  }
+
+  const goExplore = () => { setStoryStep(null); exitSim() }
+
   const goStory = (i: number) => {
     const s = story[i]
+    exitSim()
     setStoryStep(i)
     setPanel(null)
     selectLayer(s.layerId)
@@ -118,7 +144,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const showAbout = (id: string) => { setAboutId(id); setTab('about'); setPanel('right') }
 
   return (
-    <div className={`app ${panel ? `show-${panel}` : ''} ${storyStep !== null ? 'story-on' : ''}`}>
+    <div className={`app ${panel ? `show-${panel}` : ''} ${storyStep !== null ? 'story-on' : ''} ${simOn ? 'sim-on' : ''}`}>
       <header className="topbar">
         <div className="brand">
           <span className="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="#fff" strokeWidth="2.2" /><path d="M15 15l5 5" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg></span>
@@ -132,7 +158,8 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
         {story.length > 0 && (
           <div className="modes" role="group" aria-label="Mode">
             <button className={storyStep !== null ? 'on' : ''} aria-pressed={storyStep !== null} onClick={() => storyStep === null && goStory(0)}>Guided story</button>
-            <button className={storyStep === null ? 'on' : ''} aria-pressed={storyStep === null} onClick={() => setStoryStep(null)}>Explore</button>
+            <button className={storyStep === null && !simOn ? 'on' : ''} aria-pressed={storyStep === null && !simOn} onClick={goExplore}>Explore</button>
+            <button className={simOn ? 'on' : ''} aria-pressed={simOn} onClick={() => !simOn && startSim()}>Simulate</button>
           </div>
         )}
         <div className="top-actions">
@@ -147,7 +174,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
       <aside className="left" aria-label="Controls">
         <div className="sheet-handle" aria-hidden="true" />
         <LeftPanel manifest={m} group={group} view={view} activeId={activeId} step={step} onStep={setStep} hasStory={story.length > 0} layerVisible={layerVisible} bookmarkId={bookmarkId} opacity={opacity} showTerrain={showTerrain} showMask={showMask} overlayId={overlayId}
-          referenceIds={referenceIds} storyActive={storyStep !== null} onBookmark={goToBookmark} onGroup={selectGroup} onView={selectView} onLayer={selectLayer} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
+          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} onSimulate={startSim} onBookmark={goToBookmark} onGroup={selectGroup} onView={selectView} onLayer={selectLayer} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
           onMask={setShowMask} onOverlay={setOverlayId} onReference={(id, on) => setReferenceIds((r) => (on ? [...r, id] : r.filter((x) => x !== id)))} onAbout={showAbout} onStory={() => goStory(0)} />
       </aside>
 
@@ -155,7 +182,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
         <MapBoundary>
           <Suspense fallback={null}>
             <MapView envelope={m.caseStudy.searchEnvelope} terrain={terrain} showTerrain={showTerrain} active={shownLayer} overlay={overlay} showMask={showMask} opacity={opacity} references={references}
-              footprints={footprints} point={point} focus={focus} onPoint={(p) => { setPoint(p); setTab('inspect'); setAboutId(null) }} onStatus={setMapStatus} onCoverage={setCovered} />
+              footprints={simOn ? NO_FOOTPRINTS : footprints} point={point} focus={focus} sim={sim} onPoint={(p) => { setPoint(p); setTab('inspect'); setAboutId(null) }} onStatus={setMapStatus} onCoverage={setCovered} />
           </Suspense>
         </MapBoundary>
         {bookmark && <p className="place-chip">{bookmark.name}</p>}
@@ -174,7 +201,13 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
         </div>
       )}
 
-      {storyStep === null && (
+      {simOn && (
+        <div className="sim-dock">
+          <SimPanel manifest={m} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
+        </div>
+      )}
+
+      {storyStep === null && !simOn && (
         <aside className="right" aria-label="Scientific interpretation">
           <div className="sheet-handle" aria-hidden="true" />
           <div className="panel-body">

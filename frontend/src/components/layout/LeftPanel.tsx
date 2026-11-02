@@ -25,6 +25,8 @@ interface Props {
   overlayId: string
   referenceIds: string[]
   storyActive: boolean
+  simActive: boolean
+  onSimulate: () => void
   onBookmark: (b: Bookmark) => void
   onGroup: (id: string) => void
   onView: (v: EvidenceView) => void
@@ -92,6 +94,7 @@ export function LeftPanel(p: Props) {
           <div className="story-cta">
             <p><strong>New here?</strong> Walk through the event in 4 steps.</p>
             <button className="primary" onClick={p.onStory} disabled={p.storyActive}><Play />Start the guided story</button>
+            <button onClick={p.onSimulate} disabled={p.simActive}>Try the simulations</button>
           </div>
         )}
       </section>
