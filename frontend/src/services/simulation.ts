@@ -14,8 +14,8 @@ export interface SimData {
 
 export interface SimView { data: SimData; mode: 'replay' | 'whatif'; km: number; rise: number }
 
-export async function loadSimulation(): Promise<SimData> {
-  const res = await fetch(assetUrl('data/vectors/simulation.json'))
+export async function loadSimulation(path: string): Promise<SimData> {
+  const res = await fetch(assetUrl(path))
   if (!res.ok) throw new Error(`Simulation data request failed with HTTP ${res.status}`)
   return res.json()
 }

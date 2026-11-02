@@ -82,4 +82,5 @@ These are illustrations and contain no NISAR measurements.
 
 - **Flow replay:** the path is geometry, not a mapped flow line. It follows OSM rivers, and its first part joins the detachment zone, barrier lakes and upper Lende Khola with straight lines, because no channel is mapped there. The speed is invented, and nothing shows when the flow reached any place.
 - **What-if flood:** a feature counts as reached if its Copernicus DEM ground height is within the chosen rise above the nearest river point and within the chosen distance. It ignores water volume, speed, valley shape, sediment and the fall of a flood downstream, and it has not been compared with any real flood. The DEM has a 30 m grid and vertical error, so narrow gorges are poorly resolved. Only buildings UNOSAT mapped as affected are counted, so the app cannot say how many other buildings a flood would reach.
+- **Time replay:** plays stored values in order. Nothing is interpolated between saved times.
 - **Radar explainer:** a teaching model on invented ground. It is not NISAR processing, and its slider is not a measure of anything real.

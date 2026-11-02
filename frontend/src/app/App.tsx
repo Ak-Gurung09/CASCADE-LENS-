@@ -116,9 +116,11 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const startSim = () => {
     setStoryStep(null)
     setPanel(null)
-    selectLayer(TERRAIN)
-    setReferenceIds(SIM_REFERENCES)
-    setBookmarkId(null)
+    if (caseSimulation) {
+      selectLayer(TERRAIN)
+      setReferenceIds(SIM_REFERENCES)
+      setBookmarkId(null)
+    }
     setSimOn(true)
   }
 
@@ -141,6 +143,11 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
     if (b) goToBookmark(b)
   }
 
+  const caseSimulation = currentCase().simulation
+  const timeLayer = m.layers.find((l) => (l.timeSteps?.length ?? 0) > 1 && isUsable(l))
+  const canSimulate = Boolean(caseSimulation || timeLayer)
+  const showTimeLayer = () => { if (!active?.timeSteps && timeLayer) selectLayer(timeLayer.id) }
+
   const showAbout = (id: string) => { setAboutId(id); setTab('about'); setPanel('right') }
 
   return (
@@ -155,11 +162,11 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
             {CASES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
         </label>
-        {story.length > 0 && (
+        {(story.length > 0 || canSimulate) && (
           <div className="modes" role="group" aria-label="Mode">
-            <button className={storyStep !== null ? 'on' : ''} aria-pressed={storyStep !== null} onClick={() => storyStep === null && goStory(0)}>Guided story</button>
+            {story.length > 0 && <button className={storyStep !== null ? 'on' : ''} aria-pressed={storyStep !== null} onClick={() => storyStep === null && goStory(0)}>Guided story</button>}
             <button className={storyStep === null && !simOn ? 'on' : ''} aria-pressed={storyStep === null && !simOn} onClick={goExplore}>Explore</button>
-            <button className={simOn ? 'on' : ''} aria-pressed={simOn} onClick={() => !simOn && startSim()}>Simulate</button>
+            {canSimulate && <button className={simOn ? 'on' : ''} aria-pressed={simOn} onClick={() => !simOn && startSim()}>Simulate</button>}
           </div>
         )}
         <div className="top-actions">
@@ -174,7 +181,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
       <aside className="left" aria-label="Controls">
         <div className="sheet-handle" aria-hidden="true" />
         <LeftPanel manifest={m} group={group} view={view} activeId={activeId} step={step} onStep={setStep} hasStory={story.length > 0} layerVisible={layerVisible} bookmarkId={bookmarkId} opacity={opacity} showTerrain={showTerrain} showMask={showMask} overlayId={overlayId}
-          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} onSimulate={startSim} onBookmark={goToBookmark} onGroup={selectGroup} onView={selectView} onLayer={selectLayer} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
+          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} canSimulate={canSimulate} onSimulate={startSim} onBookmark={goToBookmark} onGroup={selectGroup} onView={selectView} onLayer={selectLayer} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
           onMask={setShowMask} onOverlay={setOverlayId} onReference={(id, on) => setReferenceIds((r) => (on ? [...r, id] : r.filter((x) => x !== id)))} onAbout={showAbout} onStory={() => goStory(0)} />
       </aside>
 
@@ -203,7 +210,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
 
       {simOn && (
         <div className="sim-dock">
-          <SimPanel manifest={m} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
+          <SimPanel manifest={m} simulation={caseSimulation} layer={active} step={step} canTime={Boolean(timeLayer)} onStep={setStep} onTimeTab={showTimeLayer} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
         </div>
       )}
 

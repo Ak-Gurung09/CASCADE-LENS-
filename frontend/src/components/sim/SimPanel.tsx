@@ -1,19 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Manifest } from '../../types/manifest'
+import type { Layer, Manifest } from '../../types/manifest'
 import { coherence, count, firstPass, loadSimulation, shift, SIM_CELLS, type SimData, type SimView } from '../../services/simulation'
 import { Bars } from '../charts/Charts'
 import { coherenceGroups } from '../story/StoryPanel'
 
 interface Props {
   manifest: Manifest
+  simulation?: string
+  layer?: Layer
+  step: number
+  canTime: boolean
+  onStep: (i: number) => void
+  onTimeTab: () => void
   onView: (v: SimView | null) => void
   onLoaded: (d: SimData) => void
   onExit: () => void
 }
 
-type Tab = 'replay' | 'whatif' | 'radar'
+type Tab = 'replay' | 'whatif' | 'time' | 'radar'
 
-const TABS: [Tab, string][] = [['replay', 'Flow replay'], ['whatif', 'What-if flood'], ['radar', 'Radar explainer']]
+const TAB_LABELS: Record<Tab, string> = { replay: 'Flow replay', whatif: 'What-if flood', time: 'Time replay', radar: 'Radar explainer' }
+const STEP_MS = 900
 const REPLAY_SECONDS = 24
 const n = (x: number) => Math.round(x).toLocaleString('en-GB')
 
@@ -51,7 +58,7 @@ function Replay({ data, km, setKm }: { data: SimData; km: number; setKm: (k: num
   const next = data.places.find((p) => p.km > km)
   return (
     <>
-      <p>The pulse follows the real river path from the mapped source. Orange shows what UNOSAT mapped as affected along the stretch it has passed.</p>
+      <p>The pulse follows the real river path from the mapped source. Orange shows what was mapped as affected along the stretch it has passed.</p>
       <div className="sim-controls">
         <button className="primary" onClick={() => setPlaying(!playing)}>{playing ? 'Pause' : km >= last ? 'Replay' : 'Play'}</button>
         <label className="slider grow">Distance from the source <span>{km} of {last} km</span>
@@ -62,8 +69,8 @@ function Replay({ data, km, setKm }: { data: SimData; km: number; setKm: (k: num
       <dl className="facts">
         <div><dt>River level here</dt><dd>{n(data.path[km][2])} m</dd></div>
         <div><dt>Next place</dt><dd>{next ? `${next.name}, km ${next.km}` : 'End of the path'}</dd></div>
-        <div><dt>Buildings mapped as affected</dt><dd>{n(seen.buildings)} of {n(data.totals.buildings)}</dd></div>
-        <div><dt>Roads mapped as affected</dt><dd>{n(seen.roadKm)} of {n(data.totals.mappedRoadKm)} km</dd></div>
+        {data.totals.buildings > 0 && <div><dt>Buildings mapped as affected</dt><dd>{n(seen.buildings)} of {n(data.totals.buildings)}</dd></div>}
+        {data.totals.mappedRoadKm > 0 && <div><dt>Roads mapped as affected</dt><dd>{n(seen.roadKm)} of {n(data.totals.mappedRoadKm)} km</dd></div>}
       </dl>
       <p className="notice small">Illustration only. The path is real, but the speed is not measured: nothing here shows when the flow reached any place.</p>
     </>
@@ -85,11 +92,37 @@ function WhatIf({ data, reach, setReach, rise, setRise }: { data: SimData; reach
         </label>
       </div>
       <dl className="facts">
-        <div><dt>Mapped buildings below the water</dt><dd>{n(hit.buildings)} of {n(data.totals.buildings)}</dd></div>
-        <div><dt>Roads below the water</dt><dd>{n(hit.roadKm)} of {n(data.totals.roadKm)} km</dd></div>
+        {data.totals.buildings > 0 && <div><dt>Mapped buildings below the water</dt><dd>{n(hit.buildings)} of {n(data.totals.buildings)}</dd></div>}
+        {data.totals.roadKm > 0 && <div><dt>Roads below the water</dt><dd>{n(hit.roadKm)} of {n(data.totals.roadKm)} km</dd></div>}
         <div className="wide"><dt>Places below the water: {hit.places.length} of {data.places.length}</dt><dd>{hit.places.join(', ') || 'None'}</dd></div>
       </dl>
-      <p className="notice small">Rough what-if, not a forecast and never a safety guide. It compares ground height with the river and ignores water volume, speed and valley shape, and it has not been checked against real floods. Only buildings UNOSAT mapped are counted, so other buildings are missing.</p>
+      <p className="notice small">Rough what-if, not a forecast and never a safety guide. It compares ground height with the river and ignores water volume, speed and valley shape, and it has not been checked against real floods. Only buildings in the loaded data are counted, so others are missing.</p>
+    </>
+  )
+}
+
+function TimeReplay({ layer, step, onStep }: { layer?: Layer; step: number; onStep: (i: number) => void }) {
+  const [playing, setPlaying] = useState(false)
+  const steps = layer?.timeSteps
+  const last = (steps?.length ?? 1) - 1
+  const at = Math.min(step, last)
+  useEffect(() => {
+    if (!playing) return
+    if (at >= last) { setPlaying(false); return }
+    const timer = setTimeout(() => onStep(at + 1), STEP_MS)
+    return () => clearTimeout(timer)
+  }, [playing, at, last, onStep])
+  if (!steps || last < 1) return <p className="notice">Choose a map layer that changes over time, in the panel on the left.</p>
+  return (
+    <>
+      <p>This plays the stored data for {layer!.name} in order, one saved time after another. Choose another layer on the left to play that instead.</p>
+      <div className="sim-controls">
+        <button className="primary" onClick={() => { if (at >= last) onStep(0); setPlaying(!playing) }}>{playing ? 'Pause' : at >= last ? 'Replay' : 'Play'}</button>
+        <label className="slider grow">Saved time <span>{steps[at].label}</span>
+          <input type="range" min={0} max={last} value={at} onChange={(e) => { setPlaying(false); onStep(Number(e.target.value)) }} />
+        </label>
+      </div>
+      <p className="notice small">Real stored values, with nothing filled in between the saved times. Nothing is predicted.</p>
     </>
   )
 }
@@ -112,7 +145,7 @@ function Radar({ manifest }: { manifest: Manifest }) {
   const value = coherence(c)
   return (
     <>
-      <p>The satellite passes twice, 12 days apart. Each patch of ground returns its own colour of echo. If the ground stays put, the second pass shifts every patch alike, so the difference is one even colour. If the ground changes, the patches shift at random and the signal stops matching. That match is coherence.</p>
+      <p>The satellite passes over the same ground twice. Each patch of ground returns its own colour of echo. If the ground stays put, the second pass shifts every patch alike, so the difference is one even colour. If the ground changes, the patches shift at random and the signal stops matching. That match is coherence.</p>
       <svg className="sat-track" viewBox="0 0 300 34" role="img" aria-label="A satellite crossing above the ground twice">
         <line x1="0" y1="31" x2="300" y2="31" />
         <g className="sat"><rect x="-5" y="4" width="10" height="7" rx="1.5" /><rect x="-15" y="6" width="8" height="3" /><rect x="7" y="6" width="8" height="3" /><path d="M0 11 L-9 30 L9 30 Z" /></g>
@@ -135,30 +168,34 @@ function Radar({ manifest }: { manifest: Manifest }) {
   )
 }
 
-export function SimPanel({ manifest, onView, onLoaded, onExit }: Props) {
-  const [tab, setTab] = useState<Tab>('replay')
+export function SimPanel({ manifest, simulation, layer, step, canTime, onStep, onTimeTab, onView, onLoaded, onExit }: Props) {
+  const tabs: Tab[] = [...(simulation ? ['replay', 'whatif'] as const : []), ...(canTime ? ['time'] as const : []), ...(coherenceGroups(manifest).length ? ['radar'] as const : [])]
+  const [tab, setTab] = useState<Tab>(tabs[0])
   const [data, setData] = useState<SimData | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
   const [km, setKm] = useState(0)
   const [reach, setReach] = useState(0)
   const [rise, setRise] = useState(25)
   useEffect(() => {
+    if (!simulation) return
     let live = true
-    loadSimulation().then((d) => { if (!live) return; setData(d); setReach(d.path.length - 1); onLoaded(d) }).catch((e: Error) => { if (live) setFailure(e.message) })
+    loadSimulation(simulation).then((d) => { if (!live) return; setData(d); setReach(d.path.length - 1); onLoaded(d) }).catch((e: Error) => { if (live) setFailure(e.message) })
     return () => { live = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- load once
   }, [])
   useEffect(() => {
-    onView(data && tab !== 'radar' ? { data, mode: tab, km: tab === 'replay' ? km : reach, rise } : null)
+    if (tab === 'time') onTimeTab()
+    onView(data && (tab === 'replay' || tab === 'whatif') ? { data, mode: tab, km: tab === 'replay' ? km : reach, rise } : null)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onView is a state setter's wrapper
   }, [data, tab, km, reach, rise])
   return (
     <section className="story sim-panel" aria-label="Simulations">
       <div className="tabs segmented" role="tablist">
-        {TABS.map(([id, label]) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>{label}</button>)}
+        {tabs.map((id) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>{TAB_LABELS[id]}</button>)}
       </div>
-      {failure ? <p className="notice">The simulation could not start: {failure}</p>
-        : tab === 'radar' ? <Radar manifest={manifest} />
+      {tab === 'radar' ? <Radar manifest={manifest} />
+        : tab === 'time' ? <TimeReplay layer={layer} step={step} onStep={onStep} />
+          : failure ? <p className="notice">The simulation could not start: {failure}</p>
           : !data ? <p className="muted">Loading the flow path…</p>
             : tab === 'replay' ? <Replay data={data} km={km} setKm={setKm} />
               : <WhatIf data={data} reach={reach} setReach={setReach} rise={rise} setRise={setRise} />}

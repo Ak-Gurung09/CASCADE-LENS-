@@ -234,6 +234,19 @@ test.describe('LANDMET test case', () => {
     await expect(page.locator('.legend-title').first()).toContainText('Station wind speed (m/s)')
   })
 
+  test('Simulate offers only what this data supports, and plays its saved times', async ({ page }) => {
+    await open(page, LANDMET)
+    await page.getByRole('button', { name: 'Simulate' }).click()
+    const panel = page.locator('.sim-panel')
+    await expect(panel.getByRole('tab')).toHaveText(['Time replay'])
+    await expect(panel).toContainText('00:00 UTC')
+    await panel.getByRole('button', { name: 'Play' }).click()
+    await expect(panel).toContainText('03:00 UTC')
+    await panel.getByRole('button', { name: 'Pause' }).click()
+    await page.getByRole('button', { name: 'Exit simulation' }).click()
+    await expect(panel).toHaveCount(0)
+  })
+
   test('switching case returns to Rasuwa', async ({ page }) => {
     await open(page, LANDMET)
     await page.getByLabel('Case study').selectOption('rasuwa-2026')

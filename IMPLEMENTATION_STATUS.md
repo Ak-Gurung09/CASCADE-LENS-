@@ -49,7 +49,7 @@ Report date: 2026-11-01.
 | Provenance records | Implemented and tested | Automated | Real | |
 | COG and tile export | Implemented and tested | Real files | Real | |
 | Manifest from disk state | Implemented and tested | Integration checks | Real | |
-| Application shell, map | Implemented and tested | 30 browser tests | Real | |
+| Application shell, map | Implemented and tested | 31 browser tests | Real | |
 | Case-study selector | Implemented and tested | Browser | Real | Rasuwa and LANDMET |
 | Bookmarks | Implemented and tested | Browser, exact values | Real | Approximate navigation frames |
 | Observation-pair selector | Implemented and tested | Browser | Real | |
@@ -74,16 +74,16 @@ Report date: 2026-11-01.
 ## Commands executed and results
 
 ```text
-python -m pytest tests                       104 passed
+python -m pytest tests                       105 passed
 npx tsc --noEmit                             no errors
 npm test                                     29 passed
-npx playwright test                          30 passed: 20 on the real build, 10 on the synthetic fixture
+npx playwright test                          31 passed: 21 on the real build, 10 on the synthetic fixture
 python processing/scripts/process_nisar.py   6 granules qa_passed
 python processing/scripts/generate_manifest.py   29 layers: 14 sampleable, 12 prepared, 2 catalogued, 1 renderable
 python processing/scripts/prepare_landmet.py     19 layers: 12 sampleable, 7 unavailable; peak 12.92 h local solar time
 ```
 
-**Total: 163 automated tests passing.** Before the Simulate mode was added, the real-build browser tests also passed against the final package, unzipped fresh and started through `Start CascadeLens.bat`, in both Microsoft Edge and Brave. The Simulate test ran in Edge and Brave against the build.
+**Total: 165 automated tests passing.** Before the Simulate mode was added, the real-build browser tests also passed against the final package, unzipped fresh and started through `Start CascadeLens.bat`, in both Microsoft Edge and Brave. The Simulate test ran in Edge and Brave against the build.
 
 | Performance, 2026-11-02, packaged app in headless Edge | Before | After |
 |---|---|---|

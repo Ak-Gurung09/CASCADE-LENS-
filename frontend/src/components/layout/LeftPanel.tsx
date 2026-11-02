@@ -26,6 +26,7 @@ interface Props {
   referenceIds: string[]
   storyActive: boolean
   simActive: boolean
+  canSimulate: boolean
   onSimulate: () => void
   onBookmark: (b: Bookmark) => void
   onGroup: (id: string) => void
@@ -90,11 +91,11 @@ export function LeftPanel(p: Props) {
         <p className="label">Case study</p>
         <h2 className="case">{m.caseStudy.name}</h2>
         <p className="muted small">{p.hasStory ? 'Reported event' : 'Data date'}: {formatDate(m.caseStudy.eventDate)}. A retrospective evidence explorer, not a warning service.</p>
-        {p.hasStory && (
+        {(p.hasStory || p.canSimulate) && (
           <div className="story-cta">
-            <p><strong>New here?</strong> Walk through the event in 4 steps.</p>
-            <button className="primary" onClick={p.onStory} disabled={p.storyActive}><Play />Start the guided story</button>
-            <button onClick={p.onSimulate} disabled={p.simActive}>Try the simulations</button>
+            {p.hasStory && <p><strong>New here?</strong> Walk through the event in 4 steps.</p>}
+            {p.hasStory && <button className="primary" onClick={p.onStory} disabled={p.storyActive}><Play />Start the guided story</button>}
+            {p.canSimulate && <button onClick={p.onSimulate} disabled={p.simActive}>Try the simulations</button>}
           </div>
         )}
       </section>

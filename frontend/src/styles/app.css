@@ -256,7 +256,6 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
 .bar-row b { font: 500 12px var(--mono); color: var(--text); text-align: right; }
 
 /* Simulate: three tabs in a card where the right panel sits, so the map stays clear. */
-.sim-on .legend { display: none; }
 .sim-dock { position: absolute; z-index: 3; top: 80px; right: 12px; bottom: 12px; width: 368px; display: flex; flex-direction: column; }
 .sim-panel { width: 100%; max-height: 100%; border-radius: var(--radius); gap: 12px; padding: 14px 16px 10px; font-size: 13px; }
 .sim-panel p { font-size: 13px; }
@@ -317,6 +316,7 @@ pre { font: 10.5px/1.4 var(--mono); white-space: pre-wrap; color: var(--muted); 
   .story h2 { font-size: 20px; }
   .story p { font-size: 13px; }
   .story-body.with-chart { grid-template-columns: 1fr; gap: 12px; }
+  .sim-on .legend { display: none; }
   .sim-dock { top: auto; left: 0; right: 0; bottom: 0; width: auto; }
   .sim-panel { max-height: 64dvh; border-radius: 20px 20px 0 0; }
   .sim-on .map-foot { bottom: auto; top: 66px; max-width: 55%; }
