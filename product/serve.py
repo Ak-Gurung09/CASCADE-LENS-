@@ -15,6 +15,8 @@ import shutil
 import webbrowser
 
 APP = pathlib.Path(__file__).resolve().parent / "app"
+if not APP.exists():  # Started from the project folder, where the build is in frontend/dist
+    APP = APP.parent.parent / "frontend" / "dist"
 CSP = "default-src 'self'; connect-src 'self'; img-src 'self' data: blob:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'"
 
 
