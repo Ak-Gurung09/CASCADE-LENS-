@@ -50,6 +50,18 @@ function ionosphereNote(m: Manifest) {
   return f.length ? `Most of the broad stripes in the raw phase come from the ionosphere, not the ground: subtracting the product's own estimate cuts the scatter from ${f.join(' and ')}.` : null
 }
 
+// Before/after against control ground: rain or season change hits both areas, so only the gap between them points at the slide.
+function controlText(m: Manifest) {
+  const cs = m.controlSeries
+  if (!cs) return null
+  const before = cs.pairs.find((p) => p.pair[1] <= cs.eventDate)
+  const across = cs.pairs.find((p) => p.pair[0] < cs.eventDate && p.pair[1] > cs.eventDate)
+  if (!before || !across) return null
+  const gap = (p: typeof before) => p.outside - p.inside
+  const after = cs.pairs.filter((p) => p.pair[0] >= cs.eventDate)
+  return `A pair from before the event is the fair test. Between ${day(before.pair[0])} and ${day(before.pair[1])} the slide area and the ground around it scored about the same (${before.inside.toFixed(2)} against ${before.outside.toFixed(2)}). Across the event the gap opened to ${gap(across).toFixed(2)} (${across.inside.toFixed(2)} against ${across.outside.toFixed(2)})${after.length ? `, then narrowed to ${after.map((p) => gap(p).toFixed(2)).join(', ')} in the pairs after` : ''}. Rain or season change would lower both areas together, so the opening gap points at the slide itself. The before pair spans ${before.days} days and the others ${across.days}, which this comparison only partly corrects for.`
+}
+
 // Text branches on the manifest, so the story can never claim a result that is not loaded.
 export function buildStory(m: Manifest): StoryStep[] {
   if (m.lake) return lakeStory(m)
@@ -60,9 +72,11 @@ export function buildStory(m: Manifest): StoryStep[] {
   const offsetText = contrast(m, 'goff-range |x - scene median|', 2)
   const iono = ionosphereNote(m)
   const pairB = sourceFromPairB(m)
+  const control = controlText(m)
   const radar = coherence
     ? ['The map shows coherence from the descending Track 48 pair of 16 and 28 August 2026: how consistent the radar signal stayed between the two passes.',
        ...(coherenceText ? [`Along the channel that UNOSAT mapped, coherence is much lower than on the terrain beside it. The median is ${coherenceText}, comparing inside the mapped extent with the area within 1 km of it.`] : []),
+       ...(control ? [control] : []),
        'This agrees with independent mapping, but it does not prove what happened. Low coherence has other causes too, and river channels are often low anyway.']
     : ['The descending Track 48 pair of 16 and 28 August 2026 brackets the event, and the catalogue footprints show both frames reach this corridor.',
        'The GUNW science files for this pair are not loaded in this build, so no phase or coherence is shown. They need a NASA Earthdata login to download.']

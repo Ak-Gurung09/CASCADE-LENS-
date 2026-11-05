@@ -239,4 +239,16 @@ export interface Manifest {
   layers: Layer[]
   granules: GranuleRecord[]
   lake?: LakeSeries
+  controlSeries?: ControlSeries
+}
+
+// Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair (did.py).
+export interface ControlSeries {
+  zone: string
+  control: string
+  track: number
+  frame: number
+  direction: string
+  eventDate: string
+  pairs: { pair: [string, string]; days: number; inside: number; outside: number; insideCi95: [number, number]; validPct: number; granule: string }[]
 }
