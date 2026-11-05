@@ -1,6 +1,7 @@
 import type { StoryStep } from '../../data/story'
 import type { Manifest } from '../../types/manifest'
 import { Bars, type BarGroup } from '../charts/Charts'
+import { LakeChart } from '../compare/ComparePanel'
 
 interface Props {
   steps: StoryStep[]
@@ -29,8 +30,10 @@ export function StoryPanel({ steps, index, manifest, onGo, onExit }: Props) {
   const step = steps[index]
   const last = index === steps.length - 1
   const bars = step.layerId.endsWith('gunw-coherence') ? coherenceGroups(manifest) : []
+  const chart = step.chart === 'lake' && manifest.lake
+  const name = manifest.lake ? `The ${manifest.lake.name} story` : 'The mountain-to-river story'
   return (
-    <section className="story" aria-label="Rasuwa story" aria-live="polite">
+    <section className="story" aria-label={name} aria-live="polite">
       <ol className="progress" aria-label="Story steps">
         {steps.map((s, i) => (
           <li key={s.id} className={i < index ? 'done' : i === index ? 'now' : ''}>
@@ -38,12 +41,14 @@ export function StoryPanel({ steps, index, manifest, onGo, onExit }: Props) {
           </li>
         ))}
       </ol>
-      <p className="eyebrow">Step {index + 1} of {steps.length} · The mountain-to-river story</p>
-      <div className={`story-body ${bars.length ? 'with-chart' : ''}`}>
+      <p className="eyebrow">Step {index + 1} of {steps.length} · {name}</p>
+      <div className={`story-body ${bars.length || chart ? 'with-chart' : ''}`}>
         <div>
           <h2>{index + 1}. {step.title}</h2>
           {step.paragraphs.map((p) => <p key={p}>{p}</p>)}
+          {step.sources && <p className="muted small story-sources">{step.sources}</p>}
         </div>
+        {chart && <LakeChart lake={manifest.lake!} />}
         {bars.length > 0 && <Bars title="Signal quality (coherence: 0 = noisy, 1 = stable)" groups={bars} />}
       </div>
       <footer>
