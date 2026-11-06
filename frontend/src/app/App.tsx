@@ -297,7 +297,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
                 <button role="tab" aria-selected={tab === 'inspect'} className={tab === 'inspect' ? 'on' : ''} onClick={() => setTab('inspect')}>Inspector</button>
               </div>
             )}
-            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
+            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} manifest={m} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
           </div>}
         </aside>
       )}

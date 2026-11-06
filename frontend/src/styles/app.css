@@ -592,3 +592,22 @@ button.primary:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(95, 224, 201, 
 .obs-tasks i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
 .obs-reasons { margin: 0 0 6px; padding-left: 18px; font-size: 12.5px; color: var(--text); }
 .obs-reasons li { margin: 2px 0; }
+
+/* "What could explain this?" in the inspector */
+.hypotheses { margin: 14px 0 4px; padding: 12px 14px; border: 1px solid rgba(214, 164, 255, .28); border-radius: 12px; background: rgba(214, 164, 255, .04); }
+.hypotheses h3 { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 0 0 6px; }
+.hyp { border-top: 1px solid var(--line-strong); padding: 6px 0; }
+.hyp summary { display: flex; justify-content: space-between; gap: 10px; cursor: pointer; font-size: 13px; line-height: 1.35; }
+.hyp summary span { flex: 1; }
+.hyp h5 { margin: 6px 0 2px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.hyp ul { margin: 0; padding-left: 18px; font-size: 12.5px; }
+.hyp li { margin: 2px 0; }
+.hyp-for li::marker { content: '+  '; color: #5fe0c9; }
+.hyp-against li::marker { content: '–  '; color: var(--coral); }
+.hyp-missing li::marker { content: '?  '; color: var(--amber); }
+.standing { font-size: 11px; font-weight: 600; white-space: nowrap; padding: 1px 7px; border-radius: 999px; align-self: flex-start; }
+.st-best { color: #5fe0c9; background: rgba(95, 224, 201, .12); }
+.st-possible { color: var(--amber); background: rgba(242, 196, 107, .12); }
+.st-weak { color: var(--muted); background: rgba(255, 255, 255, .05); }
+.st-cannot { color: #b07cff; background: rgba(176, 124, 255, .12); }
+.hyp-measured { margin-top: 8px; }

@@ -1,8 +1,9 @@
 import { lazy, memo, Suspense, useEffect, useState } from 'react'
-import type { Bookmark, Layer } from '../../types/manifest'
+import type { Bookmark, Layer, Manifest } from '../../types/manifest'
 import { acquisitionLabel, coordinates, isUsable, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
 import { samplePoint, type SampleResult } from '../../services/sampler'
 import { ObservabilityAt } from './ObservabilityAt'
+import { Hypotheses } from './Hypotheses'
 import { isObservability } from '../../services/observability'
 
 const DayLineChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.DayLineChart })))
@@ -58,7 +59,7 @@ function DayChart({ layer, point }: { layer: Layer; point: [number, number] }) {
   )
 }
 
-export const Inspector = memo(function Inspector({ layer, layers, point, bookmarks }: { layer: Layer | undefined; layers: Layer[]; point: [number, number] | null; bookmarks: Bookmark[] }) {
+export const Inspector = memo(function Inspector({ layer, layers, point, bookmarks, manifest }: { layer: Layer | undefined; layers: Layer[]; point: [number, number] | null; bookmarks: Bookmark[]; manifest?: Manifest }) {
   const [main, setMain] = useState<SampleResult | null>(null)
   const [quality, setQuality] = useState<Sample[]>([])
   const [busy, setBusy] = useState(false)
@@ -110,6 +111,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
           ))}
         </>
       )}
+      {manifest && <Hypotheses manifest={manifest} point={point} />}
     </div>
   )
 })
