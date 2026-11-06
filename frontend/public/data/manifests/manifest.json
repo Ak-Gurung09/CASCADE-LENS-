@@ -5080,13 +5080,12 @@
      "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "reason flags (see observability block)",
      "bounds": [
-      84.3976,
-      27.732,
-      85.5508,
-      28.35
+      84.38262429509216,
+      27.714795075127526,
+      85.55941176995117,
+      28.367440328151478
      ],
      "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
-     "validity": null,
      "tiles": {
       "url": "data/tiles/rasuwa-2026/observability-disturbance/{z}/{x}/{y}.png",
       "minzoom": 8,
@@ -5181,13 +5180,12 @@
      "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "reason flags (see observability block)",
      "bounds": [
-      84.3976,
-      27.732,
-      85.5508,
-      28.35
+      84.38262429509216,
+      27.714795075127526,
+      85.55941176995117,
+      28.367440328151478
      ],
      "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
-     "validity": null,
      "tiles": {
       "url": "data/tiles/rasuwa-2026/observability-movement/{z}/{x}/{y}.png",
       "minzoom": 8,

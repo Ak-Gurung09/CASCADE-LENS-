@@ -1144,13 +1144,12 @@
      "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "reason flags (see observability block)",
      "bounds": [
-      86.41367293064334,
-      27.82414533460846,
-      86.53595520825839,
-      27.905853213049983
+      86.41306033475027,
+      27.82360112482148,
+      86.53656674132668,
+      27.90639689377046
      ],
      "sampling": "data/sampling/tsho-rolpa-2026/observability-flags.tif",
-     "validity": null,
      "tiles": {
       "url": "data/tiles/tsho-rolpa-2026/observability-disturbance/{z}/{x}/{y}.png",
       "minzoom": 8,
@@ -1245,13 +1244,12 @@
      "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "reason flags (see observability block)",
      "bounds": [
-      86.41367293064334,
-      27.82414533460846,
-      86.53595520825839,
-      27.905853213049983
+      86.41306033475027,
+      27.82360112482148,
+      86.53656674132668,
+      27.90639689377046
      ],
      "sampling": "data/sampling/tsho-rolpa-2026/observability-flags.tif",
-     "validity": null,
      "tiles": {
       "url": "data/tiles/tsho-rolpa-2026/observability-movement/{z}/{x}/{y}.png",
       "minzoom": 8,

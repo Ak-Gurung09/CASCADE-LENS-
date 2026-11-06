@@ -13,6 +13,8 @@ import pathlib
 import sys
 
 import numpy as np
+import rasterio
+from rasterio.warp import transform_bounds
 from shapely.geometry import box, shape
 from shapely.ops import unary_union
 
@@ -44,6 +46,8 @@ def main(argv: list[str]) -> None:
     flag_tif = export.write_geotiff(out / f"_work/{case}-flags.tif", flags, tr, epsg, nodata=255,
                                     tags={"SOURCE_FILE": gunw.name, "BASELINE_FILE": baseline.name if baseline else "", "METHOD": "cascade_lens.observability"})
     flag_cog = export.to_cog(flag_tif, out / f"sampling/{case}/observability-flags.tif")
+    with rasterio.open(flag_cog) as d:
+        flag_bounds = [round(v, 9) for v in transform_bounds(d.crs, "EPSG:4326", *d.bounds)]
 
     zones = zones_for(m, vectors, zone_files)
     layers, summaries = [], {}
@@ -67,7 +71,7 @@ def main(argv: list[str]) -> None:
             "acquisition": {"reference": t1, "secondary": t2}, "orbitDirection": r["meta"]["orbitPassDirection"], "track": r["meta"]["trackNumber"],
             "frames": [r["meta"]["frameNumber"]], "postingM": [40], "crs": f"EPSG:{epsg}", "qualityLayerIds": [], "status": "sampleable", "statusReason": None,
             "sources": [{"frame": r["meta"]["frameNumber"], "granule": gunw.stem, "sourceFilename": gunw.name, "sourceDataset": "reason flags (see observability block)",
-                         "bounds": m["caseStudy"]["searchEnvelope"], "sampling": rel(flag_cog), "validity": None,
+                         "bounds": flag_bounds, "sampling": rel(flag_cog),
                          "tiles": {"url": f"{rel(folder)}/{{z}}/{{x}}/{{y}}.png", "minzoom": ZOOM[0], "maxzoom": ZOOM[1], "count": n}}],
             "sourceGranules": [gunw.stem] + ([baseline.stem] if baseline else []), "productMaturity": "Derived from Provisional products",
             "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
