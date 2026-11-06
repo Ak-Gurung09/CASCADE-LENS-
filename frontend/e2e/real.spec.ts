@@ -6,7 +6,7 @@ import { expect, test, type ConsoleMessage, type Page } from '@playwright/test'
 
 // The production build with its real data, served under a CSP that blocks every request off this origin.
 const SHOTS = '../docs/screenshots'
-const LANDMET = '/?case=landmet-2007'
+const TSHO = '/?case=tsho-rolpa-2026'
 
 async function open(page: Page, path = '/') {
   await page.goto(path)
@@ -182,7 +182,7 @@ test('has no serious accessibility violations', async ({ page }) => {
   expect(await scan()).toEqual([])
   await page.getByRole('button', { name: 'Start the guided story' }).click()
   expect(await scan()).toEqual([])
-  await open(page, LANDMET)
+  await open(page, TSHO)
   expect(await scan()).toEqual([])
 })
 
@@ -198,63 +198,11 @@ test('every control can be reached and used from the keyboard', async ({ page })
   await expect(box).toBeChecked()
 })
 
-test.describe('LANDMET test case', () => {
-  test('cannot be mistaken for NISAR or Rasuwa', async ({ page }) => {
-    await open(page, LANDMET)
-    await expect(page.locator('.fixture-banner')).toContainText('not NISAR data')
-    await expect(page.getByRole('button', { name: 'Start the guided story' })).toHaveCount(0)
-    await expect(page.getByRole('tab', { name: 'InSAR' })).toHaveCount(0)
-    await page.waitForTimeout(1000)
-    await page.screenshot({ path: `${SHOTS}/landmet-global.png` })
-  })
-
-  test('shows empty variables as unavailable, with the reason', async ({ page }) => {
-    await open(page, LANDMET)
-    const row = page.getByRole('radio', { name: /Total cloud fraction/ })
-    await expect(row).toBeDisabled()
-    await expect(row.locator('xpath=ancestor::label')).toContainText('Every value in this file is fill')
-  })
-
-  test('the time slider changes the map and the stored value', async ({ page }) => {
-    await open(page, LANDMET)
-    await inspect(page, 'Sahara')
-    await expect(page.locator('.value')).toHaveText('276.90 K') // FDtemps step 0, read directly from the file
-    const tile = page.waitForResponse((r) => r.url().includes('/tiles/landmet/skin-temp/t04/'))
-    await page.getByLabel('Time of day').fill('4')
-    await expect(page.locator('.slider', { hasText: 'Time of day' })).toContainText('12:00 UTC')
-    await tile
-    await expect(page.locator('.value')).toHaveText('295.60 K') // FDtemps step 4, the Sahara's midday peak
-    await expect(page.locator('.day-chart')).toBeVisible()
-    await page.waitForTimeout(800)
-    await page.screenshot({ path: `${SHOTS}/landmet-time.png` })
-  })
-
-  test('flags the impossible wind speed instead of showing it as data', async ({ page }) => {
-    await open(page, LANDMET)
-    await page.getByRole('radio', { name: /Station wind speed/ }).check()
-    await expect(page.locator('.limits')).toContainText('118.6 m/s')
-    await expect(page.locator('.legend-title').first()).toContainText('Station wind speed (m/s)')
-  })
-
-  test('Simulate offers only what this data supports, and plays its saved times', async ({ page }) => {
-    await open(page, LANDMET)
-    await page.getByRole('button', { name: 'Simulate' }).click()
-    const panel = page.locator('.sim-panel')
-    await expect(panel.getByRole('tab')).toHaveText(['Time replay'])
-    await expect(panel).toContainText('00:00 UTC')
-    await panel.getByRole('button', { name: 'Play' }).click()
-    await expect(panel).toContainText('03:00 UTC')
-    await panel.getByRole('button', { name: 'Pause' }).click()
-    await page.getByRole('button', { name: 'Exit simulation' }).click()
-    await expect(panel).toHaveCount(0)
-  })
-
-  test('switching case returns to Rasuwa', async ({ page }) => {
-    await open(page, LANDMET)
-    await page.getByLabel('Case study').selectOption('rasuwa-2026')
-    await expect(page.getByRole('heading', { name: 'Rasuwa–Bhote Koshi–Trishuli, Nepal' })).toBeVisible()
-    await expect(page.locator('.fixture-banner')).toHaveCount(0)
-  })
+test('switching case moves between Tsho Rolpa and Rasuwa', async ({ page }) => {
+  await open(page, TSHO)
+  await expect(page.getByRole('heading', { name: /Tsho Rolpa/ }).first()).toBeVisible()
+  await page.getByLabel('Case study').selectOption('rasuwa-2026')
+  await expect(page.getByRole('heading', { name: 'Rasuwa–Bhote Koshi–Trishuli, Nepal' })).toBeVisible()
 })
 
 test.describe('phone', () => {

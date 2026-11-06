@@ -51,7 +51,7 @@ Report date: 2026-11-06. Two main cases now ship: Rasuwa (flagship, opens first)
 | COG and tile export | Implemented and tested | Real files | Real | |
 | Manifest from disk state | Implemented and tested | Integration checks | Real | |
 | Application shell, map | Implemented and tested | 31 browser tests | Real | |
-| Case-study selector | Implemented and tested | Browser | Real | Rasuwa and LANDMET |
+| Case-study selector | Implemented and tested | Browser | Real | Rasuwa and Tsho Rolpa |
 | Bookmarks | Implemented and tested | Browser, exact values | Real | Approximate navigation frames |
 | Observation-pair selector | Implemented and tested | Browser | Real | |
 | Dual-evidence switching | Implemented and tested | Browser | Real | Keeps the selected point |
@@ -85,10 +85,10 @@ Re-run on 2026-11-06 in a cloud copy (Chromium, not Edge or Brave):
 python -m pytest tests                       67 passed, 35 skipped (skips need the raw NISAR files)
 npx tsc --noEmit                             no errors
 npm test                                     42 passed
-npx playwright test                          26 passed, 6 failed
+npx playwright test                          27 passed
 ```
 
-The 6 browser failures are older than this work: the LANDMET test case (5 tests) and the Rasuwa Simulate tab (1 test) were taken out of the app when Tsho Rolpa was added on 3 to 4 Nov, and their tests were not updated. Whether to bring them back is an open question for the team.
+The Rasuwa Simulate tab, dropped when Tsho Rolpa was added on 3 to 4 Nov, is back. The LANDMET test case stays out of the app (team decision, 6 Nov), so its tests were replaced by a Tsho Rolpa to Rasuwa case-switch test.
 
 Results from 2026-11-01, kept for reference:
 
