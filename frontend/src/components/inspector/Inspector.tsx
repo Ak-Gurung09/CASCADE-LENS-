@@ -4,6 +4,7 @@ import { acquisitionLabel, coordinates, isUsable, posting, STATUS_LABEL, unitLab
 import { samplePoint, type SampleResult } from '../../services/sampler'
 import { ObservabilityAt } from './ObservabilityAt'
 import { Hypotheses } from './Hypotheses'
+import { ReportButtons } from './ReportButtons'
 import { isObservability } from '../../services/observability'
 
 const DayLineChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.DayLineChart })))
@@ -112,6 +113,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
         </>
       )}
       {manifest && <Hypotheses manifest={manifest} point={point} />}
+      {manifest && <ReportButtons manifest={manifest} point={point} />}
     </div>
   )
 })

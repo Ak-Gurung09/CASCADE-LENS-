@@ -611,3 +611,5 @@ button.primary:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(95, 224, 201, 
 .st-weak { color: var(--muted); background: rgba(255, 255, 255, .05); }
 .st-cannot { color: #b07cff; background: rgba(176, 124, 255, .12); }
 .hyp-measured { margin-top: 8px; }
+.report-btns { margin: 14px 0 4px; }
+.report-btns h3 { font-size: 13px; margin: 0 0 8px; }
