@@ -1,5 +1,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Bookmark, Manifest } from '../types/manifest'
+import { EvidenceTag } from '../components/explanations/EvidenceTag'
+import { EVIDENCE, evidenceOf } from '../services/evidence'
 import { CASES, currentCase, isUsable, loadManifest, STATUS_LABEL } from '../services/manifest'
 import { buildStory } from '../data/story'
 import { LeftPanel, type EvidenceView } from '../components/layout/LeftPanel'
@@ -288,7 +290,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
               {detail && <span className={`badge status-${detail.status}`}>{STATUS_LABEL[detail.status]}</span>}
             </div>
             <h2 className="title">{detail?.name}</h2>
-            {detail && <p className="subtitle">{detail.measurementClass}</p>}
+            {detail && <p className="evidence-line"><EvidenceTag kind={evidenceOf(detail)} />{EVIDENCE[evidenceOf(detail)].meaning}</p>}
             {aboutId ? <button className="link" onClick={() => setAboutId(null)}>Back to {active?.name}</button> : (
               <div className="tabs underline" role="tablist">
                 <button role="tab" aria-selected={tab === 'about'} className={tab === 'about' ? 'on' : ''} onClick={() => setTab('about')}>Interpretation</button>

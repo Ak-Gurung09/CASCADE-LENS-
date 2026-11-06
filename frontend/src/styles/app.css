@@ -570,3 +570,15 @@ button.primary:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(95, 224, 201, 
 .scenario-profile .tick { stroke: rgba(255, 127, 102, .45); stroke-dasharray: 2 3; }
 .scenario-profile .when { fill: var(--coral) !important; font-size: 8px !important; }
 .scenario-panel .segmented button { flex: 1; }
+
+/* Evidence classes: one colour per kind of result, everywhere in the app */
+.evidence { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; border: 1px solid currentColor; white-space: nowrap; cursor: help; }
+.evidence.compact { font-size: 9.5px; padding: 1px 6px; }
+.ev-observed { color: var(--accent); }
+.ev-derived { color: #8fb8ff; }
+.ev-forecast { color: var(--amber); }
+.ev-hypothesis { color: #d6a4ff; }
+.ev-reference { color: #c9c4b8; }
+.ev-simulation { color: var(--coral); border-style: dashed; }
+.ev-unknown { color: var(--muted); border-style: dotted; }
+.evidence-line { display: flex; align-items: center; gap: 8px; margin-top: -8px; color: var(--muted); font-size: 12.5px; }

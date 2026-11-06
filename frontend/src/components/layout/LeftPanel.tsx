@@ -1,6 +1,8 @@
 import type { Bookmark, Layer, Manifest, ObservationGroup } from '../../types/manifest'
 import type { CSSProperties } from 'react'
 import { formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
+import { evidenceOf } from '../../services/evidence'
+import { EvidenceTag } from '../explanations/EvidenceTag'
 import { missionStyle, splitName } from '../explanations/AboutSource'
 
 export type EvidenceView = 'gunw' | 'goff' | 'gcov'
@@ -72,7 +74,7 @@ function LayerRow({ layer, active, onSelect }: { layer: Layer; active: boolean; 
     <label className={`option compact ${active ? 'on' : ''} ${usable ? '' : 'locked'}`}>
       <input type="radio" name="layer" checked={active} disabled={!usable} onChange={onSelect} />
       <i className="swatch" style={stops ? { background: `linear-gradient(90deg, ${stops.join(',')})` } : undefined} />
-      <span>{layer.name}<small className={`status status-${layer.status}`}>{layer.category === 'gridded' && !usable ? layer.statusReason : STATUS_LABEL[layer.status]}</small></span>
+      <span>{layer.name}<small className={`status status-${layer.status}`}>{layer.category === 'gridded' && !usable ? layer.statusReason : STATUS_LABEL[layer.status]}{usable && <> · <EvidenceTag kind={evidenceOf(layer)} compact /></>}</small></span>
     </label>
   )
 }
