@@ -240,6 +240,30 @@ export interface Manifest {
   granules: GranuleRecord[]
   lake?: LakeSeries
   controlSeries?: ControlSeries
+  observability?: Observability
+}
+
+export interface ObservabilityZone { name: string; pixels: number; percent?: Record<string, number>; verdict?: string; verdictRule?: string }
+
+// Radar Observability block written by processing/scripts/prepare_observability.py
+export interface Observability {
+  pair: [string, string]
+  baselinePair: [string, string] | null
+  granule: string
+  baselineGranule: string | null
+  track: number
+  frame: number
+  orbit: string
+  look: string
+  compositeReleaseId: string
+  productVersion: string
+  incidenceDeg5to95: [number, number]
+  postingM: number
+  classes: Record<string, { code: number; label: string; color: string; meaning: string }[]>
+  thresholds: Record<string, { value: number | string; provenance: string }>
+  sensitivityUsableMovementPct: Record<string, number | null>
+  limitations: string[]
+  zones: Record<string, Record<string, ObservabilityZone>>
 }
 
 // Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair (did.py).

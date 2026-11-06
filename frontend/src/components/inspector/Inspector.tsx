@@ -2,6 +2,8 @@ import { lazy, memo, Suspense, useEffect, useState } from 'react'
 import type { Bookmark, Layer } from '../../types/manifest'
 import { acquisitionLabel, coordinates, isUsable, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
 import { samplePoint, type SampleResult } from '../../services/sampler'
+import { ObservabilityAt } from './ObservabilityAt'
+import { isObservability } from '../../services/observability'
 
 const DayLineChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.DayLineChart })))
 
@@ -17,7 +19,7 @@ function number(v: number) {
 }
 
 function Value({ layer, result }: Sample) {
-  if (result.value === undefined) return null
+  if (result.value === undefined || isObservability(layer)) return null // its reasons are spelled out above
   return (
     <p className="value">
       {number(result.value)} <small>{layer.displayDb ? 'linear' : unitLabel(layer.units)}</small>
@@ -84,6 +86,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
         <div><dt>Location</dt><dd>{coordinates(point[0], point[1])}</dd></div>
         <div><dt>Context</dt><dd>{placeOf(point, bookmarks)}</dd></div>
       </dl>
+      <ObservabilityAt layers={layers} point={point} />
       {!layer ? <p className="muted">Select a layer to read a value here.</p> : busy ? <p className="muted">Loading sample…</p> : main && (
         <>
           <p className={`sample sample-${main.state}`}>{main.message}</p>

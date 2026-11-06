@@ -2,6 +2,7 @@ import type { Bookmark, Layer, Manifest, ObservationGroup } from '../../types/ma
 import type { CSSProperties } from 'react'
 import { formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
 import { evidenceOf } from '../../services/evidence'
+import { isObservability } from '../../services/observability'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 import { missionStyle, splitName } from '../explanations/AboutSource'
 
@@ -87,7 +88,8 @@ export function LeftPanel(p: Props) {
   const snaps = m.groups.filter((g) => g.kind === 'snapshot')
   const shown = view === 'gcov' ? snaps : pairs
   const layers = m.layers.filter((l) => group && l.groupId === group.id && (l.category === view || l.previewOf === view))
-  const gridded = m.layers.filter((l) => l.category === 'gridded')
+  const gridded = m.layers.filter((l) => l.category === 'gridded' && !isObservability(l))
+  const observability = m.layers.filter((l) => isObservability(l) && isUsable(l))
   const terrain = m.layers.find((l) => l.category === 'terrain')
   const refs = m.layers.filter((l) => l.category === 'reference' && isUsable(l))
   const missions = [...new Set(refs.map((r) => r.mission))]
@@ -104,7 +106,7 @@ export function LeftPanel(p: Props) {
         <p className="muted small">{p.hasStory && !m.lake ? 'Reported event' : 'Data date'}: {formatDate(m.caseStudy.eventDate)}. A retrospective evidence explorer, not a warning service.</p>
         {(p.hasStory || p.canSimulate || p.canCompare) && (
           <div className="story-cta">
-            {p.hasStory && <p><strong>New here?</strong> {m.lake ? `Follow the lake's story in ${p.storySteps ?? 4} short steps.` : 'Walk through the event in 4 steps.'}</p>}
+            {p.hasStory && <p><strong>New here?</strong> {m.lake ? `Follow the lake's story in ${p.storySteps ?? 4} short steps.` : `Walk through the event in ${p.storySteps ?? 4} steps.`}</p>}
             {p.hasStory && <button className="primary" onClick={p.onStory} disabled={p.storyActive}><Play />Start the guided story</button>}
             {!p.hasStory && p.canCompare && <p><strong>New here?</strong> Compare the lake on two radar dates.</p>}
             {p.canCompare && <button className={p.hasStory ? '' : 'primary'} onClick={p.onCompare} disabled={p.compareActive}>{!p.hasStory && <Play />}Compare two dates</button>}
@@ -122,6 +124,14 @@ export function LeftPanel(p: Props) {
           ))}
         </div>
       </section>
+
+      {observability.length > 0 && (
+        <section className="obs-section">
+          <h3 className="label">Can the radar see it?</h3>
+          <p className="muted small">Where NISAR can be trusted, and why not elsewhere. Grey is not "no change": it means the radar could not judge.</p>
+          {observability.map((l) => <LayerRow key={l.id} layer={l} active={l.id === p.activeId} onSelect={() => p.onLayer(l.id)} />)}
+        </section>
+      )}
 
       {gridded.length > 0 && (
         <section>

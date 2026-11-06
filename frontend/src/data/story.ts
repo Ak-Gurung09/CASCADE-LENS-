@@ -8,7 +8,7 @@ export interface StoryStep {
   layerId: string
   references: string[]
   paragraphs: string[]
-  chart?: 'lake'
+  chart?: 'lake' | 'observability'
   sources?: string
 }
 
@@ -62,6 +62,25 @@ function controlText(m: Manifest) {
   return `A pair from before the event is the fair test. Between ${day(before.pair[0])} and ${day(before.pair[1])} the slide area and the ground around it scored about the same (${before.inside.toFixed(2)} against ${before.outside.toFixed(2)}). Across the event the gap opened to ${gap(across).toFixed(2)} (${across.inside.toFixed(2)} against ${across.outside.toFixed(2)})${after.length ? `, then narrowed to ${after.map((p) => gap(p).toFixed(2)).join(', ')} in the pairs after` : ''}. Rain or season change would lower both areas together, so the opening gap points at the slide itself. The before pair spans ${before.days} days and the others ${across.days}, which this comparison only partly corrects for.`
 }
 
+// Radar Observability: what the radar could and could not judge, from the observability block (prepare_observability.py)
+function observabilityStep(m: Manifest): StoryStep[] {
+  const o = m.observability
+  const layer = m.layers.find((l) => l.measurementType === 'observability-disturbance' && isUsable(l))
+  if (!o || !layer) return []
+  const z = (task: string, id: string) => o.zones[task]?.[id]?.percent?.Usable
+  const src = [z('disturbance', 'vector:unosat_detachment_zone.geojson'), z('movement', 'vector:unosat_detachment_zone.geojson')]
+  const flow = [z('disturbance', 'vector:unosat_mudflow_extent.geojson'), z('movement', 'vector:unosat_mudflow_extent.geojson')]
+  const out = o.zones.disturbance?.['vector:unosat_mudflow_extent.geojson']?.percent?.['Not acquired']
+  const paras = [
+    'Before reading any radar result, CascadeLens checks whether the radar could see the place at all, for the question being asked. Each spot keeps its own reasons: outside the frame, no data, hidden by the mountain’s own slope (layover or shadow), or a weak signal.',
+    ...(src.every((v) => v != null) ? [`At the detachment zone, a surface change could be seen on ${src[0]!.toFixed(0)}% of the ground, but ground movement could be measured on only ${src[1]!.toFixed(0)}%. So the radar can say the source changed, but not how far it moved.`] : []),
+    ...(flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for spotting change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies outside this radar frame, so there is no conclusion there at all, which is different from no damage.` : ''}`] : []),
+    'Click anywhere on the map to see the reasons for that exact spot.',
+  ]
+  return [{ id: 'observability', title: 'Can the radar see it?', bookmarkId: 'source', layerId: layer.id, references: ['ref:unosat-extent', 'ref:unosat-detachment'], paragraphs: paras, chart: 'observability',
+    sources: `Derived by CascadeLens from the NISAR GUNW pair ${day(o.pair[0])}–${day(o.pair[1])} 2026 (track ${o.track}, frame ${o.frame})${o.baselinePair ? `, the ${day(o.baselinePair[0])}–${day(o.baselinePair[1])} pair as the before baseline,` : ''} and the Copernicus DEM. Coherence threshold ${o.thresholds.coherenceMin?.value}; geometry from the product's own viewing angles (incidence ${o.incidenceDeg5to95[0]}–${o.incidenceDeg5to95[1]}°).` }]
+}
+
 // Text branches on the manifest, so the story can never claim a result that is not loaded.
 export function buildStory(m: Manifest): StoryStep[] {
   if (m.lake) return lakeStory(m)
@@ -86,7 +105,9 @@ export function buildStory(m: Manifest): StoryStep[] {
       paragraphs: [
         'On 26 August 2026 a mountain mass movement was reported in the Langtang/Lhende area, near the Nepal–China border. Reports describe an ice-and-rock avalanche that blocked the upper Lhende Khola. Details of the source are still debated.',
         'The red polygon is UNOSAT’s mapped detachment zone and the blue polygons are barrier lakes. Both are independent satellite mapping, not NISAR results, and neither is field validated.',
-        ...(sourceHasNoData(m) ? ['NISAR’s 16–28 August pair has no usable measurement here: the detachment zone and barrier lakes fall in a gap between radar swaths. So the radar evidence in this pair starts downstream.'] : []),
+        ...(sourceHasNoData(m) ? [m.observability
+          ? 'In NISAR’s 16–28 August pair the radar did record the detachment zone, but its phase was not unwrapped there, so no ground movement can be measured at the source. Step 3 shows exactly what the radar can and cannot judge here.'
+          : 'NISAR’s 16–28 August pair has no unwrapped phase over the detachment zone and barrier lakes, so no movement can be measured there.'] : []),
         ...(pairB ? [`The 19–31 August pair views the slope from the opposite side and does reach it. There, radar image matching largely fails: the median correlation peak is ${pairB}. That is what a heavily changed surface can look like, but other causes are possible.`] : []),
       ],
     },
@@ -94,6 +115,7 @@ export function buildStory(m: Manifest): StoryStep[] {
       id: 'radar', title: 'The radar evidence', bookmarkId: 'bhote-koshi', layerId: coherence ? 'pair-a:gunw-coherence' : 'context:terrain', references: ['ref:unosat-extent', 'ref:rivers'],
       paragraphs: [...radar, 'Twelve days separate the two acquisitions, so a pair can show that something changed between them, but not when within that interval.'],
     },
+    ...observabilityStep(m),
     {
       id: 'downstream', title: 'The downstream corridor', bookmarkId: 'bhote-koshi', layerId: 'context:terrain', references: ['ref:unosat-extent', 'ref:unosat-roads', 'ref:unosat-buildings', 'ref:eos-dpm', 'ref:impact-change', 'ref:rivers', 'ref:places'],
       paragraphs: [

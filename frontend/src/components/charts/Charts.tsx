@@ -29,7 +29,7 @@ export function Donut({ title, slices, centre, note }: { title: string; slices: 
 
 export interface BarGroup { label: string; bars: { label: string; value: number; color: string }[] }
 
-export function Bars({ title, groups, max = 1 }: { title: string; groups: BarGroup[]; max?: number }) {
+export function Bars({ title, groups, max = 1, unit = '' }: { title: string; groups: BarGroup[]; max?: number; unit?: string }) {
   return (
     <figure className="bars">
       <figcaption>{title}</figcaption>
@@ -40,7 +40,7 @@ export function Bars({ title, groups, max = 1 }: { title: string; groups: BarGro
             <div className="bar-row" key={b.label}>
               <span>{b.label}</span>
               <div className="bar-track"><div className="bar-fill" style={{ width: `${Math.min(100, (b.value / max) * 100)}%`, background: b.color }} /></div>
-              <b>{b.value.toFixed(2)}</b>
+              <b>{unit === '%' ? `${b.value.toFixed(0)}%` : b.value.toFixed(2)}</b>
             </div>
           ))}
         </div>
