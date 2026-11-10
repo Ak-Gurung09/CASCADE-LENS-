@@ -2,7 +2,7 @@
 
 **Status: the minimum scientific MVP threshold is met.** The product runs real NISAR measurements of the Rasuwa event, offline, from a one-click package. It is a first prototype on Provisional data, and its limits below are real.
 
-Report date: 2026-11-01.
+Report date: 2026-11-10. Two main cases now ship: Rasuwa (flagship, opens first) and Tsho Rolpa glacial lake.
 
 ## Minimum completion threshold (brief, section 25.4)
 
@@ -23,7 +23,8 @@ Report date: 2026-11-01.
 - **GCOV snapshots** are not downloaded. They need 31 GB, and the tab says so.
 - **GSLC** is deferred: no justified use yet.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
-- **No pre-event control pair** has been compared, so low coherence is not yet tested against the channel's normal state.
+- **Frame 75 is not assessed for observability**: it has no pre-event baseline pair yet, so about half the mapped mudflow and the Trishuli corridor are shown as "outside the frame checked". Frame 75 does cover them (Pair A was processed for both frames) but is not assessed yet.
+- **Not built from the November master prompt** (need data or are out of scope): timeline across many pairs, rainfall and river-flow context (IMERG, GloFAS), slope screening, road impact, live processing, hosting. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
 - **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave, not Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
 - **The app cannot run from `index.html` directly.** Browsers block that, and the page now explains what to do.
@@ -50,7 +51,7 @@ Report date: 2026-11-01.
 | COG and tile export | Implemented and tested | Real files | Real | |
 | Manifest from disk state | Implemented and tested | Integration checks | Real | |
 | Application shell, map | Implemented and tested | 31 browser tests | Real | |
-| Case-study selector | Implemented and tested | Browser | Real | Rasuwa and LANDMET |
+| Case-study selector | Implemented and tested | Browser | Real | Rasuwa and Tsho Rolpa |
 | Bookmarks | Implemented and tested | Browser, exact values | Real | Approximate navigation frames |
 | Observation-pair selector | Implemented and tested | Browser | Real | |
 | Dual-evidence switching | Implemented and tested | Browser | Real | Keeps the selected point |
@@ -68,14 +69,39 @@ Report date: 2026-11-01.
 | One-click package | Implemented and tested | Fresh unzip, via the `.bat` | Real | Needs Python 3 |
 | Accessibility | Implemented and tested | axe, keyboard | n/a | No serious findings |
 | Responsive layout | Implemented and tested | 375 px emulation | n/a | Not on a physical phone |
+| Evidence classes on every layer | Implemented and tested | Unit, browser | Real | Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown |
+| Radar Observability ("Can the radar see it?") | Implemented and tested | 7 Python, 4 frontend, browser | Real, derived | Both cases, frame 74 only; see [RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md) |
+| Pre-event control comparison | Implemented | Run on real files | Real, derived | Rasuwa story step 2 chart |
+| "What could explain this?" | Implemented and tested | 7 unit, browser | Real inputs, rule-based | Hypotheses, never probabilities |
+| Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | 3 unit, browser downloads | Real | Built in the browser |
+| Landslide-prone terrain screen (Model A) | Experimental | 5 Python, 2 unit, browser | Real DEM, derived | Rasuwa only; AUC 0.66 on one event |
+| Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch |
+| Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
+| First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |
+| Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names an existing test | n/a | Shown in the app as "What is real?" |
 | Image swipe comparison | Deferred | None | n/a | Optional |
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 
 ## Commands executed and results
 
+Re-run on 2026-11-10 in a cloud copy (Chromium, not Edge or Brave):
+
+```text
+python -m pytest tests                       72 passed, 35 skipped (skips need the raw NISAR files)
+npx tsc --noEmit                             no errors
+npm test                                     52 passed
+npx playwright test                          29 passed
+python processing/scripts/prepare_hazards.py 689 road segments, 179 tiles, 29 s
+```
+
+The skeptical review and the scorecard are in [REVIEW_AND_SCORECARD.md](docs/REVIEW_AND_SCORECARD.md). Capability maturity lives in one place, `frontend/public/data/status.json`.
+
+The Rasuwa Simulate tab, dropped when Tsho Rolpa was added on 3 to 4 Nov, is back. The LANDMET test case stays out of the app (team decision, 6 Nov), so its tests were replaced by a Tsho Rolpa to Rasuwa case-switch test.
+
+Results from 2026-11-01, kept for reference:
+
 ```text
 python -m pytest tests                       105 passed
-npx tsc --noEmit                             no errors
 npm test                                     29 passed
 npx playwright test                          31 passed: 21 on the real build, 10 on the synthetic fixture
 python processing/scripts/process_nisar.py   6 granules qa_passed
@@ -83,7 +109,7 @@ python processing/scripts/generate_manifest.py   29 layers: 14 sampleable, 12 pr
 python processing/scripts/prepare_landmet.py     19 layers: 12 sampleable, 7 unavailable; peak 12.92 h local solar time
 ```
 
-**Total: 165 automated tests passing.** Before the Simulate mode was added, the real-build browser tests also passed against the final package, unzipped fresh and started through `Start CascadeLens.bat`, in both Microsoft Edge and Brave. The Simulate test ran in Edge and Brave against the build.
+On 2026-11-01, 165 automated tests passed. Before the Simulate mode was added, the real-build browser tests also passed against the final package, unzipped fresh and started through `Start CascadeLens.bat`, in both Microsoft Edge and Brave. The Simulate test ran in Edge and Brave against the build.
 
 | Performance, 2026-11-02, packaged app in headless Edge | Before | After |
 |---|---|---|
@@ -110,7 +136,8 @@ These are medians of 3 localhost runs, not hosted or low-bandwidth measurements.
 See [SCIENTIFIC_VALIDATION.md](docs/SCIENTIFIC_VALIDATION.md).
 
 - Coherence is much lower along the mapped channel: 0.19 and 0.16 inside, against 0.46 and 0.52 nearby.
-- Pair A has no data at the detachment zone: a swath gap.
+- Pair A sees the detachment zone (wrapped coherence present, a change would be visible on 66% of it), but its unwrapped phase is zero-filled there, so movement cannot be measured. An earlier report called this a swath gap; that was wrong.
+- Against a pre-event control (23 Jul to 16 Aug), mudflow coherence falls from 0.41 to 0.28 while nearby untouched ground rises from 0.43 to 0.52, then recovers over later pairs.
 - Pair B reaches it, and matching largely fails: correlation peak 0.18 against 0.63.
 - Raw phase is dominated by the ionosphere.
 - Pixel offsets show no large coherent shift.
@@ -123,4 +150,4 @@ GOFF units check, ignored GOFF mask, unreliable phase shown as valid, GCOV mask 
 
 ## Remaining actions
 
-See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). The most valuable next step is a pre-event control pair.
+See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). The most valuable next steps need new downloads: frame 75 baseline pairs (to assess the downstream corridor) and the frame 98/16 pairs (a second viewing direction). The download list is kept with the project files.

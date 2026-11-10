@@ -38,11 +38,27 @@ export function coherenceGroups(m: Manifest): BarGroup[] {
   })
 }
 
+const OBS_ZONES: [string, string][] = [['vector:unosat_detachment_zone.geojson', 'Detachment zone'], ['vector:unosat_mudflow_extent.geojson', 'Mapped mudflow'], ['bookmark:bhote-koshi', 'Bhote Koshi corridor'], ['bookmark:trishuli', 'Trishuli corridor']]
+
+export function observabilityGroups(m: Manifest): BarGroup[] {
+  const o = m.observability
+  if (!o) return []
+  return OBS_ZONES.flatMap(([id, label]) => {
+    const d = o.zones.disturbance?.[id]?.percent?.Usable
+    const mv = o.zones.movement?.[id]?.percent?.Usable
+    return d == null || mv == null ? [] : [{ label, bars: [
+      { label: 'See a change', value: d, color: 'var(--accent)' },
+      { label: 'Measure movement', value: mv, color: '#8fb8ff' },
+    ] }]
+  })
+}
+
 export function StoryPanel({ steps, index, manifest, onGo, onExit }: Props) {
   const step = steps[index]
   const last = index === steps.length - 1
   const bars = step.layerId.endsWith('gunw-coherence') ? coherenceGroups(manifest) : []
   const chart = step.chart === 'lake' && manifest.lake
+  const obsBars = step.chart === 'observability' ? observabilityGroups(manifest) : []
   const name = manifest.lake ? `The ${manifest.lake.name} story` : 'The mountain-to-river story'
   return (
     <section className="story" aria-label={name} aria-live="polite">
@@ -54,13 +70,14 @@ export function StoryPanel({ steps, index, manifest, onGo, onExit }: Props) {
         ))}
       </ol>
       <p className="eyebrow">Step {index + 1} of {steps.length} · {name}</p>
-      <div className={`story-body ${bars.length || chart ? 'with-chart' : ''}`}>
+      <div className={`story-body ${bars.length || chart || obsBars.length ? 'with-chart' : ''}`}>
         <div>
           <h2>{index + 1}. {step.title}</h2>
           {step.paragraphs.map((p) => <p key={p}>{p}</p>)}
           {step.sources && <p className="muted small story-sources">{step.sources}</p>}
         </div>
         {chart && <LakeChart lake={manifest.lake!} />}
+        {obsBars.length > 0 && <Bars title="Share of ground the radar can judge (%)" groups={obsBars} max={100} unit="%" />}
         {bars.length > 0 && <Bars title="Signal quality (coherence: 0 = noisy, 1 = stable)" groups={bars} />}
       </div>
       <footer>

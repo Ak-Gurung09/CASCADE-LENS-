@@ -26,6 +26,8 @@ export interface VectorStyle {
   radius?: number
   dash?: boolean
   bounds: Bounds
+  colorProperty?: string // per-feature colour, falling back to color
+  width?: number
 }
 
 export interface Legend {
@@ -240,6 +242,31 @@ export interface Manifest {
   granules: GranuleRecord[]
   lake?: LakeSeries
   controlSeries?: ControlSeries
+  observability?: Observability
+  hazards?: Hazards
+}
+
+export interface ObservabilityZone { name: string; pixels: number; percent?: Record<string, number>; verdict?: string; verdictRule?: string }
+
+// Radar Observability block written by processing/scripts/prepare_observability.py
+export interface Observability {
+  pair: [string, string]
+  baselinePair: [string, string] | null
+  granule: string
+  baselineGranule: string | null
+  track: number
+  frame: number
+  orbit: string
+  look: string
+  compositeReleaseId: string
+  productVersion: string
+  incidenceDeg5to95: [number, number]
+  postingM: number
+  classes: Record<string, { code: number; label: string; color: string; meaning: string }[]>
+  thresholds: Record<string, { value: number | string; provenance: string }>
+  sensitivityUsableMovementPct: Record<string, number | null>
+  limitations: string[]
+  zones: Record<string, Record<string, ObservabilityZone>>
 }
 
 // Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair (did.py).
@@ -251,4 +278,12 @@ export interface ControlSeries {
   direction: string
   eventDate: string
   pairs: { pair: [string, string]; days: number; inside: number; outside: number; insideCi95: [number, number]; validPct: number; granule: string }[]
+}
+
+// Terrain screen and road exposure, written by processing/scripts/prepare_hazards.py
+export interface Hazards {
+  terrain: { layerId: string; flags: Record<string, number>; classes: { code: number; label: string; color: string; meaning: string }[]; maturity: string
+    validation: { detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
+  roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number }>; rules: Record<string, string>; maturity: string }
+  dynamicTrigger: { maturity: string; needs: string[] }
 }

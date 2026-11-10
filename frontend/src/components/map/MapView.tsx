@@ -74,7 +74,7 @@ function addReference(map: MlMap, l: Layer) {
   if (v.type === 'fill') {
     map.addLayer({ ...base, type: 'fill', paint: { 'fill-color': v.color!, 'fill-opacity': v.opacity ?? 0.5, 'fill-outline-color': v.color! } })
   } else if (v.type === 'line') {
-    map.addLayer({ ...base, type: 'line', paint: { 'line-color': v.color!, 'line-opacity': v.opacity ?? 0.8, 'line-width': 1.4, ...(v.dash ? { 'line-dasharray': [3, 2] } : {}) } })
+    map.addLayer({ ...base, type: 'line', paint: { 'line-color': v.colorProperty ? ['coalesce', ['get', v.colorProperty], v.color!] : v.color!, 'line-opacity': v.opacity ?? 0.8, 'line-width': v.width ?? 1.4, ...(v.dash ? { 'line-dasharray': [3, 2] } : {}) } })
   } else {
     map.addLayer({ ...base, type: 'circle', paint: { 'circle-color': v.color!, 'circle-opacity': v.opacity ?? 0.8, 'circle-radius': v.radius ?? 2 } })
   }

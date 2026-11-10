@@ -1,5 +1,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Bookmark, Manifest } from '../types/manifest'
+import { EvidenceTag } from '../components/explanations/EvidenceTag'
+import { EVIDENCE, evidenceOf } from '../services/evidence'
 import { CASES, currentCase, isUsable, loadManifest, STATUS_LABEL } from '../services/manifest'
 import { buildStory } from '../data/story'
 import { LeftPanel, type EvidenceView } from '../components/layout/LeftPanel'
@@ -7,6 +9,7 @@ import type { MapStatus } from '../components/map/MapView'
 import { Legend } from '../components/legends/Legend'
 import { Credits } from '../components/legends/Credits'
 import { Inspector } from '../components/inspector/Inspector'
+import { FindingCard, StatusPanel } from '../components/explanations/FirstMinute'
 import { Interpretation } from '../components/explanations/Interpretation'
 import { AboutSource } from '../components/explanations/AboutSource'
 import { StoryPanel } from '../components/story/StoryPanel'
@@ -66,6 +69,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const [bookmarkId, setBookmarkId] = useState<string | null>(null)
   const [focus, setFocus] = useState<{ bounds: Bookmark['bounds']; nonce: number } | null>(null)
   const [point, setPoint] = useState<[number, number] | null>(null)
+  const [statusOpen, setStatusOpen] = useState(false)
   const [storyStep, setStoryStep] = useState<number | null>(null)
   const [simOn, setSimOn] = useState(false)
   const [compareOn, setCompareOn] = useState(false)
@@ -213,6 +217,7 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
           </div>
         )}
         <div className="top-actions">
+          <button className="status-btn" onClick={() => setStatusOpen((v) => !v)} aria-pressed={statusOpen}>What is real?</button>
           {provisional && <span className="badge amber" title={active?.productMaturity}>Provisional data</span>}
           <button className="mobile-only" aria-expanded={panel === 'left'} onClick={() => setPanel(panel === 'left' ? null : 'left')}>Layers</button>
           <button className="mobile-only" aria-expanded={panel === 'right'} onClick={() => setPanel(panel === 'right' ? null : 'right')}>Details</button>
@@ -240,6 +245,8 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
             <Terrain3D lake={m.lake} onExit={() => setThreeOn(false)} />
           </Suspense>
         )}
+        {storyStep === null && !simOn && panel === null && <FindingCard manifest={m} onStory={() => goStory(0)} onStatus={() => setStatusOpen(true)} />}
+        {statusOpen && <StatusPanel onClose={() => setStatusOpen(false)} />}
         {bookmark && <p className="place-chip">{bookmark.name}</p>}
         {mapStatus.state === 'error' && <p className="map-alert" role="alert">{mapStatus.message}</p>}
         {!covered && <p className="map-notice" role="status">No geographic coverage: {active?.name} has no data in this view.</p>}
@@ -288,14 +295,14 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
               {detail && <span className={`badge status-${detail.status}`}>{STATUS_LABEL[detail.status]}</span>}
             </div>
             <h2 className="title">{detail?.name}</h2>
-            {detail && <p className="subtitle">{detail.measurementClass}</p>}
+            {detail && <p className="evidence-line"><EvidenceTag kind={evidenceOf(detail)} />{EVIDENCE[evidenceOf(detail)].meaning}</p>}
             {aboutId ? <button className="link" onClick={() => setAboutId(null)}>Back to {active?.name}</button> : (
               <div className="tabs underline" role="tablist">
                 <button role="tab" aria-selected={tab === 'about'} className={tab === 'about' ? 'on' : ''} onClick={() => setTab('about')}>Interpretation</button>
                 <button role="tab" aria-selected={tab === 'inspect'} className={tab === 'inspect' ? 'on' : ''} onClick={() => setTab('inspect')}>Inspector</button>
               </div>
             )}
-            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
+            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} manifest={m} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
           </div>}
         </aside>
       )}

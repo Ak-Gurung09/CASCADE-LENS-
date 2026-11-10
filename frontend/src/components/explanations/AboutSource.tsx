@@ -1,3 +1,5 @@
+import { EvidenceTag } from './EvidenceTag'
+import { evidenceOf } from '../../services/evidence'
 import type { CSSProperties } from 'react'
 import type { Layer } from '../../types/manifest'
 import { STATUS_LABEL } from '../../services/manifest'
@@ -48,7 +50,7 @@ export function AboutSource({ layer, backLabel, onBack }: { layer: Layer; backLa
         {figure && <p className="hero-figure">{figure}</p>}
         <div className="chips-row">
           <span className="chip">{layer.acquisition.reference}</span>
-          <span className="chip">{layer.measurementClass}</span>
+          <EvidenceTag kind={evidenceOf(layer)} compact />
           <span className={`chip status-${layer.status}`}>{STATUS_LABEL[layer.status]}</span>
           {lic && <span className="chip">{lic}</span>}
         </div>

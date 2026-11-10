@@ -5044,6 +5044,364 @@
    "sourceGranules": [],
    "productMaturity": "Community-maintained",
    "page": "https://data.humdata.org/dataset/cod-ab-npl"
+  },
+  {
+   "id": "rasuwa-2026:observability-disturbance",
+   "groupId": null,
+   "name": "Can the radar see it? (surface change)",
+   "category": "gridded",
+   "mission": "NISAR",
+   "instrument": "L-SAR",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "observability-disturbance",
+   "kind": "categorical",
+   "units": null,
+   "acquisition": {
+    "reference": "2026-08-16",
+    "secondary": "2026-08-28"
+   },
+   "orbitDirection": "Descending",
+   "track": 48,
+   "frames": [
+    74
+   ],
+   "postingM": [
+    40
+   ],
+   "crs": "EPSG:32645",
+   "qualityLayerIds": [],
+   "status": "sampleable",
+   "statusReason": null,
+   "sources": [
+    {
+     "frame": 74,
+     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
+     "sourceDataset": "reason flags (see observability block)",
+     "bounds": [
+      84.38262429509216,
+      27.714795075127526,
+      85.55941176995117,
+      28.367440328151478
+     ],
+     "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026/observability-disturbance/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 12,
+      "count": 179
+     }
+    }
+   ],
+   "sourceGranules": [
+    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001"
+   ],
+   "productMaturity": "Derived from Provisional products",
+   "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#5FE0C9",
+     "#F2C46B",
+     "#B07CFF",
+     "#6B7682",
+     "#2A3138"
+    ],
+    "keys": [
+     {
+      "color": "#5FE0C9",
+      "label": "Usable"
+     },
+     {
+      "color": "#F2C46B",
+      "label": "Seen, but not reliable"
+     },
+     {
+      "color": "#B07CFF",
+      "label": "Hidden by terrain"
+     },
+     {
+      "color": "#6B7682",
+      "label": "No data in the product"
+     },
+     {
+      "color": "#2A3138",
+      "label": "Outside the frame checked"
+     }
+    ]
+   },
+   "explanation": {
+    "what": "Could a surface change between these dates be seen here?",
+    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
+    "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
+    "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
+   },
+   "limitations": [
+    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
+    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+    "Products are Provisional."
+   ]
+  },
+  {
+   "id": "rasuwa-2026:observability-movement",
+   "groupId": null,
+   "name": "Can the radar see it? (ground movement)",
+   "category": "gridded",
+   "mission": "NISAR",
+   "instrument": "L-SAR",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "observability-movement",
+   "kind": "categorical",
+   "units": null,
+   "acquisition": {
+    "reference": "2026-08-16",
+    "secondary": "2026-08-28"
+   },
+   "orbitDirection": "Descending",
+   "track": 48,
+   "frames": [
+    74
+   ],
+   "postingM": [
+    40
+   ],
+   "crs": "EPSG:32645",
+   "qualityLayerIds": [],
+   "status": "sampleable",
+   "statusReason": null,
+   "sources": [
+    {
+     "frame": 74,
+     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
+     "sourceDataset": "reason flags (see observability block)",
+     "bounds": [
+      84.38262429509216,
+      27.714795075127526,
+      85.55941176995117,
+      28.367440328151478
+     ],
+     "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026/observability-movement/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 12,
+      "count": 179
+     }
+    }
+   ],
+   "sourceGranules": [
+    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001"
+   ],
+   "productMaturity": "Derived from Provisional products",
+   "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#5FE0C9",
+     "#F2C46B",
+     "#B07CFF",
+     "#6B7682",
+     "#2A3138"
+    ],
+    "keys": [
+     {
+      "color": "#5FE0C9",
+      "label": "Usable"
+     },
+     {
+      "color": "#F2C46B",
+      "label": "Seen, but not reliable"
+     },
+     {
+      "color": "#B07CFF",
+      "label": "Hidden by terrain"
+     },
+     {
+      "color": "#6B7682",
+      "label": "No data in the product"
+     },
+     {
+      "color": "#2A3138",
+      "label": "Outside the frame checked"
+     }
+    ]
+   },
+   "explanation": {
+    "what": "Could ground movement be measured here?",
+    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
+    "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
+    "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
+   },
+   "limitations": [
+    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
+    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+    "Products are Provisional."
+   ]
+  },
+  {
+   "groupId": null,
+   "mission": "Copernicus DEM",
+   "instrument": "TanDEM-X (via Copernicus DEM GLO-30)",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "sampleable",
+   "statusReason": null,
+   "sourceGranules": [],
+   "productMaturity": "Experimental screen",
+   "id": "rasuwa-2026:terrain-screen",
+   "name": "Landslide-prone terrain (screen)",
+   "category": "gridded",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "terrain-screen",
+   "kind": "categorical",
+   "units": null,
+   "acquisition": {
+    "reference": "2011-2015 (DEM source campaign)",
+    "secondary": null
+   },
+   "postingM": [
+    40
+   ],
+   "crs": "EPSG:32645",
+   "sources": [
+    {
+     "frame": null,
+     "granule": "Copernicus DEM GLO-30",
+     "sourceFilename": "copdem_glo30.tif",
+     "sourceDataset": "factor flags (see hazards block)",
+     "bounds": [
+      84.382624295,
+      27.714795075,
+      85.55941177,
+      28.367440328
+     ],
+     "sampling": "data/sampling/rasuwa-2026/terrain-screen-flags.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026/terrain-screen/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 12,
+      "count": 179
+     }
+    }
+   ],
+   "attribution": "Derived by CascadeLens from Copernicus DEM GLO-30",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#3B5A55",
+     "#C9B458",
+     "#E8873A",
+     "#D9483B"
+    ],
+    "keys": [
+     {
+      "color": "#3B5A55",
+      "label": "Low"
+     },
+     {
+      "color": "#C9B458",
+      "label": "Moderate"
+     },
+     {
+      "color": "#E8873A",
+      "label": "High"
+     },
+     {
+      "color": "#D9483B",
+      "label": "Very high"
+     }
+    ]
+   },
+   "explanation": {
+    "what": "Where the shape of the ground favours slope failure: steepness, converging hollows and wet ground.",
+    "measures": "Slope, plan curvature and a topographic wetness index from the elevation model, combined by fixed, published rules.",
+    "inspect": "Click a spot to see which terrain factors apply there.",
+    "establishes": "A screen of terrain only. It is not a forecast, not trained on a Nepal landslide inventory, and leaves out geology, soil and rainfall."
+   },
+   "limitations": [
+    "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
+    "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed."
+   ]
+  },
+  {
+   "groupId": null,
+   "mission": "CascadeLens",
+   "instrument": "OpenStreetMap roads + terrain screen + Radar Observability",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "prepared",
+   "statusReason": null,
+   "sourceGranules": [],
+   "productMaturity": "Experimental screen",
+   "id": "rasuwa-2026:road-exposure",
+   "name": "Road exposure (screen)",
+   "category": "reference",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "road-exposure",
+   "kind": "vector",
+   "units": null,
+   "acquisition": {
+    "reference": "Event pair 2026-08-16 to 2026-08-28",
+    "secondary": null
+   },
+   "sources": [],
+   "vector": {
+    "url": "data/vectors/road-exposure-rasuwa-2026.geojson",
+    "type": "line",
+    "color": "#E8B04A",
+    "opacity": 0.95,
+    "bounds": [
+     84.551423,
+     27.780618,
+     85.37967,
+     28.28711
+    ],
+    "colorProperty": "color",
+    "width": 3
+   },
+   "attribution": "Derived by CascadeLens from OpenStreetMap (ODbL), Copernicus DEM, UNOSAT and NISAR GUNW",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#D9483B",
+     "#E8B04A",
+     "#7FB8A8"
+    ],
+    "keys": [
+     {
+      "color": "#D9483B",
+      "label": "High exposure"
+     },
+     {
+      "color": "#E8B04A",
+      "label": "Moderate exposure"
+     },
+     {
+      "color": "#7FB8A8",
+      "label": "Low exposure"
+     }
+    ]
+   },
+   "limitations": [
+    "A screen, not a risk rating: traffic, road design, retaining walls and drainage are unknown.",
+    "OpenStreetMap roads exported after the event; some may have moved or closed.",
+    "Click a road segment to see why it is rated as it is, and whether the radar can watch it."
+   ]
   }
  ],
  "granules": [
@@ -5522,5 +5880,428 @@
     "granule": "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001"
    }
   ]
+ },
+ "observability": {
+  "pair": [
+   "2026-08-16",
+   "2026-08-28"
+  ],
+  "baselinePair": [
+   "2026-07-23",
+   "2026-08-16"
+  ],
+  "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+  "baselineGranule": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+  "track": 48,
+  "frame": 74,
+  "orbit": "Descending",
+  "look": "Left",
+  "compositeReleaseId": "P05023",
+  "productVersion": "1.0.11",
+  "incidenceDeg5to95": [
+   32.3,
+   38.2
+  ],
+  "losToSensorEastNorth": [
+   -0.552,
+   0.167
+  ],
+  "geometryHeightM": 1500.0,
+  "postingM": 40,
+  "flags": {
+   "outside": 1,
+   "noData": 2,
+   "layover": 4,
+   "shadow": 8,
+   "lowCoherence": 16,
+   "noConnectedComponent": 32,
+   "lowBaselineCoherence": 64
+  },
+  "classes": {
+   "disturbance": [
+    {
+     "code": 1,
+     "label": "Usable",
+     "color": "#5FE0C9",
+     "meaning": "The radar saw this ground clearly before and across the event, so a change here would show."
+    },
+    {
+     "code": 2,
+     "label": "Seen, but not reliable",
+     "color": "#F2C46B",
+     "meaning": "The ground was already incoherent in the baseline pair, so a drop across the event cannot be told apart from normal noise."
+    },
+    {
+     "code": 3,
+     "label": "Hidden by terrain",
+     "color": "#B07CFF",
+     "meaning": "Layover or radar shadow: the slope's geometry hides it from this viewing angle."
+    },
+    {
+     "code": 4,
+     "label": "No data in the product",
+     "color": "#6B7682",
+     "meaning": "Inside the frame, but the product holds no value here."
+    },
+    {
+     "code": 5,
+     "label": "Outside the frame checked",
+     "color": "#2A3138",
+     "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."
+    }
+   ],
+   "movement": [
+    {
+     "code": 1,
+     "label": "Usable",
+     "color": "#5FE0C9",
+     "meaning": "Phase is coherent and unwrapped, so ground movement could be measured here."
+    },
+    {
+     "code": 2,
+     "label": "Seen, but not reliable",
+     "color": "#F2C46B",
+     "meaning": "Phase is too noisy (low coherence) or was not unwrapped here, so no movement value can be trusted."
+    },
+    {
+     "code": 3,
+     "label": "Hidden by terrain",
+     "color": "#B07CFF",
+     "meaning": "Layover or radar shadow: the slope's geometry hides it from this viewing angle."
+    },
+    {
+     "code": 4,
+     "label": "No data in the product",
+     "color": "#6B7682",
+     "meaning": "Inside the frame, but the product holds no value here."
+    },
+    {
+     "code": 5,
+     "label": "Outside the frame checked",
+     "color": "#2A3138",
+     "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."
+    }
+   ]
+  },
+  "thresholds": {
+   "coherenceMin": {
+    "value": 0.3,
+    "provenance": "Project choice. 0.3 is a common lower bound for usable L-band phase; results at 0.2 and 0.4 are reported alongside so the choice can be checked."
+   },
+   "layover": {
+    "value": "range slope toward the radar > incidence angle",
+    "provenance": "Standard SAR geometry (layover occurs when the terrain slope facing the sensor exceeds the incidence angle)."
+   },
+   "shadow": {
+    "value": "range slope away from the radar > 90 deg - incidence angle",
+    "provenance": "Standard SAR geometry (active radar shadow)."
+   }
+  },
+  "sensitivityUsableMovementPct": {
+   "0.2": 95.0,
+   "0.3": 82.4,
+   "0.4": 67.2
+  },
+  "limitations": [
+   "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
+   "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+   "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+   "Products are Provisional."
+  ],
+  "zones": {
+   "disturbance": {
+    "bookmark:source": {
+     "name": "Mountain source area",
+     "pixels": 79881,
+     "percent": {
+      "Usable": 68.5,
+      "Seen, but not reliable": 21.5,
+      "Hidden by terrain": 10.0,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 0.0
+     },
+     "verdict": "Enough evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "bookmark:bhote-koshi": {
+     "name": "Bhote Koshi corridor",
+     "pixels": 79843,
+     "percent": {
+      "Usable": 70.0,
+      "Seen, but not reliable": 21.2,
+      "Hidden by terrain": 8.8,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 0.0
+     },
+     "verdict": "Enough evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "bookmark:trishuli": {
+     "name": "Trishuli downstream corridor",
+     "pixels": 1479716,
+     "percent": {
+      "Usable": 3.4,
+      "Seen, but not reliable": 1.2,
+      "Hidden by terrain": 0.0,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 95.3
+     },
+     "verdict": "Insufficient evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "vector:unosat_mudflow_extent.geojson": {
+     "name": "unosat_mudflow_extent",
+     "pixels": 36940,
+     "percent": {
+      "Usable": 33.6,
+      "Seen, but not reliable": 11.6,
+      "Hidden by terrain": 2.9,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 52.0
+     },
+     "verdict": "Partial evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "vector:unosat_detachment_zone.geojson": {
+     "name": "unosat_detachment_zone",
+     "pixels": 1219,
+     "percent": {
+      "Usable": 66.4,
+      "Seen, but not reliable": 20.6,
+      "Hidden by terrain": 13.0,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 0.0
+     },
+     "verdict": "Enough evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "_case": {
+     "name": "Whole case area",
+     "pixels": 5043504,
+     "percent": {
+      "Usable": 38.8,
+      "Seen, but not reliable": 7.2,
+      "Hidden by terrain": 3.2,
+      "No data in the product": 0.1,
+      "Outside the frame checked": 50.7
+     },
+     "verdict": "Partial evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    }
+   },
+   "movement": {
+    "bookmark:source": {
+     "name": "Mountain source area",
+     "pixels": 79881,
+     "percent": {
+      "Usable": 25.3,
+      "Seen, but not reliable": 64.8,
+      "Hidden by terrain": 10.0,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 0.0
+     },
+     "verdict": "Partial evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "bookmark:bhote-koshi": {
+     "name": "Bhote Koshi corridor",
+     "pixels": 79843,
+     "percent": {
+      "Usable": 75.8,
+      "Seen, but not reliable": 15.4,
+      "Hidden by terrain": 8.8,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 0.0
+     },
+     "verdict": "Enough evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "bookmark:trishuli": {
+     "name": "Trishuli downstream corridor",
+     "pixels": 1479716,
+     "percent": {
+      "Usable": 3.9,
+      "Seen, but not reliable": 0.8,
+      "Hidden by terrain": 0.0,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 95.3
+     },
+     "verdict": "Insufficient evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "vector:unosat_mudflow_extent.geojson": {
+     "name": "unosat_mudflow_extent",
+     "pixels": 36940,
+     "percent": {
+      "Usable": 9.0,
+      "Seen, but not reliable": 36.1,
+      "Hidden by terrain": 2.9,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 52.0
+     },
+     "verdict": "Insufficient evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "vector:unosat_detachment_zone.geojson": {
+     "name": "unosat_detachment_zone",
+     "pixels": 1219,
+     "percent": {
+      "Usable": 0.0,
+      "Seen, but not reliable": 87.0,
+      "Hidden by terrain": 13.0,
+      "No data in the product": 0.0,
+      "Outside the frame checked": 0.0
+     },
+     "verdict": "Insufficient evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    },
+    "_case": {
+     "name": "Whole case area",
+     "pixels": 5043504,
+     "percent": {
+      "Usable": 30.0,
+      "Seen, but not reliable": 16.0,
+      "Hidden by terrain": 3.2,
+      "No data in the product": 0.1,
+      "Outside the frame checked": 50.7
+     },
+     "verdict": "Partial evidence",
+     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
+    }
+   }
+  }
+ },
+ "hazards": {
+  "terrain": {
+   "layerId": "rasuwa-2026:terrain-screen",
+   "flags": {
+    "slope15to25": 1,
+    "slope25to35": 2,
+    "slope35plus": 4,
+    "hollow": 8,
+    "wet": 16
+   },
+   "classes": [
+    {
+     "code": 1,
+     "label": "Low",
+     "color": "#3B5A55",
+     "meaning": "Gentle ground (under 15 deg), or moderate slopes with no other factor."
+    },
+    {
+     "code": 2,
+     "label": "Moderate",
+     "color": "#C9B458",
+     "meaning": "Moderately steep, or steep but neither convergent nor wet."
+    },
+    {
+     "code": 3,
+     "label": "High",
+     "color": "#E8873A",
+     "meaning": "Steep and either convergent or wet."
+    },
+    {
+     "code": 4,
+     "label": "Very high",
+     "color": "#D9483B",
+     "meaning": "35 deg or steeper, convergent and wet: where shallow slides and debris flows typically start."
+    }
+   ],
+   "thresholds": {
+    "slopeBandsDeg": {
+     "value": [
+      15.0,
+      25.0,
+      35.0
+     ],
+     "provenance": "Project choice of common slope classes; they are not calibrated for Nepal. Each band's share of the mapped 2026 detachment zone is reported so the choice can be checked."
+    },
+    "hollow": {
+     "value": "plan curvature < 0 after 3x3 smoothing",
+     "provenance": "Standard terrain-analysis convention (convergent flow)."
+    },
+    "wet": {
+     "value": "TWI above the 75th percentile of slopes over 15 deg",
+     "provenance": "Relative, project choice. TWI = ln(a / tan b) with D8 flow accumulation (Beven and Kirkby 1979)."
+    }
+   },
+   "wetIndexCut": 6.4,
+   "validation": {
+    "detachmentZone": {
+     "pixels": 1219,
+     "percentByClass": {
+      "Low": 7.1,
+      "Moderate": 36.9,
+      "High": 44.1,
+      "Very high": 11.8
+     },
+     "aucVsRestOfArea": 0.663
+    },
+    "mudflowRunout": {
+     "pixels": 36616,
+     "percentByClass": {
+      "Low": 58.0,
+      "Moderate": 24.3,
+      "High": 15.4,
+      "Very high": 2.4
+     },
+     "note": "The runout is where debris travelled and settled, mostly valley floors. A terrain screen for slope failure is not expected to rank it high."
+    },
+    "wholeArea": {
+     "Low": 25.1,
+     "Moderate": 43.5,
+     "High": 28.6,
+     "Very high": 2.9
+    }
+   },
+   "limitations": [
+    "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
+    "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed."
+   ],
+   "maturity": "EXPERIMENTAL"
+  },
+  "roads": {
+   "layerId": "rasuwa-2026:road-exposure",
+   "segmentM": 250,
+   "bufferM": 150,
+   "riverM": 100,
+   "roadTypes": [
+    "primary",
+    "secondary",
+    "tertiary",
+    "trunk"
+   ],
+   "kmByExposure": {
+    "High": {
+     "km": 73.3,
+     "unwatchedKm": 32.7
+    },
+    "Low": {
+     "km": 32.5,
+     "unwatchedKm": 31.5
+    },
+    "Moderate": {
+     "km": 47.6,
+     "unwatchedKm": 44.8
+    }
+   },
+   "rules": {
+    "High": "Crosses ground mapped as hit in 2026, or 30% or more of the ground within 150 m screens High or Very high",
+    "Moderate": "10% or more screens High or Very high, or within 100 m of a river",
+    "Low": "Otherwise",
+    "radarWatch": "Share of the 150 m corridor where the event pair could see a surface change: 50% or more = can watch, 20 to 50% = partly, under 20% = cannot"
+   },
+   "maturity": "EXPERIMENTAL"
+  },
+  "dynamicTrigger": {
+   "maturity": "BLOCKED BY DATA",
+   "needs": [
+    "GPM IMERG daily rainfall for Aug 2026",
+    "SMAP soil moisture",
+    "A Nepal-calibrated rainfall threshold"
+   ]
+  }
  }
 }

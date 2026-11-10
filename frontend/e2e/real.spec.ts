@@ -6,7 +6,7 @@ import { expect, test, type ConsoleMessage, type Page } from '@playwright/test'
 
 // The production build with its real data, served under a CSP that blocks every request off this origin.
 const SHOTS = '../docs/screenshots'
-const LANDMET = '/?case=landmet-2007'
+const TSHO = '/?case=tsho-rolpa-2026'
 
 async function open(page: Page, path = '/') {
   await page.goto(path)
@@ -92,12 +92,14 @@ test('completes the story with the outside world blocked', async ({ page }) => {
   page.on('request', (r) => { if (new URL(r.url()).hostname !== 'localhost') external.push(r.url()) })
   await open(page)
   await page.getByRole('button', { name: 'Start the guided story' }).click()
-  await expect(page.locator('.story')).toContainText('gap between radar swaths')
+  await expect(page.locator('.story')).toContainText('phase was not unwrapped there')
   await expect(page.locator('.story')).toContainText('at the detachment zone against')
   await page.getByRole('button', { name: 'Next' }).click()
   await expect(page.locator('.story')).toContainText('much lower than on the terrain beside it')
   await page.getByRole('button', { name: 'Next' }).click()
-  await expect(page.getByRole('heading', { name: '3. The downstream corridor' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '3. Can the radar see it?' })).toBeVisible()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await expect(page.getByRole('heading', { name: '4. The downstream corridor' })).toBeVisible()
   await page.getByRole('button', { name: 'Next' }).click()
   await expect(page.locator('.story')).toContainText('No displacement is calculated')
   await expect(page.locator('.story')).toContainText('from the ionosphere')
@@ -151,7 +153,7 @@ test('Sentinel-1 layers stay separate from NISAR and cannot be sampled', async (
   await tile
   await expect(page.locator('.legend')).toContainText('More change')
   await page.getByRole('button', { name: /About Sentinel-1 damage proxy/ }).click()
-  await expect(page.getByRole('heading', { name: /damage proxy map/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /damage proxy map/i })).toBeVisible()
   await expect(page.locator('.limits')).toContainText('Not NISAR')
   await expect(page.locator('.limits')).toContainText('cannot sample it')
   await expect(page.locator('.credits summary')).toContainText('Sentinel-1')
@@ -180,7 +182,7 @@ test('has no serious accessibility violations', async ({ page }) => {
   expect(await scan()).toEqual([])
   await page.getByRole('button', { name: 'Start the guided story' }).click()
   expect(await scan()).toEqual([])
-  await open(page, LANDMET)
+  await open(page, TSHO)
   expect(await scan()).toEqual([])
 })
 
@@ -196,63 +198,11 @@ test('every control can be reached and used from the keyboard', async ({ page })
   await expect(box).toBeChecked()
 })
 
-test.describe('LANDMET test case', () => {
-  test('cannot be mistaken for NISAR or Rasuwa', async ({ page }) => {
-    await open(page, LANDMET)
-    await expect(page.locator('.fixture-banner')).toContainText('not NISAR data')
-    await expect(page.getByRole('button', { name: 'Start the guided story' })).toHaveCount(0)
-    await expect(page.getByRole('tab', { name: 'InSAR' })).toHaveCount(0)
-    await page.waitForTimeout(1000)
-    await page.screenshot({ path: `${SHOTS}/landmet-global.png` })
-  })
-
-  test('shows empty variables as unavailable, with the reason', async ({ page }) => {
-    await open(page, LANDMET)
-    const row = page.getByRole('radio', { name: /Total cloud fraction/ })
-    await expect(row).toBeDisabled()
-    await expect(row.locator('xpath=ancestor::label')).toContainText('Every value in this file is fill')
-  })
-
-  test('the time slider changes the map and the stored value', async ({ page }) => {
-    await open(page, LANDMET)
-    await inspect(page, 'Sahara')
-    await expect(page.locator('.value')).toHaveText('276.90 K') // FDtemps step 0, read directly from the file
-    const tile = page.waitForResponse((r) => r.url().includes('/tiles/landmet/skin-temp/t04/'))
-    await page.getByLabel('Time of day').fill('4')
-    await expect(page.locator('.slider', { hasText: 'Time of day' })).toContainText('12:00 UTC')
-    await tile
-    await expect(page.locator('.value')).toHaveText('295.60 K') // FDtemps step 4, the Sahara's midday peak
-    await expect(page.locator('.day-chart')).toBeVisible()
-    await page.waitForTimeout(800)
-    await page.screenshot({ path: `${SHOTS}/landmet-time.png` })
-  })
-
-  test('flags the impossible wind speed instead of showing it as data', async ({ page }) => {
-    await open(page, LANDMET)
-    await page.getByRole('radio', { name: /Station wind speed/ }).check()
-    await expect(page.locator('.limits')).toContainText('118.6 m/s')
-    await expect(page.locator('.legend-title').first()).toContainText('Station wind speed (m/s)')
-  })
-
-  test('Simulate offers only what this data supports, and plays its saved times', async ({ page }) => {
-    await open(page, LANDMET)
-    await page.getByRole('button', { name: 'Simulate' }).click()
-    const panel = page.locator('.sim-panel')
-    await expect(panel.getByRole('tab')).toHaveText(['Time replay'])
-    await expect(panel).toContainText('00:00 UTC')
-    await panel.getByRole('button', { name: 'Play' }).click()
-    await expect(panel).toContainText('03:00 UTC')
-    await panel.getByRole('button', { name: 'Pause' }).click()
-    await page.getByRole('button', { name: 'Exit simulation' }).click()
-    await expect(panel).toHaveCount(0)
-  })
-
-  test('switching case returns to Rasuwa', async ({ page }) => {
-    await open(page, LANDMET)
-    await page.getByLabel('Case study').selectOption('rasuwa-2026')
-    await expect(page.getByRole('heading', { name: 'Rasuwa–Bhote Koshi–Trishuli, Nepal' })).toBeVisible()
-    await expect(page.locator('.fixture-banner')).toHaveCount(0)
-  })
+test('switching case moves between Tsho Rolpa and Rasuwa', async ({ page }) => {
+  await open(page, TSHO)
+  await expect(page.getByRole('heading', { name: /Tsho Rolpa/ }).first()).toBeVisible()
+  await page.getByLabel('Case study').selectOption('rasuwa-2026')
+  await expect(page.getByRole('heading', { name: 'Rasuwa–Bhote Koshi–Trishuli, Nepal' })).toBeVisible()
 })
 
 test.describe('phone', () => {
@@ -271,6 +221,7 @@ test.describe('phone', () => {
     await page.waitForTimeout(1500)
     await page.screenshot({ path: `${SHOTS}/phone-story.png` })
     for (const b of await page.locator('.top-actions button, .story button').all()) {
+      if (!(await b.isVisible())) continue // hidden at phone width, so not a tap target
       const h = (await b.boundingBox())?.height ?? 0
       if (await b.evaluate((e) => !e.classList.contains('link'))) expect(h).toBeGreaterThanOrEqual(32)
     }
@@ -304,4 +255,44 @@ test('records performance', async ({ page }) => {
   writeFileSync('e2e/performance.json', JSON.stringify(report, null, 2))
   expect(mapReady).toBeLessThan(8000)
   expect(firstSample).toBeLessThan(5000)
+})
+
+test('a clicked spot gets ranked explanations and a downloadable evidence report', async ({ page }) => {
+  await open(page)
+  await page.getByRole('button', { name: 'Bhote Koshi corridor' }).click()
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  const panel = page.locator('.hypotheses')
+  await expect(panel.locator('.hyp').first()).toContainText('ground surface was disturbed', { timeout: 20000 })
+  await expect(panel).toContainText('it is not a probability')
+  const [csv] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'CSV', exact: true }).click()])
+  expect(csv.suggestedFilename()).toMatch(/^cascadelens-rasuwa-2026-.*\.csv$/)
+})
+
+test('the first minute leads with the finding and an honest status list', async ({ page }) => {
+  await page.addInitScript(() => localStorage.removeItem('cascadelens.finding.seen'))
+  await open(page)
+  const card = page.getByRole('dialog', { name: 'The key finding' })
+  await expect(card).toContainText('beyond this radar frame')
+  await expect(card).toContainText('Provisional products')
+  await card.getByRole('button', { name: 'What is real here?' }).click()
+  const status = page.getByRole('dialog', { name: 'What is real here?' })
+  await expect(status).toContainText('blocked by data')
+  await expect(status).toContainText('experimental')
+  await page.getByRole('button', { name: 'Close' }).click()
+  await card.getByRole('button', { name: 'Walk through the evidence' }).click()
+  await expect(page.locator('.story')).toContainText('The source')
+  await expect(card).toHaveCount(0)
+})
+
+test('hazard screens explain a road stretch and say whether the radar could watch it', async ({ page }) => {
+  await open(page)
+  await page.getByRole('radio', { name: /Landslide-prone terrain/ }).check()
+  await page.getByRole('checkbox', { name: 'Show road exposure' }).check()
+  await page.getByRole('button', { name: 'Trishuli downstream corridor' }).click()
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  const hz = page.locator('.hazard-at')
+  await expect(hz).toContainText('Experimental')
+  await expect(hz).toContainText('exposure', { timeout: 20000 })
+  await expect(hz).toContainText(/Radar (can|cannot) watch|Partly watchable/)
+  await expect(page.locator('.legend')).toContainText('High exposure')
 })

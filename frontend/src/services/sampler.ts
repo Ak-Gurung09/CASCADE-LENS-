@@ -84,8 +84,9 @@ async function sampleSource(s: RasterSource, lng: number, lat: number, opener: O
   const { col, row } = pixelIndex(raster.image, x, y)
   if (col < 0 || row < 0 || col >= raster.image.getWidth() || row >= raster.image.getHeight())
     return { state: 'outside', message: MESSAGE.outside }
-  const [value, validity] = await Promise.all([pixel(raster, row, col), open(s.validity!, opener).then((v) => pixel(v, row, col))])
-  const state = classify(value, validity)
+  // Derived layers such as Radar Observability carry no separate validity raster: their own nodata value marks gaps.
+  const [value, validity] = await Promise.all([pixel(raster, row, col), s.validity ? open(s.validity, opener).then((v) => pixel(v, row, col)) : Promise.resolve(VALID)])
+  const state = !s.validity && value === raster.image.getGDALNoData() ? 'nodata' : classify(value, validity)
   const stored = state === 'nodata' ? undefined : value
   return { state, value: stored, frame: s.frame, granule: s.granule, row, col, message: MESSAGE[state] }
 }
@@ -104,7 +105,7 @@ export async function samplePoint(layer: Layer, lng: number, lat: number, opener
       return results.reduce((a, b) => (RANK.indexOf(b.state) < RANK.indexOf(a.state) ? b : a))
     } catch (e) {
       if (attempt === ATTEMPTS) return { state: 'error', message: `${MESSAGE.error} ${e instanceof Error ? e.message : ''}`.trim() }
-      layer.sources.forEach((s) => { cache.delete(s.sampling!); cache.delete(s.validity!) })
+      layer.sources.forEach((s) => { cache.delete(s.sampling!); if (s.validity) cache.delete(s.validity) })
     }
   }
 }
