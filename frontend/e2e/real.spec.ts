@@ -221,6 +221,7 @@ test.describe('phone', () => {
     await page.waitForTimeout(1500)
     await page.screenshot({ path: `${SHOTS}/phone-story.png` })
     for (const b of await page.locator('.top-actions button, .story button').all()) {
+      if (!(await b.isVisible())) continue // hidden at phone width, so not a tap target
       const h = (await b.boundingBox())?.height ?? 0
       if (await b.evaluate((e) => !e.classList.contains('link'))) expect(h).toBeGreaterThanOrEqual(32)
     }
@@ -265,4 +266,33 @@ test('a clicked spot gets ranked explanations and a downloadable evidence report
   await expect(panel).toContainText('it is not a probability')
   const [csv] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'CSV', exact: true }).click()])
   expect(csv.suggestedFilename()).toMatch(/^cascadelens-rasuwa-2026-.*\.csv$/)
+})
+
+test('the first minute leads with the finding and an honest status list', async ({ page }) => {
+  await page.addInitScript(() => localStorage.removeItem('cascadelens.finding.seen'))
+  await open(page)
+  const card = page.getByRole('dialog', { name: 'The key finding' })
+  await expect(card).toContainText('outside this radar frame')
+  await expect(card).toContainText('Provisional products')
+  await card.getByRole('button', { name: 'What is real here?' }).click()
+  const status = page.getByRole('dialog', { name: 'What is real here?' })
+  await expect(status).toContainText('blocked by data')
+  await expect(status).toContainText('experimental')
+  await page.getByRole('button', { name: 'Close' }).click()
+  await card.getByRole('button', { name: 'Walk through the evidence' }).click()
+  await expect(page.locator('.story')).toContainText('The source')
+  await expect(card).toHaveCount(0)
+})
+
+test('hazard screens explain a road stretch and say whether the radar could watch it', async ({ page }) => {
+  await open(page)
+  await page.getByRole('radio', { name: /Landslide-prone terrain/ }).check()
+  await page.getByRole('checkbox', { name: 'Show road exposure' }).check()
+  await page.getByRole('button', { name: 'Trishuli downstream corridor' }).click()
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  const hz = page.locator('.hazard-at')
+  await expect(hz).toContainText('Experimental')
+  await expect(hz).toContainText('exposure', { timeout: 20000 })
+  await expect(hz).toContainText(/Radar (can|cannot) watch|Partly watchable/)
+  await expect(page.locator('.legend')).toContainText('High exposure')
 })
