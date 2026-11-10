@@ -5244,6 +5244,164 @@
     "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
     "Products are Provisional."
    ]
+  },
+  {
+   "groupId": null,
+   "mission": "Copernicus DEM",
+   "instrument": "TanDEM-X (via Copernicus DEM GLO-30)",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "sampleable",
+   "statusReason": null,
+   "sourceGranules": [],
+   "productMaturity": "Experimental screen",
+   "id": "rasuwa-2026:terrain-screen",
+   "name": "Landslide-prone terrain (screen)",
+   "category": "gridded",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "terrain-screen",
+   "kind": "categorical",
+   "units": null,
+   "acquisition": {
+    "reference": "2011-2015 (DEM source campaign)",
+    "secondary": null
+   },
+   "postingM": [
+    40
+   ],
+   "crs": "EPSG:32645",
+   "sources": [
+    {
+     "frame": null,
+     "granule": "Copernicus DEM GLO-30",
+     "sourceFilename": "copdem_glo30.tif",
+     "sourceDataset": "factor flags (see hazards block)",
+     "bounds": [
+      84.382624295,
+      27.714795075,
+      85.55941177,
+      28.367440328
+     ],
+     "sampling": "data/sampling/rasuwa-2026/terrain-screen-flags.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026/terrain-screen/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 12,
+      "count": 179
+     }
+    }
+   ],
+   "attribution": "Derived by CascadeLens from Copernicus DEM GLO-30",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#3B5A55",
+     "#C9B458",
+     "#E8873A",
+     "#D9483B"
+    ],
+    "keys": [
+     {
+      "color": "#3B5A55",
+      "label": "Low"
+     },
+     {
+      "color": "#C9B458",
+      "label": "Moderate"
+     },
+     {
+      "color": "#E8873A",
+      "label": "High"
+     },
+     {
+      "color": "#D9483B",
+      "label": "Very high"
+     }
+    ]
+   },
+   "explanation": {
+    "what": "Where the shape of the ground favours slope failure: steepness, converging hollows and wet ground.",
+    "measures": "Slope, plan curvature and a topographic wetness index from the elevation model, combined by fixed, published rules.",
+    "inspect": "Click a spot to see which terrain factors apply there.",
+    "establishes": "A screen of terrain only. It is not a forecast, not trained on a Nepal landslide inventory, and leaves out geology, soil and rainfall."
+   },
+   "limitations": [
+    "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
+    "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed."
+   ]
+  },
+  {
+   "groupId": null,
+   "mission": "CascadeLens",
+   "instrument": "OpenStreetMap roads + terrain screen + Radar Observability",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "prepared",
+   "statusReason": null,
+   "sourceGranules": [],
+   "productMaturity": "Experimental screen",
+   "id": "rasuwa-2026:road-exposure",
+   "name": "Road exposure (screen)",
+   "category": "reference",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "road-exposure",
+   "kind": "vector",
+   "units": null,
+   "acquisition": {
+    "reference": "Event pair 2026-08-16 to 2026-08-28",
+    "secondary": null
+   },
+   "sources": [],
+   "vector": {
+    "url": "data/vectors/road-exposure-rasuwa-2026.geojson",
+    "type": "line",
+    "color": "#E8B04A",
+    "opacity": 0.95,
+    "bounds": [
+     84.551423,
+     27.780618,
+     85.37967,
+     28.28711
+    ],
+    "colorProperty": "color",
+    "width": 3
+   },
+   "attribution": "Derived by CascadeLens from OpenStreetMap (ODbL), Copernicus DEM, UNOSAT and NISAR GUNW",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#D9483B",
+     "#E8B04A",
+     "#7FB8A8"
+    ],
+    "keys": [
+     {
+      "color": "#D9483B",
+      "label": "High exposure"
+     },
+     {
+      "color": "#E8B04A",
+      "label": "Moderate exposure"
+     },
+     {
+      "color": "#7FB8A8",
+      "label": "Low exposure"
+     }
+    ]
+   },
+   "limitations": [
+    "A screen, not a risk rating: traffic, road design, retaining walls and drainage are unknown.",
+    "OpenStreetMap roads exported after the event; some may have moved or closed.",
+    "Click a road segment to see why it is rated as it is, and whether the radar can watch it."
+   ]
   }
  ],
  "granules": [
@@ -6011,6 +6169,139 @@
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     }
    }
+  }
+ },
+ "hazards": {
+  "terrain": {
+   "layerId": "rasuwa-2026:terrain-screen",
+   "flags": {
+    "slope15to25": 1,
+    "slope25to35": 2,
+    "slope35plus": 4,
+    "hollow": 8,
+    "wet": 16
+   },
+   "classes": [
+    {
+     "code": 1,
+     "label": "Low",
+     "color": "#3B5A55",
+     "meaning": "Gentle ground (under 15 deg), or moderate slopes with no other factor."
+    },
+    {
+     "code": 2,
+     "label": "Moderate",
+     "color": "#C9B458",
+     "meaning": "Moderately steep, or steep but neither convergent nor wet."
+    },
+    {
+     "code": 3,
+     "label": "High",
+     "color": "#E8873A",
+     "meaning": "Steep and either convergent or wet."
+    },
+    {
+     "code": 4,
+     "label": "Very high",
+     "color": "#D9483B",
+     "meaning": "35 deg or steeper, convergent and wet: where shallow slides and debris flows typically start."
+    }
+   ],
+   "thresholds": {
+    "slopeBandsDeg": {
+     "value": [
+      15.0,
+      25.0,
+      35.0
+     ],
+     "provenance": "Project choice of common slope classes; they are not calibrated for Nepal. Each band's share of the mapped 2026 detachment zone is reported so the choice can be checked."
+    },
+    "hollow": {
+     "value": "plan curvature < 0 after 3x3 smoothing",
+     "provenance": "Standard terrain-analysis convention (convergent flow)."
+    },
+    "wet": {
+     "value": "TWI above the 75th percentile of slopes over 15 deg",
+     "provenance": "Relative, project choice. TWI = ln(a / tan b) with D8 flow accumulation (Beven and Kirkby 1979)."
+    }
+   },
+   "wetIndexCut": 6.4,
+   "validation": {
+    "detachmentZone": {
+     "pixels": 1219,
+     "percentByClass": {
+      "Low": 7.1,
+      "Moderate": 36.9,
+      "High": 44.1,
+      "Very high": 11.8
+     },
+     "aucVsRestOfArea": 0.663
+    },
+    "mudflowRunout": {
+     "pixels": 36616,
+     "percentByClass": {
+      "Low": 58.0,
+      "Moderate": 24.3,
+      "High": 15.4,
+      "Very high": 2.4
+     },
+     "note": "The runout is where debris travelled and settled, mostly valley floors. A terrain screen for slope failure is not expected to rank it high."
+    },
+    "wholeArea": {
+     "Low": 25.1,
+     "Moderate": 43.5,
+     "High": 28.6,
+     "Very high": 2.9
+    }
+   },
+   "limitations": [
+    "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
+    "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed."
+   ],
+   "maturity": "EXPERIMENTAL"
+  },
+  "roads": {
+   "layerId": "rasuwa-2026:road-exposure",
+   "segmentM": 250,
+   "bufferM": 150,
+   "riverM": 100,
+   "roadTypes": [
+    "primary",
+    "secondary",
+    "tertiary",
+    "trunk"
+   ],
+   "kmByExposure": {
+    "High": {
+     "km": 73.3,
+     "unwatchedKm": 32.7
+    },
+    "Low": {
+     "km": 32.5,
+     "unwatchedKm": 31.5
+    },
+    "Moderate": {
+     "km": 47.6,
+     "unwatchedKm": 44.8
+    }
+   },
+   "rules": {
+    "High": "Crosses ground mapped as hit in 2026, or 30% or more of the ground within 150 m screens High or Very high",
+    "Moderate": "10% or more screens High or Very high, or within 100 m of a river",
+    "Low": "Otherwise",
+    "radarWatch": "Share of the 150 m corridor where the event pair could see a surface change: 50% or more = can watch, 20 to 50% = partly, under 20% = cannot"
+   },
+   "maturity": "EXPERIMENTAL"
+  },
+  "dynamicTrigger": {
+   "maturity": "BLOCKED BY DATA",
+   "needs": [
+    "GPM IMERG daily rainfall for Aug 2026",
+    "SMAP soil moisture",
+    "A Nepal-calibrated rainfall threshold"
+   ]
   }
  }
 }

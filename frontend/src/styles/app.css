@@ -613,3 +613,12 @@ button.primary:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(95, 224, 201, 
 .hyp-measured { margin-top: 8px; }
 .report-btns { margin: 14px 0 4px; }
 .report-btns h3 { font-size: 13px; margin: 0 0 8px; }
+
+/* Hazard screens */
+.exp { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--amber); border: 1px dashed rgba(242, 196, 107, .6); border-radius: 999px; padding: 0 6px; margin-left: 6px; vertical-align: middle; }
+.hazard-at { margin: 14px 0 4px; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 12px; background: rgba(255, 255, 255, .03); }
+.hazard-at h3 { font-size: 13px; margin: 0 0 8px; }
+.hz-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 13px; margin-bottom: 8px; }
+.hz-row b { display: inline-flex; align-items: center; gap: 6px; }
+.hz-row i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.hz-row ul { grid-column: 1 / -1; margin: 2px 0 0; padding-left: 18px; font-size: 12.5px; }

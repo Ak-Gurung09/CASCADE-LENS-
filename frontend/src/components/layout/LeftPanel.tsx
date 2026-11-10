@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
 import { evidenceOf } from '../../services/evidence'
 import { isObservability } from '../../services/observability'
+import { isTerrainScreen } from '../../services/hazards'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 import { missionStyle, splitName } from '../explanations/AboutSource'
 
@@ -88,7 +89,9 @@ export function LeftPanel(p: Props) {
   const snaps = m.groups.filter((g) => g.kind === 'snapshot')
   const shown = view === 'gcov' ? snaps : pairs
   const layers = m.layers.filter((l) => group && l.groupId === group.id && (l.category === view || l.previewOf === view))
-  const gridded = m.layers.filter((l) => l.category === 'gridded' && !isObservability(l))
+  const gridded = m.layers.filter((l) => l.category === 'gridded' && !isObservability(l) && !isTerrainScreen(l))
+  const screens = m.layers.filter((l) => isTerrainScreen(l) && isUsable(l))
+  const roadScreen = m.layers.find((l) => l.measurementType === 'road-exposure' && isUsable(l))
   const observability = m.layers.filter((l) => isObservability(l) && isUsable(l))
   const terrain = m.layers.find((l) => l.category === 'terrain')
   const refs = m.layers.filter((l) => l.category === 'reference' && isUsable(l))
@@ -130,6 +133,15 @@ export function LeftPanel(p: Props) {
           <h3 className="label">Can the radar see it?</h3>
           <p className="muted small">Where NISAR can be trusted, and why not elsewhere. Grey is not "no change": it means the radar could not judge.</p>
           {observability.map((l) => <LayerRow key={l.id} layer={l} active={l.id === p.activeId} onSelect={() => p.onLayer(l.id)} />)}
+        </section>
+      )}
+
+      {(screens.length > 0 || roadScreen) && (
+        <section className="obs-section">
+          <h3 className="label">Hazard screens <span className="exp">Experimental</span></h3>
+          <p className="muted small">Where terrain favours slope failure, and which road stretches are exposed. Screens, not forecasts.</p>
+          {screens.map((l) => <LayerRow key={l.id} layer={l} active={l.id === p.activeId} onSelect={() => p.onLayer(l.id)} />)}
+          {roadScreen && <label className="check"><input type="checkbox" checked={p.referenceIds.includes(roadScreen.id)} onChange={(e) => p.onReference(roadScreen.id, e.target.checked)} />Show road exposure</label>}
         </section>
       )}
 

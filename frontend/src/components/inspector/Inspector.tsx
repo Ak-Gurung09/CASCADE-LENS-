@@ -5,6 +5,8 @@ import { samplePoint, type SampleResult } from '../../services/sampler'
 import { ObservabilityAt } from './ObservabilityAt'
 import { Hypotheses } from './Hypotheses'
 import { ReportButtons } from './ReportButtons'
+import { HazardAt } from './HazardAt'
+import { isTerrainScreen } from '../../services/hazards'
 import { isObservability } from '../../services/observability'
 
 const DayLineChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.DayLineChart })))
@@ -21,7 +23,7 @@ function number(v: number) {
 }
 
 function Value({ layer, result }: Sample) {
-  if (result.value === undefined || isObservability(layer)) return null // its reasons are spelled out above
+  if (result.value === undefined || isObservability(layer) || isTerrainScreen(layer)) return null // its reasons are spelled out above
   return (
     <p className="value">
       {number(result.value)} <small>{layer.displayDb ? 'linear' : unitLabel(layer.units)}</small>
@@ -112,6 +114,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
           ))}
         </>
       )}
+      {manifest?.hazards && <HazardAt manifest={manifest} point={point} />}
       {manifest && <Hypotheses manifest={manifest} point={point} />}
       {manifest && <ReportButtons manifest={manifest} point={point} />}
     </div>

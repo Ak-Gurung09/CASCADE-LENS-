@@ -26,6 +26,8 @@ export interface VectorStyle {
   radius?: number
   dash?: boolean
   bounds: Bounds
+  colorProperty?: string // per-feature colour, falling back to color
+  width?: number
 }
 
 export interface Legend {
@@ -241,6 +243,7 @@ export interface Manifest {
   lake?: LakeSeries
   controlSeries?: ControlSeries
   observability?: Observability
+  hazards?: Hazards
 }
 
 export interface ObservabilityZone { name: string; pixels: number; percent?: Record<string, number>; verdict?: string; verdictRule?: string }
@@ -275,4 +278,12 @@ export interface ControlSeries {
   direction: string
   eventDate: string
   pairs: { pair: [string, string]; days: number; inside: number; outside: number; insideCi95: [number, number]; validPct: number; granule: string }[]
+}
+
+// Terrain screen and road exposure, written by processing/scripts/prepare_hazards.py
+export interface Hazards {
+  terrain: { layerId: string; flags: Record<string, number>; classes: { code: number; label: string; color: string; meaning: string }[]; maturity: string
+    validation: { detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
+  roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number }>; rules: Record<string, string>; maturity: string }
+  dynamicTrigger: { maturity: string; needs: string[] }
 }

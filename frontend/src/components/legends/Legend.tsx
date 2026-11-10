@@ -19,9 +19,10 @@ function Ramp({ stops, low, high }: { stops: string[]; low: string; high: string
 
 export function Legend({ layer, references }: { layer: Layer | undefined; references: Layer[] }) {
   const l = layer?.legend
-  const rasters = references.filter((r) => r.legend)
-  const vectors = references.filter((r) => r.vector?.color)
-  if (!l && !rasters.length && !vectors.length) return null
+  const rasters = references.filter((r) => r.legend && !r.vector)
+  const keyed = references.filter((r) => r.vector && r.legend?.keys)
+  const vectors = references.filter((r) => r.vector?.color && !r.legend?.keys)
+  if (!l && !rasters.length && !vectors.length && !keyed.length) return null
   const unit = unitLabel(l?.unit)
   const labels = l?.labels ?? []
   return (
@@ -42,6 +43,7 @@ export function Legend({ layer, references }: { layer: Layer | undefined; refere
         </div>
       )}
       {rasters.map((r) => <div key={r.id}><p className="legend-title">{r.name}</p><Ramp stops={r.legend!.stops} low={r.legend!.lowLabel ?? ''} high={r.legend!.highLabel ?? ''} /></div>)}
+      {keyed.map((r) => <div key={r.id}><p className="legend-title">{r.name}</p><ul className="swatches">{r.legend!.keys!.map((k) => <li key={k.label}><i className={`sw-${r.vector!.type}`} style={{ background: k.color }} />{k.label}</li>)}</ul></div>)}
       {vectors.length > 0 && (
         <ul className="swatches">
           {vectors.map((r) => (

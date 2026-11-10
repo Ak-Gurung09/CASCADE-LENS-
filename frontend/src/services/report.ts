@@ -4,6 +4,7 @@ import { samplePoint } from './sampler'
 import { evidenceOf, EVIDENCE } from './evidence'
 import { classify, isObservability, reasons, taskOf } from './observability'
 import { explain, gather, type Hypothesis } from './hypotheses'
+import { isTerrainScreen, nearestRoad, terrainClass, terrainFactors, terrainLayer, type RoadSegment } from './hazards'
 
 // One evidence report for one clicked spot: every value read there, where it came from, and what it can and cannot say.
 
@@ -26,6 +27,7 @@ export interface Report {
   observability: { pair: string; frame: string; answers: { question: string; answer: string }[]; reasons: string[] } | null
   readings: ReportRow[]
   explanations: Hypothesis[]
+  hazards?: { terrain: { class: string; factors: string[] } | null; road: RoadSegment | null; maturity: string }
   notes: string[]
 }
 
@@ -34,12 +36,16 @@ const QUESTION = { disturbance: 'Could a surface change be seen here?', movement
 export async function buildReport(m: Manifest, p: [number, number], now = new Date()): Promise<Report> {
   const usable = m.layers.filter((l) => isUsable(l) && l.status !== 'renderable' && l.sources.some((s) => s.sampling))
   const obs = usable.filter(isObservability)
-  const plain = usable.filter((l) => !isObservability(l))
-  const [samples, clues, flagSample] = await Promise.all([
+  const plain = usable.filter((l) => !isObservability(l) && !isTerrainScreen(l))
+  const tl = terrainLayer(m)
+  const [samples, clues, flagSample, tSample, road] = await Promise.all([
     Promise.all(plain.map((l) => samplePoint(l, p[0], p[1]))),
     gather(m, p),
     obs[0] ? samplePoint(obs[0], p[0], p[1]) : Promise.resolve(null),
+    tl ? samplePoint(tl, p[0], p[1]) : Promise.resolve(null),
+    m.hazards ? nearestRoad(m, p) : Promise.resolve(null),
   ])
+  const tf = tSample?.state === 'valid' && tSample.value !== undefined ? tSample.value : null
   const flags = flagSample?.state === 'valid' && flagSample.value !== undefined ? flagSample.value : null
   const o = obs[0]
   return {
@@ -59,6 +65,7 @@ export async function buildReport(m: Manifest, p: [number, number], now = new Da
       units: l.units, observation: acquisitionLabel(l), source: samples[i].granule ?? null,
     })),
     explanations: explain(clues),
+    hazards: m.hazards ? { terrain: tf === null ? null : { class: m.hazards.terrain.classes.find((c) => c.code === terrainClass(tf))?.label ?? '', factors: terrainFactors(tf) }, road, maturity: 'Experimental screens, not forecasts' } : undefined,
     notes: [
       'Values are the nearest stored pixel, with no interpolation. A blank value means no valid observation, which is not the same as no change.',
       'Explanations are a rule-based screen: they count which checks agree. They are hypotheses, not probabilities or verdicts.',
@@ -100,6 +107,10 @@ ${r.observability.reasons.length ? `<ul>${li(r.observability.reasons)}</ul>` : '
 ${r.explanations.map((h) => `<h3>${esc(h.title)} <span class="tag">${esc(h.standing)}</span></h3>
 ${h.for.length ? `<p><b>For</b></p><ul>${li(h.for)}</ul>` : ''}${h.against.length ? `<p><b>Against</b></p><ul>${li(h.against)}</ul>` : ''}
 ${h.missing.length ? `<p><b>Would settle it</b></p><ul>${li(h.missing)}</ul>` : ''}`).join('')}
+${r.hazards ? `<h2>Hazard screens <span class="tag">Experimental</span></h2>
+${r.hazards.terrain ? `<p><b>Landslide-prone terrain:</b> ${esc(r.hazards.terrain.class)}</p><ul>${li(r.hazards.terrain.factors)}</ul>` : ''}
+${r.hazards.road ? `<p><b>Road within ${r.hazards.road.distanceM} m (${esc(r.hazards.road.road)}):</b> ${esc(r.hazards.road.exposure)} exposure. ${esc(r.hazards.road.radarWatch)} (${r.hazards.road.radarUsablePct}% of the stretch usable for change).</p><ul>${li(r.hazards.road.reasons)}</ul>` : ''}
+<p class="muted">${esc(r.hazards.maturity)}. Terrain and position only: geology, soil and rainfall are not included.</p>` : ''}
 <h2>Every value at this spot</h2>
 <table><tr><th>Layer</th><th>Evidence</th><th>Value</th><th>Observation</th><th>Source file</th></tr>
 ${r.readings.map((x) => `<tr><td>${esc(x.layer)}</td><td>${esc(x.evidence)}</td><td>${x.value === null ? `<span class="muted">${esc(x.state)}</span>` : `${num(x.value)} ${esc(x.units === '1' ? '' : x.units ?? '')}`}</td><td>${esc(x.observation)}</td><td style="word-break:break-all">${esc(x.source)}</td></tr>`).join('')}</table>
