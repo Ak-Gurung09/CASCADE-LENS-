@@ -70,11 +70,11 @@ function observabilityStep(m: Manifest): StoryStep[] {
   const z = (task: string, id: string) => o.zones[task]?.[id]?.percent?.Usable
   const src = [z('disturbance', 'vector:unosat_detachment_zone.geojson'), z('movement', 'vector:unosat_detachment_zone.geojson')]
   const flow = [z('disturbance', 'vector:unosat_mudflow_extent.geojson'), z('movement', 'vector:unosat_mudflow_extent.geojson')]
-  const out = o.zones.disturbance?.['vector:unosat_mudflow_extent.geojson']?.percent?.['Not acquired']
+  const out = o.zones.disturbance?.['vector:unosat_mudflow_extent.geojson']?.percent?.['Outside the frame checked']
   const paras = [
     'Before reading any radar result, CascadeLens checks whether the radar could see the place at all, for the question being asked. Each spot keeps its own reasons: outside the frame, no data, hidden by the mountain’s own slope (layover or shadow), or a weak signal.',
     ...(src.every((v) => v != null) ? [`At the detachment zone, a surface change could be seen on ${src[0]!.toFixed(0)}% of the ground, but ground movement could be measured on only ${src[1]!.toFixed(0)}%. So the radar can say the source changed, but not how far it moved.`] : []),
-    ...(flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for spotting change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies outside this radar frame, so there is no conclusion there at all, which is different from no damage.` : ''}`] : []),
+    ...(flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for spotting change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies beyond this frame, in the neighbouring one, which is not checked yet because its pre-event pair is not downloaded. No conclusion there is different from no damage.` : ''}`] : []),
     'Click anywhere on the map to see the reasons for that exact spot.',
   ]
   return [{ id: 'observability', title: 'Can the radar see it?', bookmarkId: 'source', layerId: layer.id, references: ['ref:unosat-extent', 'ref:unosat-detachment'], paragraphs: paras, chart: 'observability',

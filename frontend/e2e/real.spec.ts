@@ -272,7 +272,7 @@ test('the first minute leads with the finding and an honest status list', async 
   await page.addInitScript(() => localStorage.removeItem('cascadelens.finding.seen'))
   await open(page)
   const card = page.getByRole('dialog', { name: 'The key finding' })
-  await expect(card).toContainText('outside this radar frame')
+  await expect(card).toContainText('beyond this radar frame')
   await expect(card).toContainText('Provisional products')
   await card.getByRole('button', { name: 'What is real here?' }).click()
   const status = page.getByRole('dialog', { name: 'What is real here?' })

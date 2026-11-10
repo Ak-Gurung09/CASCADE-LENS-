@@ -57,8 +57,8 @@ export function explain(c: Clues): Hypothesis[] {
   const field = 'A field report or a cloud-free before-and-after optical image of this spot.'
 
   if (unseen) {
-    const why = c.flags === null ? 'This spot lies outside the area the radar check covers.' : fl & FLAG.outside ? 'This spot is outside the radar frame used here: it was not acquired.' : 'The radar product holds no value at this spot.'
-    return [{ id: 'unseen', title: 'No NISAR explanation is possible here', standing: 'Cannot judge here', for: [why], against: [],
+    const why = c.flags === null ? 'This spot lies outside the area the radar check covers.' : fl & FLAG.outside ? 'This spot is outside the radar frame checked here. A neighbouring frame may cover it, but it is not assessed yet.' : 'The radar product holds no value at this spot.'
+    return [{ id: 'unseen', title: 'No NISAR explanation from the frame checked', standing: 'Cannot judge here', for: [why], against: [],
       missing: ['A radar pair that covers this spot (the next frame along the track, or the other track in the download list).', field] }]
   }
 

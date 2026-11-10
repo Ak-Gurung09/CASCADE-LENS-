@@ -33,7 +33,7 @@ export function HazardAt({ manifest, point }: { manifest: Manifest; point: [numb
           <b style={{ color: road.color }}><i style={{ background: road.color }} />{road.exposure} exposure</b>
           <ul>
             {road.reasons.length ? road.reasons.map((r) => <li key={r}>{r}</li>) : <li>No exposure factor found along this stretch.</li>}
-            <li>{road.radarWatch}: the event pair could see a change on {road.radarUsablePct}% of this stretch{road.radarUnseenPct >= 50 ? ', and most of it lies outside the radar frame' : road.radarHiddenPct >= 20 ? `, ${road.radarHiddenPct}% is hidden by terrain` : ''}.</li>
+            <li>{road.radarWatch}: the event pair could see a change on {road.radarUsablePct}% of this stretch{road.radarUnseenPct >= 50 ? ', and most of it lies beyond the frame checked' : road.radarHiddenPct >= 20 ? `, ${road.radarHiddenPct}% is hidden by terrain` : ''}.</li>
           </ul>
         </div>
       )}

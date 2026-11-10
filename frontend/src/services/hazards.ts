@@ -53,7 +53,7 @@ export async function nearestRoad(m: Manifest, p: [number, number], withinM = 15
   const l = roadLayer(m)
   if (!l?.vector) return null
   const url = l.vector.url
-  if (!cache.has(url)) cache.set(url, fetch(assetUrl(url)).then((r) => r.json()).then((fc) => fc.features as Seg[]).catch(() => []))
+  if (!cache.has(url)) cache.set(url, fetch(assetUrl(url)).then((r) => r.json()).then((fc) => (Array.isArray(fc?.features) ? fc.features as Seg[] : [])).catch(() => []))
   let best: RoadSegment | null = null
   for (const s of await cache.get(url)!) {
     const d = distanceM(p, s.geometry.coordinates)

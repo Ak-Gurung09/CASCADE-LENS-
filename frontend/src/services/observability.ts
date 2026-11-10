@@ -5,7 +5,7 @@ export const FLAG = { outside: 1, noData: 2, layover: 4, shadow: 8, lowCoherence
 export type Task = 'disturbance' | 'movement'
 
 const REASON: [number, string][] = [
-  [FLAG.outside, 'Outside this radar frame: not acquired.'],
+  [FLAG.outside, 'Outside the radar frame checked here. A neighbouring frame may cover it, but it is not assessed yet.'],
   [FLAG.noData, 'Inside the frame, but the product holds no value here.'],
   [FLAG.layover, 'Layover: the slope faces the radar more steeply than its viewing angle, so echoes from different heights pile up.'],
   [FLAG.shadow, 'Radar shadow: the slope faces away too steeply for the radar to reach it.'],

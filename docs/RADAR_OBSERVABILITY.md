@@ -17,7 +17,7 @@ Added November 2026. These three tools answer, for any spot on the map: *could N
 
 | Flag | Bit | Rule |
 |---|---|---|
-| Outside the frame | 1 | Outside the product's `boundingPolygon`: not acquired |
+| Outside the frame checked | 1 | Outside the product's `boundingPolygon`. A neighbouring frame may cover it; it is not assessed here |
 | No data | 2 | Inside the frame, but wrapped coherence has no value |
 | Layover | 4 | Ground slope facing the radar, measured along the horizontal look direction, is steeper than the incidence angle |
 | Shadow | 8 | Slope facing away is steeper than 90° minus the incidence angle (active shadow only) |
@@ -27,13 +27,13 @@ Added November 2026. These three tools answer, for any spot on the map: *could N
 
 The look direction and incidence come from the product's own `radarGrid` cubes (`losUnitVectorX/Y`, `incidenceAngle`). NISAR looks left; for frame 74 the unit vector toward the sensor is about 0.55 west and 0.17 north.
 
-**Classes per task.** Not acquired (bit 1), then no data (bit 2), then hidden by terrain (bits 4 or 8). Otherwise, for *disturbance*, "seen but not reliable" if the baseline was incoherent (bit 64); for *movement*, if coherence is low or phase was not unwrapped (bits 16 or 32). Everything else is usable. Zone verdicts: 50% usable or more is "enough evidence", 20 to 50% "partial", under 20% "insufficient".
+**Classes per task.** Outside the frame checked (bit 1), then no data (bit 2), then hidden by terrain (bits 4 or 8). Otherwise, for *disturbance*, "seen but not reliable" if the baseline was incoherent (bit 64); for *movement*, if coherence is low or phase was not unwrapped (bits 16 or 32). Everything else is usable. Zone verdicts: 50% usable or more is "enough evidence", 20 to 50% "partial", under 20% "insufficient".
 
 **Sensitivity.** Usable share for movement over the whole Rasuwa area is 95% at a 0.2 coherence threshold, 82% at 0.3 and 67% at 0.4 (Tsho Rolpa: 95, 77, 62%). The threshold is a project choice, so the app reports all three.
 
 **Results.**
 
-| Zone | Change visible: usable | Movement: usable | Not acquired |
+| Zone | Change visible: usable | Movement: usable | Outside the frame checked |
 |---|---|---|---|
 | Rasuwa detachment zone (UNOSAT) | 66% | 0% | 0% |
 | Rasuwa mapped mudflow (UNOSAT) | 34% | 9% | 52% |
@@ -67,3 +67,13 @@ Each explanation lists the evidence for and against it, and what would settle it
 ## Evidence classes
 
 Every layer, panel and report carries one class (`frontend/src/services/evidence.ts`): Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown. Missing data is labelled Unknown, never treated as safe.
+
+## 4. Hazard screens (experimental)
+
+`processing/src/cascade_lens/hazard.py`, run by `processing/scripts/prepare_hazards.py` on the same 40 m grid.
+
+**Landslide-prone terrain (Model A, terrain only).** Slope bands (15, 25, 35°), converging hollows (negative plan curvature) and a topographic wetness index (D8 flow accumulation) give Low, Moderate, High or Very high. Each pixel keeps its factor bits for the inspector. Check against the one event we have: 56% of the UNOSAT 2026 detachment zone screens High or Very high, against 32% of the whole area (AUC 0.66). The mudflow runout screens mostly Low (58%), as expected for valley floors where debris settles. No geology, soil, land cover or rainfall, and no calibration: it is a screen, not a susceptibility model or forecast.
+
+**Road exposure.** Trunk, primary, secondary and tertiary OpenStreetMap roads cut into 250 m stretches. High: crosses the 2026 mapped mudflow or UNOSAT affected roads, or 30% of the ground within 150 m screens High or Very high. Moderate: 10% or more, or within 100 m of a river. Each stretch also says whether the event pair could watch it (share of its corridor usable for change). Of 153 km screened, 73 km rate High; 109 km lie mostly beyond the frame checked, so the radar could not watch them for this event.
+
+**Model B (rainfall triggering)** is blocked by data: it needs GPM IMERG rainfall, soil moisture and a Nepal-calibrated threshold.

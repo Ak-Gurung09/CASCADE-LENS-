@@ -1192,7 +1192,7 @@
      },
      {
       "color": "#2A3138",
-      "label": "Not acquired"
+      "label": "Outside the frame checked"
      }
     ]
    },
@@ -1292,7 +1292,7 @@
      },
      {
       "color": "#2A3138",
-      "label": "Not acquired"
+      "label": "Outside the frame checked"
      }
     ]
    },
@@ -10353,9 +10353,9 @@
     },
     {
      "code": 5,
-     "label": "Not acquired",
+     "label": "Outside the frame checked",
      "color": "#2A3138",
-     "meaning": "Outside this frame. No observation means no conclusion, not no change."
+     "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."
     }
    ],
    "movement": [
@@ -10385,9 +10385,9 @@
     },
     {
      "code": 5,
-     "label": "Not acquired",
+     "label": "Outside the frame checked",
      "color": "#2A3138",
-     "meaning": "Outside this frame. No observation means no conclusion, not no movement."
+     "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."
     }
    ]
   },
@@ -10426,7 +10426,7 @@
       "Seen, but not reliable": 22.7,
       "Hidden by terrain": 7.5,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10439,7 +10439,7 @@
       "Seen, but not reliable": 30.3,
       "Hidden by terrain": 8.6,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10452,7 +10452,7 @@
       "Seen, but not reliable": 82.4,
       "Hidden by terrain": 0.0,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Insufficient evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10465,7 +10465,7 @@
       "Seen, but not reliable": 21.2,
       "Hidden by terrain": 6.2,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10478,7 +10478,7 @@
       "Seen, but not reliable": 30.4,
       "Hidden by terrain": 8.6,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10493,7 +10493,7 @@
       "Seen, but not reliable": 27.7,
       "Hidden by terrain": 7.5,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10506,7 +10506,7 @@
       "Seen, but not reliable": 45.6,
       "Hidden by terrain": 8.6,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10519,7 +10519,7 @@
       "Seen, but not reliable": 75.0,
       "Hidden by terrain": 0.0,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10532,7 +10532,7 @@
       "Seen, but not reliable": 37.6,
       "Hidden by terrain": 6.2,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10545,7 +10545,7 @@
       "Seen, but not reliable": 45.8,
       "Hidden by terrain": 8.6,
       "No data in the product": 0.0,
-      "Not acquired": 0.0
+      "Outside the frame checked": 0.0
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."

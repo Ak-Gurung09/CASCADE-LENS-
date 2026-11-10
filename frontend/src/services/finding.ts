@@ -18,7 +18,7 @@ export function finding(m: Manifest): Finding | null {
   if (pre && co) points.push({ label: 'Measured change', text: `Inside the mapped mudflow, radar coherence fell from ${pre.inside.toFixed(2)} before the event to ${co.inside.toFixed(2)} across it, while untouched ground nearby went from ${pre.outside.toFixed(2)} to ${co.outside.toFixed(2)}. The drop is specific to the mudflow, not the season.` })
   const d = zone('disturbance', det)?.percent, mv = zone('movement', det)?.percent
   if (d && mv) points.push({ label: 'What the radar could judge', text: `At the source, a surface change was visible on ${pct(d.Usable)} of the ground, but ground movement could be measured on ${pct(mv.Usable)}. NISAR shows that the source changed, not how far it moved.` })
-  if (outside?.percent) points.push({ label: 'What it could not see', text: `${pct(outside.percent['Not acquired'])} of the mapped mudflow that lies in the study area is outside this radar frame. CascadeLens marks it "not seen" rather than letting it look unchanged.` })
+  if (outside?.percent) points.push({ label: 'What it could not see', text: `${pct(outside.percent['Outside the frame checked'])} of the mapped mudflow lies beyond this radar frame, in the neighbouring frame, which is not checked yet. CascadeLens marks it as unchecked rather than letting it look unchanged.` })
   return {
     headline: 'NISAR saw the Rasuwa mudflow change the ground, and CascadeLens shows exactly where the radar could and could not judge it.',
     points,

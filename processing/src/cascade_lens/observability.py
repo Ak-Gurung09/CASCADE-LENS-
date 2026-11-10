@@ -62,14 +62,14 @@ CLASSES = {
         (2, "Seen, but not reliable", "#F2C46B", "The ground was already incoherent in the baseline pair, so a drop across the event cannot be told apart from normal noise."),
         (3, "Hidden by terrain", "#B07CFF", "Layover or radar shadow: the slope's geometry hides it from this viewing angle."),
         (4, "No data in the product", "#6B7682", "Inside the frame, but the product holds no value here."),
-        (5, "Not acquired", "#2A3138", "Outside this frame. No observation means no conclusion, not no change."),
+        (5, "Outside the frame checked", "#2A3138", "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."),
     ],
     "movement": [
         (1, "Usable", "#5FE0C9", "Phase is coherent and unwrapped, so ground movement could be measured here."),
         (2, "Seen, but not reliable", "#F2C46B", "Phase is too noisy (low coherence) or was not unwrapped here, so no movement value can be trusted."),
         (3, "Hidden by terrain", "#B07CFF", "Layover or radar shadow: the slope's geometry hides it from this viewing angle."),
         (4, "No data in the product", "#6B7682", "Inside the frame, but the product holds no value here."),
-        (5, "Not acquired", "#2A3138", "Outside this frame. No observation means no conclusion, not no movement."),
+        (5, "Outside the frame checked", "#2A3138", "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."),
     ],
 }
 

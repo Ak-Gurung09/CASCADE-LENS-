@@ -2,7 +2,7 @@
 
 **Status: the minimum scientific MVP threshold is met.** The product runs real NISAR measurements of the Rasuwa event, offline, from a one-click package. It is a first prototype on Provisional data, and its limits below are real.
 
-Report date: 2026-11-06. Two main cases now ship: Rasuwa (flagship, opens first) and Tsho Rolpa glacial lake.
+Report date: 2026-11-10. Two main cases now ship: Rasuwa (flagship, opens first) and Tsho Rolpa glacial lake.
 
 ## Minimum completion threshold (brief, section 25.4)
 
@@ -23,7 +23,7 @@ Report date: 2026-11-06. Two main cases now ship: Rasuwa (flagship, opens first)
 - **GCOV snapshots** are not downloaded. They need 31 GB, and the tab says so.
 - **GSLC** is deferred: no justified use yet.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
-- **Frame 75 is not assessed for observability**: it has no pre-event baseline pair yet, so about half the mapped mudflow and the Trishuli corridor are shown as not acquired.
+- **Frame 75 is not assessed for observability**: it has no pre-event baseline pair yet, so about half the mapped mudflow and the Trishuli corridor are shown as "outside the frame checked". Frame 75 does cover them (Pair A was processed for both frames) but is not assessed yet.
 - **Not built from the November master prompt** (need data or are out of scope): timeline across many pairs, rainfall and river-flow context (IMERG, GloFAS), slope screening, road impact, live processing, hosting. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
 - **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave, not Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
@@ -74,19 +74,27 @@ Report date: 2026-11-06. Two main cases now ship: Rasuwa (flagship, opens first)
 | Pre-event control comparison | Implemented | Run on real files | Real, derived | Rasuwa story step 2 chart |
 | "What could explain this?" | Implemented and tested | 7 unit, browser | Real inputs, rule-based | Hypotheses, never probabilities |
 | Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | 3 unit, browser downloads | Real | Built in the browser |
+| Landslide-prone terrain screen (Model A) | Experimental | 5 Python, 2 unit, browser | Real DEM, derived | Rasuwa only; AUC 0.66 on one event |
+| Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch |
+| Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
+| First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |
+| Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names an existing test | n/a | Shown in the app as "What is real?" |
 | Image swipe comparison | Deferred | None | n/a | Optional |
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 
 ## Commands executed and results
 
-Re-run on 2026-11-06 in a cloud copy (Chromium, not Edge or Brave):
+Re-run on 2026-11-10 in a cloud copy (Chromium, not Edge or Brave):
 
 ```text
-python -m pytest tests                       67 passed, 35 skipped (skips need the raw NISAR files)
+python -m pytest tests                       72 passed, 35 skipped (skips need the raw NISAR files)
 npx tsc --noEmit                             no errors
-npm test                                     42 passed
-npx playwright test                          27 passed
+npm test                                     52 passed
+npx playwright test                          29 passed
+python processing/scripts/prepare_hazards.py 689 road segments, 179 tiles, 29 s
 ```
+
+The skeptical review and the scorecard are in [REVIEW_AND_SCORECARD.md](docs/REVIEW_AND_SCORECARD.md). Capability maturity lives in one place, `frontend/public/data/status.json`.
 
 The Rasuwa Simulate tab, dropped when Tsho Rolpa was added on 3 to 4 Nov, is back. The LANDMET test case stays out of the app (team decision, 6 Nov), so its tests were replaced by a Tsho Rolpa to Rasuwa case-switch test.
 

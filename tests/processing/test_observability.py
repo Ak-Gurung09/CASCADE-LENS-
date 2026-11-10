@@ -49,6 +49,6 @@ def test_priority_outside_beats_everything():
 def test_summary_never_calls_missing_data_usable():
     cls = np.array([[5, 5, 5, 1]], np.uint8)
     s = ob.summary(cls, np.ones(cls.shape, bool), "movement")
-    assert s["percent"]["Not acquired"] == 75.0 and s["verdict"] == "Partial evidence"
+    assert s["percent"]["Outside the frame checked"] == 75.0 and s["verdict"] == "Partial evidence"
     s = ob.summary(np.array([[5, 5, 5, 5, 5, 1]], np.uint8), np.ones((1, 6), bool), "movement")
     assert s["verdict"] == "Insufficient evidence"
