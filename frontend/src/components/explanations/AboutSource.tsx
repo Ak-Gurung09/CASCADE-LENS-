@@ -12,7 +12,7 @@ export const MISSION_STYLE: Record<string, { short: string; color: string; about
   OpenStreetMap: { short: 'OSM', color: '#7fd98c', about: 'Community-mapped geography' },
   'COD-AB': { short: 'COD', color: '#b9a4ff', about: 'Official administrative boundaries' },
 }
-export const missionStyle = (m: string) => MISSION_STYLE[m] ?? { short: m.slice(0, 3).toUpperCase(), color: '#5fe0c9', about: m }
+export const missionStyle = (m: string) => MISSION_STYLE[m] ?? { short: m.slice(0, 3).toUpperCase(), color: '#c3ccff', about: m }
 
 // "UNOSAT barrier lakes (0.31 km²)" -> title "Barrier lakes", figure "0.31 km²".
 export function splitName(l: Pick<Layer, 'name' | 'mission'>) {

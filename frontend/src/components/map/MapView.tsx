@@ -33,7 +33,6 @@ const STYLE: StyleSpecification = {
   version: 8,
   sources: {},
   layers: [
-    { id: 'bg', type: 'background', paint: { 'background-color': '#0f1518' } },
     { id: 'anchor-base', type: 'background', layout: { visibility: 'none' } },
     { id: 'anchor-analysis', type: 'background', layout: { visibility: 'none' } },
     { id: 'anchor-overlay', type: 'background', layout: { visibility: 'none' } },
@@ -274,13 +273,15 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // On a phone the story is a bottom sheet over the map, so frame the bookmark in the part still visible.
     const phone = window.matchMedia('(max-width: 980px)').matches
-    // On a large screen the story card floats over the bottom of the map, and the left panel over its left side.
-    const sheet = document.querySelector('.story')?.getBoundingClientRect()
-    const covered = sheet && sheet.top > 100 ? window.innerHeight - sheet.top : 0
+    // On a large screen the story is a headline across the bottom left with its text card on the right, and the left panel covers the left side.
+    const guided = !phone && document.querySelector('.story.guided')
+    const sheet = (guided ? document.querySelector('.story-hero') : document.querySelector('.story'))?.getBoundingClientRect()
+    const covered = sheet && sheet.top > 100 ? Math.min(window.innerHeight - sheet.top, window.innerHeight * 0.42) : 0
+    const card = guided ? (document.querySelector('.story-card')?.getBoundingClientRect().width ?? 0) + 20 : 0
     const left = !phone && document.querySelector('.app:not(.hide-left) .left') ? 350 : 0
     const dock = !phone && document.querySelector('.app:not(.hide-right) .compare-dock') ? 450 : 0
     const panels = !phone && document.querySelector('.sim-panel') // The whole path should clear the side panels and the top bar
-    mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: panels ? { top: 100, left: 360, right: 400, bottom: 40 } : { top: 90, left: 40 + left, right: 60 + dock, bottom: 30 + covered }, duration: calm ? 0 : 900 })
+    mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: panels ? { top: 100, left: 360, right: 400, bottom: 40 } : { top: 90, left: 40 + left, right: 60 + dock + card, bottom: 30 + covered }, duration: calm ? 0 : 900 })
   }, [focus, ready])
 
   return <div ref={host} className="map" role="application" aria-label="Study area map. Click to inspect a location." data-testid="map" />

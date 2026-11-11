@@ -6,15 +6,18 @@ import { useEffect, useRef, useState } from 'react'
 
 const EDGE_PX = 24
 const DRAG_PX = 6
-const desktop = () => window.matchMedia('(min-width: 981px) and (hover: hover) and (pointer: fine)').matches
+const matches = (q: string) => typeof window.matchMedia === 'function' && Boolean(window.matchMedia(q)?.matches)
+const desktop = () => matches('(min-width: 981px) and (hover: hover) and (pointer: fine)')
+const wide = () => matches('(min-width: 981px)')
 
-export function useAutoHidePanels(resetKey: string) {
+// `tuckLeft` starts a mode with the controls panel already away: its tab at the screen edge, or keyboard focus, brings it back.
+export function useAutoHidePanels(resetKey: string, tuckLeft = false) {
   const [hideLeft, setHideLeft] = useState(false)
   const [hideRight, setHideRight] = useState(false)
   const down = useRef<{ x: number; y: number } | null>(null)
 
   // A new mode brings its panels back
-  useEffect(() => { setHideLeft(false); setHideRight(false) }, [resetKey])
+  useEffect(() => { setHideLeft(tuckLeft && wide()); setHideRight(false) }, [resetKey, tuckLeft])
 
   useEffect(() => {
     const onData = (t: EventTarget | null) => t instanceof HTMLCanvasElement && Boolean(t.closest('.center'))

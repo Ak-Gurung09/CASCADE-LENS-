@@ -16,6 +16,7 @@ import { StoryPanel } from '../components/story/StoryPanel'
 import { SimPanel } from '../components/sim/SimPanel'
 import { ComparePanel } from '../components/compare/ComparePanel'
 import { ScenarioPanel } from '../components/scenario/ScenarioPanel'
+import { Intro, introWanted } from '../components/intro/Intro'
 import { useAutoHidePanels } from './useAutoHidePanels'
 import type { SimData, SimView } from '../services/simulation'
 
@@ -48,12 +49,18 @@ export function App() {
     loadManifest().then((m) => { if (live) setManifest(m) }).catch((e: Error) => { if (live) setFailure(e.message) })
     return () => { live = false }
   }, [])
-  if (failure) return <main className="splash"><h1>GAIA CascadeLens could not start</h1><p>{failure}</p><p>Run the processing scripts to generate the data manifest, then reload.</p></main>
-  if (!manifest) return <main className="splash"><p>Initializing…</p></main>
-  return <Explorer manifest={manifest} />
+  // The opening screen counts up with the real loading: the data list first, then the map.
+  const [intro, setIntro] = useState(introWanted)
+  const [mapReady, setMapReady] = useState(false)
+  const endIntro = useCallback(() => setIntro(false), [])
+  const onMapReady = useCallback(() => setMapReady(true), [])
+  const screen = failure ? <main className="splash"><h1>GAIA CascadeLens could not start</h1><p>{failure}</p><p>Run the processing scripts to generate the data manifest, then reload.</p></main>
+    : !manifest ? <main className="splash"><p>Initializing…</p></main>
+    : <Explorer manifest={manifest} onMapReady={onMapReady} />
+  return <>{screen}{intro && <Intro progress={failure || mapReady ? 1 : manifest ? 0.6 : 0.15} onDone={endIntro} />}</>
 }
 
-function Explorer({ manifest: m }: { manifest: Manifest }) {
+function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?: () => void }) {
   const primary = m.groups.find((g) => g.kind === 'pair')
   const firstLayer = m.layers.find((l) => (primary ? l.groupId === primary.id : l.category === 'gridded') && isUsable(l))
   const [groupId, setGroupId] = useState(primary?.id ?? '')
@@ -79,7 +86,9 @@ function Explorer({ manifest: m }: { manifest: Manifest }) {
   const [mapStatus, setMapStatus] = useState<MapStatus>({ state: 'loading' })
   const [covered, setCovered] = useState(true)
   const [panel, setPanel] = useState<'left' | 'right' | null>(null)
-  const edges = useAutoHidePanels(`${storyStep}-${simOn}-${compareOn}-${threeOn}-${scenarioOn}`)
+  // The guided story is a headline over the map, so the controls panel waits at the screen edge while it runs
+  const edges = useAutoHidePanels(`${storyStep !== null}-${simOn}-${compareOn}-${threeOn}-${scenarioOn}`, storyStep !== null)
+  useEffect(() => { if (mapStatus.state !== 'loading') onMapReady?.() }, [mapStatus.state, onMapReady])
   const [tab, setTab] = useState<'inspect' | 'about'>('about')
   const [aboutId, setAboutId] = useState<string | null>(null)
 
