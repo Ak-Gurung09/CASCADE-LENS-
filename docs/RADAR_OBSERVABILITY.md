@@ -13,25 +13,38 @@ Added November 2026. These three tools answer, for any spot on the map: *could N
 | Rasuwa | 16 to 28 Aug 2026 | 23 Jul to 16 Aug 2026 | 48 descending / 74 | 32.3 to 38.2° |
 | Tsho Rolpa | 16 to 28 Aug 2026 | 23 Jul to 16 Aug 2026 | 48 descending / 74 | 43.3 to 43.9° |
 
-**Method** (`processing/src/cascade_lens/observability.py`, run by `processing/scripts/prepare_observability.py`). The analysis grid is 40 m in UTM zone 45N. Each pixel keeps separate reason flags, never one blended score:
+**Method, version 2** (`processing/src/cascade_lens/observability.py`, run by `processing/scripts/prepare_observability.py`). The analysis grid is 40 m in UTM zone 45N. Each cell keeps separate reason flags (16-bit), never one blended score:
 
 | Flag | Bit | Rule |
 |---|---|---|
 | Outside the frame checked | 1 | Outside the product's `boundingPolygon`. A neighbouring frame may cover it; it is not assessed here |
-| No data | 2 | Inside the frame, but wrapped coherence has no value |
+| No data | 2 | Inside the frame, but the product holds no coherence value, or its mask holds the fill value 255 |
 | Layover | 4 | Ground slope facing the radar, measured along the horizontal look direction, is steeper than the incidence angle |
 | Shadow | 8 | Slope facing away is steeper than 90° minus the incidence angle (active shadow only) |
 | Low coherence | 16 | Event-pair coherence below 0.3 |
-| No unwrapped phase | 32 | Connected component 0, or unwrapped phase exactly 0 (the product's fill in unwrapping gaps) |
+| No reliably unwrapped phase | 32 | Component label 0 or the component fill value (read from the file), non-finite phase, or phase exactly 0 (the product's fill in unwrapping gaps) |
 | Low baseline coherence | 64 | Baseline-pair coherence below 0.3 |
+| Flagged by the product's mask | 128 | The event product's own `unwrappedInterferogram/mask` marks water or an invalid subswath |
+| Geometry not assessed | 256 | Elevation, incidence angle or look direction missing or invalid, so layover and shadow cannot be checked |
+| Baseline has no valid value | 512 | The baseline product holds no value, or its mask marks fill, water or an invalid subswath |
 
-The look direction and incidence come from the product's own `radarGrid` cubes (`losUnitVectorX/Y`, `incidenceAngle`). NISAR looks left; for frame 74 the unit vector toward the sensor is about 0.55 west and 0.17 north.
+Every flag uses one coherence product: `unwrappedInterferogram/{pol}/coherenceMagnitude`. It shares a grid with the unwrapped phase, the components and the mask, and it is the layer the app shows as "Coherence magnitude". Its 80 m pixels are sampled nearest-neighbour onto the 40 m grid, so each product pixel covers 2 × 2 cells; the finer grid exists for the terrain geometry. A product without its mask is refused.
 
-**Classes per task.** Outside the frame checked (bit 1), then no data (bit 2), then hidden by terrain (bits 4 or 8). Otherwise, for *disturbance*, "seen but not reliable" if the baseline was incoherent (bit 64); for *movement*, if coherence is low or phase was not unwrapped (bits 16 or 32). Everything else is usable. Zone verdicts: 50% usable or more is "enough evidence", 20 to 50% "partial", under 20% "insufficient".
+The look direction and incidence come from the product's own `radarGrid` cubes (`losUnitVectorX/Y`, `incidenceAngle`), at the cube height nearest the median terrain height. NISAR looks left; for frame 74 the unit vector toward the sensor is about 0.55 west and 0.17 north.
 
-**Sensitivity.** Usable share for movement over the whole Rasuwa area is 95% at a 0.2 coherence threshold, 82% at 0.3 and 67% at 0.4 (Tsho Rolpa: 95, 77, 62%). The threshold is a project choice, so the app reports all three.
+**Classes per task.** In order of precedence: outside the frame checked (class 5); no valid data in the product, meaning no value or flagged by the product's mask (class 4); hidden by terrain (class 3); not assessed, when the geometry or, for *disturbance*, the baseline is missing (class 6). Otherwise, for *disturbance*, "seen but not reliable" if the baseline was incoherent; for *movement*, if coherence is low or the phase was not reliably unwrapped (class 2). Everything else is usable (class 1). Disturbance is not assessed at all without a baseline pair. Zone verdicts: 50% usable or more is "enough evidence", 20 to 50% "partial", under 20% "insufficient".
 
-**Results.**
+**Sensitivity.** The usable share for movement is recomputed at coherence thresholds of 0.2, 0.3 and 0.4 with the same rule as the movement class, over every cell inside the frame footprint. The threshold is a project choice, so all three are reported.
+
+**Version 1, withdrawn.** The first version read the wrapped-grid coherence, ignored the product's mask, let a missing elevation or viewing angle count as visible, and accepted the component fill value. In the Rasuwa detachment zone, every frame-74 pixel is flagged by the product's own mask (coherence, phase, components and the GOFF mask alike), yet version 1 reported a surface change as visible on 66% of it. The app withholds version 1 figures and says so until the case is rebuilt.
+
+**Rebuild** (needs the raw GUNW files; nothing is downloaded). Replace the paths with yours, then run the hazards step on the new flags and merge:
+
+```bash
+python processing/scripts/prepare_observability.py frontend/public/data/manifests/manifest.json <event GUNW f074 .h5> <baseline GUNW f074 .h5> frontend/public/data/sampling/context/copdem_glo30.tif frontend/public/data/vectors data/interim/observability unosat_detachment_zone.geojson unosat_mudflow_extent.geojson
+```
+
+**Results, version 1 (withdrawn: computed without the product's mask; see above).** Kept for comparison until the rebuild replaces them.
 
 | Zone | Change visible: usable | Movement: usable | Outside the frame checked |
 |---|---|---|---|
@@ -58,7 +71,7 @@ So at the Rasuwa source a surface change could be seen, but movement could not b
 
 The checks it uses are event-pair coherence (low below 0.3, stable at 0.6 or more), the observability flags, pixel offsets compared with the scene's usual spread (half the 2nd to 98th percentile range, with the match quality at or above the scene median), the slope from the DEM (steep at 25° or more), elevation (4,800 m or more counts as snow and ice ground), whether the spot lies inside an independently mapped area (UNOSAT, REACH), and the case-wide control comparison.
 
-Each explanation lists the evidence for and against it, and what would settle it. Ranking counts agreeing checks minus disagreeing ones: two or more is "best supported", one "possible", otherwise "weak". **It is never a probability.** Where the radar did not look (outside the frame or no data), the panel refuses to explain and says what data is missing.
+Each explanation lists the checks for and against it, the context that is not counted, and what would settle it. Only two kinds of check are counted: a radar value at the clicked spot (coherence, pixel offsets, the baseline flags) and independent mapping of that spot (UNOSAT, REACH). Slope, elevation, area-wide figures such as the control comparison, and the absence of mapping are listed as context, because they describe the place without showing that anything happened there. The label counts checks for minus checks against: two or more is "Fits the checks", one is "Partly fits", otherwise "Little support". Without a valid radar value at the spot, the radar-based explanations say "Cannot judge here". **It is never a probability.** Where the radar did not look, or the product's own mask flags the spot, the panel refuses to explain and says what data is missing.
 
 ## 3. Evidence report
 

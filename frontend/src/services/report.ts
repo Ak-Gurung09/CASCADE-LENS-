@@ -2,7 +2,7 @@ import type { Manifest } from '../types/manifest'
 import { acquisitionLabel, isUsable } from './manifest'
 import { samplePoint } from './sampler'
 import { evidenceOf, EVIDENCE } from './evidence'
-import { classify, isObservability, reasons, taskOf } from './observability'
+import { classify, classLabel, isObservability, observabilityCurrent, reasons, STALE_NOTE, taskOf } from './observability'
 import { explain, gather, type Hypothesis } from './hypotheses'
 import { isTerrainScreen, nearestRoad, terrainClass, terrainFactors, terrainLayer, type RoadSegment } from './hazards'
 
@@ -24,7 +24,7 @@ export interface Report {
   generatedAt: string
   case: { id: string; name: string; eventDate: string }
   point: { lng: number; lat: number }
-  observability: { pair: string; frame: string; answers: { question: string; answer: string }[]; reasons: string[] } | null
+  observability: { pair: string; frame: string; methodVersion: number; current: boolean; answers: { question: string; answer: string }[]; reasons: string[] } | null
   readings: ReportRow[]
   explanations: Hypothesis[]
   hazards?: { terrain: { class: string; factors: string[] } | null; road: RoadSegment | null; maturity: string }
@@ -56,7 +56,9 @@ export async function buildReport(m: Manifest, p: [number, number], now = new Da
     observability: o ? {
       pair: `${o.acquisition.reference} to ${o.acquisition.secondary}`,
       frame: `Track ${o.track}, frame ${o.frames.join(', ')}`,
-      answers: obs.map((l) => ({ question: QUESTION[taskOf(l)], answer: flags === null ? 'Not assessed here' : l.legend?.keys?.[classify(flags, taskOf(l)) - 1]?.label ?? '' })),
+      methodVersion: m.observability?.methodVersion ?? 1,
+      current: observabilityCurrent(m),
+      answers: obs.map((l) => ({ question: QUESTION[taskOf(l)], answer: flags === null ? 'Not assessed here' : classLabel(l, classify(flags, taskOf(l))) })),
       reasons: flags === null ? ['Outside the area checked. That is not the same as safe or unchanged.'] : reasons(flags),
     } : null,
     readings: plain.map((l, i) => ({
@@ -68,7 +70,8 @@ export async function buildReport(m: Manifest, p: [number, number], now = new Da
     hazards: m.hazards ? { terrain: tf === null ? null : { class: m.hazards.terrain.classes.find((c) => c.code === terrainClass(tf))?.label ?? '', factors: terrainFactors(tf) }, road, maturity: 'Experimental screens, not forecasts' } : undefined,
     notes: [
       'Values are the nearest stored pixel, with no interpolation. A blank value means no valid observation, which is not the same as no change.',
-      'Explanations are a rule-based screen: they count which checks agree. They are hypotheses, not probabilities or verdicts.',
+      'Explanations are a rule-based screen: they count which checks agree, using radar values at this spot and independent mapping. Context such as slope is listed but not counted. They are hypotheses, not probabilities or verdicts.',
+      ...(o && !observabilityCurrent(m) ? [`Radar observability: ${STALE_NOTE}`] : []),
       'NISAR products are provisional releases. This report is a retrospective research aid, not a warning.',
     ],
   }
@@ -100,12 +103,14 @@ table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid 
 <button onclick="print()">Print or save as PDF</button>
 <h1>${esc(r.title)}</h1>
 <p class="muted">Spot ${r.point.lat.toFixed(5)}° N, ${r.point.lng.toFixed(5)}° E · event ${esc(r.case.eventDate)} · generated ${esc(r.generatedAt.slice(0, 16).replace('T', ' '))} UTC</p>
-${r.observability ? `<h2>Can the radar see here? <span class="tag">Derived</span></h2><p class="muted">Pair ${esc(r.observability.pair)}, ${esc(r.observability.frame)}</p>
+${r.observability ? `<h2>Can the radar see here? <span class="tag">Derived</span></h2><p class="muted">Pair ${esc(r.observability.pair)}, ${esc(r.observability.frame)}, method version ${r.observability.methodVersion}</p>
+${r.observability.current ? '' : `<p><b>${esc(STALE_NOTE)}</b></p>`}
 <table>${r.observability.answers.map((a) => `<tr><th>${esc(a.question)}</th><td>${esc(a.answer)}</td></tr>`).join('')}</table>
 ${r.observability.reasons.length ? `<ul>${li(r.observability.reasons)}</ul>` : '<p>No problems found at this spot.</p>'}` : ''}
 <h2>What could explain this? <span class="tag">Hypothesis</span></h2>
 ${r.explanations.map((h) => `<h3>${esc(h.title)} <span class="tag">${esc(h.standing)}</span></h3>
 ${h.for.length ? `<p><b>For</b></p><ul>${li(h.for)}</ul>` : ''}${h.against.length ? `<p><b>Against</b></p><ul>${li(h.against)}</ul>` : ''}
+${h.context.length ? `<p><b>Context, not counted</b></p><ul>${li(h.context)}</ul>` : ''}
 ${h.missing.length ? `<p><b>Would settle it</b></p><ul>${li(h.missing)}</ul>` : ''}`).join('')}
 ${r.hazards ? `<h2>Hazard screens <span class="tag">Experimental</span></h2>
 ${r.hazards.terrain ? `<p><b>Landslide-prone terrain:</b> ${esc(r.hazards.terrain.class)}</p><ul>${li(r.hazards.terrain.factors)}</ul>` : ''}

@@ -64,6 +64,15 @@ def _read(h5, path):
     return _py(h5[path][()]) if path in h5 else None
 
 
+def fill_value(ds, spec_default):
+    """A dataset's own _FillValue, or the specification's documented value when the attribute is missing."""
+    v = ds.attrs.get("_FillValue")
+    if v is None:
+        return spec_default
+    v = np.asarray(v).ravel()
+    return v[0].item() if v.size else spec_default
+
+
 def units_match(want: str, got) -> bool:
     return got == want or (want in UNITLESS and got in UNITLESS)
 

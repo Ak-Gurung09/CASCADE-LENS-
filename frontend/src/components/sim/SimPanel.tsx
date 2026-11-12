@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Layer, Manifest } from '../../types/manifest'
-import { coherence, count, firstPass, loadSimulation, shift, SIM_CELLS, type SimData, type SimView } from '../../services/simulation'
+import { coherence, count, firstPass, loadSimulation, replayAdvance, shift, SIM_CELLS, type SimData, type SimView } from '../../services/simulation'
 import { Bars } from '../charts/Charts'
 import { coherenceGroups } from '../story/StoryPanel'
 
@@ -45,10 +45,11 @@ function Replay({ data, km, setKm }: { data: SimData; km: number; setKm: (k: num
     let pos = km >= last ? 0 : km
     let before = performance.now()
     let frame = requestAnimationFrame(function tick(now) {
-      pos += ((now - before) / 1000) * (last / REPLAY_SECONDS)
+      const step = replayAdvance(pos, now - before, last, REPLAY_SECONDS)
+      pos = step.pos
       before = now
-      if (pos >= last) { setKm(last); setPlaying(false); return }
-      setKm(Math.floor(pos)) // Whole kilometres, so the map redraws about 8 times a second, not 60
+      setKm(step.km) // Whole kilometres, so the map redraws about 8 times a second, not 60
+      if (step.done) { setPlaying(false); return }
       frame = requestAnimationFrame(tick)
     })
     return () => cancelAnimationFrame(frame)

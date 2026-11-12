@@ -51,3 +51,11 @@ export function coherence(change: number) {
   }
   return Math.hypot(re, im) / SIM_CELLS
 }
+
+// One animation frame of the flow replay: whole kilometres along the path, never outside it.
+// A frame's timestamp can come before the moment the replay started, so a negative elapsed time counts as no time.
+export function replayAdvance(pos: number, elapsedMs: number, last: number, seconds: number): { pos: number; km: number; done: boolean } {
+  const next = Math.max(0, pos) + (Math.max(0, elapsedMs) / 1000) * (last / seconds)
+  if (!(next < last)) return { pos: last, km: Math.max(0, last), done: true }
+  return { pos: next, km: Math.min(last, Math.max(0, Math.floor(next))), done: false }
+}

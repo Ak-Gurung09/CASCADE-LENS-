@@ -3,6 +3,7 @@ import type { Bookmark, Layer, Manifest } from '../../types/manifest'
 import { acquisitionLabel, coordinates, isUsable, posting, STATUS_LABEL, unitLabel } from '../../services/manifest'
 import { samplePoint, type SampleResult } from '../../services/sampler'
 import { ObservabilityAt } from './ObservabilityAt'
+import { observabilityCurrent } from '../../services/observability'
 import { Hypotheses } from './Hypotheses'
 import { ReportButtons } from './ReportButtons'
 import { HazardAt } from './HazardAt'
@@ -90,7 +91,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
         <div><dt>Location</dt><dd>{coordinates(point[0], point[1])}</dd></div>
         <div><dt>Context</dt><dd>{placeOf(point, bookmarks)}</dd></div>
       </dl>
-      <ObservabilityAt layers={layers} point={point} />
+      <ObservabilityAt layers={layers} point={point} current={observabilityCurrent(manifest)} />
       {!layer ? <p className="muted">Select a layer to read a value here.</p> : busy ? <p className="muted">Loading sample…</p> : main && (
         <>
           <p className={`sample sample-${main.state}`}>{main.message}</p>

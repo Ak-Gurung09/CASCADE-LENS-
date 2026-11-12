@@ -43,7 +43,9 @@ def main(argv: list[str]) -> None:
 
     with rasterio.open(flags_path) as d:
         tr, crs, shp, epsg = d.transform, d.crs, d.shape, d.crs.to_epsg()
-        obs_flags = d.read(1)
+        obs_flags, obs_nodata = d.read(1), d.nodata
+    if obs_nodata is None:
+        raise ValueError(f"{flags_path.name} declares no nodata value, so unassessed cells cannot be told apart")
     posting = tr.a
     z = hz.to_grid(dem, tr, crs, shp)
     r = hz.screen(z, posting)
@@ -56,7 +58,7 @@ def main(argv: list[str]) -> None:
     det, flow = poly("unosat_detachment_zone.geojson"), poly("unosat_mudflow_extent.geojson")
     burn = lambda g: rasterize([(mapping(g), 1)], out_shape=shp, transform=tr, fill=0, dtype="uint8").astype(bool)  # noqa: E731
     in_det, in_flow = burn(det), burn(flow)
-    seen = obs_flags != 255
+    seen = obs_flags != obs_nodata
     valid = (cls > 0) & seen
     score = cls.astype(float)
     validation = {
@@ -85,7 +87,9 @@ def main(argv: list[str]) -> None:
     # Road corridor exposure, 250 m segments
     rivers = unary_union([stransform(to_utm, shape(f["geometry"])) for f in read_fc(vectors / "osm_rivers.geojson") if f["properties"].get("waterway") == "river"])
     hit = unary_union([stransform(to_utm, shape(f["geometry"])) for f in read_fc(vectors / "unosat_affected_roads.geojson")]).buffer(30)
-    disturb = ob.classify(obs_flags, "disturbance")
+    # Whether the radar could watch a stretch needs the disturbance task, which exists only with a pre-event baseline pair
+    has_baseline = bool((m.get("observability") or {}).get("baselinePair"))
+    disturb = ob.classify(obs_flags, "disturbance") if has_baseline else np.full(obs_flags.shape, 6, np.uint8)
     feats, tally = [], {}
     inv = ~tr
     for f in read_fc(vectors / "osm_roads.geojson"):
@@ -112,7 +116,7 @@ def main(argv: list[str]) -> None:
             steep = round(100 * float(((cl >= 3)).mean()), 1)
             usable = round(100 * float((sc == 1).mean()), 1)
             hidden = round(100 * float((sc == 3).mean()), 1)
-            unseen = round(100 * float(np.isin(sc, (4, 5)).mean()), 1)
+            unseen = round(100 * float(np.isin(sc, (4, 5, 6)).mean()), 1)
             near_river = bool(seg.distance(rivers) <= RIVER_M) if not rivers.is_empty else False
             mapped = bool(seg.intersects(flow)) or bool(seg.intersects(hit))
             reasons = []
@@ -125,7 +129,8 @@ def main(argv: list[str]) -> None:
             if near_river:
                 reasons.append(f"Within {RIVER_M} m of a river: bank erosion and flood exposure")
             level = "High" if mapped or steep >= 30 else "Moderate" if steep >= 10 or near_river else "Low"
-            watch = "Radar can watch" if usable >= 50 else "Partly watchable" if usable >= 20 else "Radar cannot watch"
+            watch = ("Not assessed" if not has_baseline else
+                     "Radar can watch" if usable >= 50 else "Partly watchable" if usable >= 20 else "Radar cannot watch")
             km = seg.length / 1000
             t = tally.setdefault(level, {"km": 0.0, "unwatchedKm": 0.0})
             t["km"] += km

@@ -205,16 +205,11 @@ def _outline_path(lake: np.ndarray) -> str:
 def prepare(cfg: dict, files: list[pathlib.Path], public: pathlib.Path, work: pathlib.Path, qa_dir: pathlib.Path, dem: pathlib.Path | None = None,
             pair_folders: list[pathlib.Path] | None = None) -> dict:
     case = cfg["id"]
-    lon, lat = cfg["lake"]["lng"], cfg["lake"]["lat"]
     rows, cols = cfg["box_rows"], cfg["box_cols"]
     zmin, zmax = cfg["zoom"]
     epsg = cfg["epsg"]
-    to_utm = Transformer.from_crs(4326, epsg, always_xy=True)
-    cx, cy = to_utm.transform(lon, lat)
-    # Shared grid: pixel centres on the 20 m GCOV grid (xCoordinates of the 20 m files end in 0, offset 10 from the 10 m files' 5)
-    x0 = np.floor((cx - cols / 2 * POSTING) / POSTING) * POSTING + cfg["grid_offset"]
-    y0 = np.floor((cy + rows / 2 * POSTING) / POSTING) * POSTING + cfg["grid_offset"]
-    transform = from_origin(x0 - POSTING / 2, y0 + POSTING / 2, POSTING, POSTING)
+    g = lake_grid(cfg)
+    cx, cy, x0, y0, transform = g["cx"], g["cy"], g["x0"], g["y0"], g["transform"]
     bounds = list(transform_bounds(f"EPSG:{epsg}", "EPSG:4326", x0 - POSTING / 2, y0 + POSTING / 2 - rows * POSTING, x0 - POSTING / 2 + cols * POSTING, y0 + POSTING / 2, densify_pts=21))
     yy, xx = np.mgrid[0:rows, 0:cols]
     pc, pr = (cx - x0) / POSTING, (y0 - cy) / POSTING
@@ -361,12 +356,25 @@ def prepare(cfg: dict, files: list[pathlib.Path], public: pathlib.Path, work: pa
                      "terrain": terrain, "imageSize": [crop[3] - crop[2], crop[1] - crop[0]], "imageMetres": [(crop[3] - crop[2]) * POSTING, (crop[1] - crop[0]) * POSTING], "changeKm2": round(change, 3), "methodHalfRangeKm2": round(spread, 3),
                      "method": f"Dark area in HH + HV below {THRESHOLD_DB:.0f} dB after {FILTER}x{FILTER} smoothing on a {POSTING:.0f} m grid. The range reruns it at {THRESHOLD_RANGE[0]:.0f} and {THRESHOLD_RANGE[1]:.0f} dB."}}
     if pair_folders:
-        grid = {"x0": x0, "y0": y0, "rows": rows, "cols": cols, "posting": POSTING, "transform": transform}
-        m = motion.add_motion(m, cfg, pair_folders, public, work, grid, np.any(np.stack(lakes), axis=0))
+        m = motion.add_coherence_layer(m, cfg, pair_folders, public, work, g, np.any(np.stack(lakes), axis=0))
     return m
 
 
-def nisar_maturity(ident: dict) -> str:
-    doi = str(ident.get("productDoi") or "")
-    name = {"B": "Beta", "P": "Provisional", "V": "Validated"}.get(doi.rsplit("-", 1)[-1][:1], "Provisional per file name")
-    return f"{name} ({ident.get('compositeReleaseId') or 'P05023'})"
+def lake_grid(cfg: dict) -> dict:
+    """The shared 20 m lake grid: pixel centres on the 20 m GCOV grid (xCoordinates of the 20 m files end in 0, offset 10 from the 10 m files' 5)."""
+    rows, cols, epsg = cfg["box_rows"], cfg["box_cols"], cfg["epsg"]
+    cx, cy = Transformer.from_crs(4326, epsg, always_xy=True).transform(cfg["lake"]["lng"], cfg["lake"]["lat"])
+    x0 = np.floor((cx - cols / 2 * POSTING) / POSTING) * POSTING + cfg["grid_offset"]
+    y0 = np.floor((cy + rows / 2 * POSTING) / POSTING) * POSTING + cfg["grid_offset"]
+    return {"x0": x0, "y0": y0, "rows": rows, "cols": cols, "posting": POSTING, "cx": cx, "cy": cy,
+            "transform": from_origin(x0 - POSTING / 2, y0 + POSTING / 2, POSTING, POSTING)}
+
+
+def research_inputs(cfg: dict, public: pathlib.Path) -> tuple[dict, np.ndarray]:
+    """The lake grid and the union of every date's lake outline, read back from the prepared lake vector, for motion.motion_research."""
+    grid = lake_grid(cfg)
+    fc = json.loads((public / f"vectors/{cfg['id']}-lake.geojson").read_text(encoding="utf-8"))
+    shapes = [(transform_geom("EPSG:4326", f"EPSG:{cfg['epsg']}", f["geometry"]), 1) for f in fc["features"]]
+    shape = (grid["rows"], grid["cols"])
+    lake = features.rasterize(shapes, out_shape=shape, transform=grid["transform"]).astype(bool) if shapes else np.zeros(shape, bool)
+    return grid, lake

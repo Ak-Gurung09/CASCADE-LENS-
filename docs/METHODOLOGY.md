@@ -30,7 +30,9 @@ Phase-like layers are coloured relative to each frame's median, so both frames s
 
 ## Connected components
 
-`.../{pol}/connectedComponents` is UInt16 with fill 65535. Labels are shown as categories. ATBD section 5.9.1.7 says label 0 marks phase that could not be reliably unwrapped, so those phase pixels are masked. Coherence is not affected by this rule.
+`.../{pol}/connectedComponents` is UInt16; its fill value is read from the file's `_FillValue` (65535 in Rev E). Labels are shown as categories. ATBD section 5.9.1.7 says label 0 marks phase that could not be reliably unwrapped, so those phase pixels are masked. Coherence is not affected by this rule. In the component layer itself, a label means nothing where the product holds no phase, so those pixels are no data.
+
+Unwrapped phase stored as exactly 0.0 is the product's fill in unwrapping gaps: it is masked, with the value kept. A component's own reference pixel can legitimately be 0, so at most one real pixel per component may be lost.
 
 ## Mask
 
@@ -40,7 +42,9 @@ Phase-like layers are coloured relative to each frame's median, so both frames s
 |---|---|---|---|
 | 0 No data | Non-finite, or fill in mask or components | No | n/a |
 | 1 Valid | Passed every rule | Yes | Yes |
-| 2 Masked | Water, invalid subswath, component label 0 (phase), or flagged outlier | Optional overlay | Yes |
+| 2 Masked | Water, invalid subswath, component label 0 or zero-filled value (phase), or flagged outlier | Optional overlay | Yes |
+
+No data always takes precedence over masked: a pixel whose mask holds the fill value stays no data whatever the other rules say.
 
 ## GOFF offsets
 

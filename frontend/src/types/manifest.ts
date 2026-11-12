@@ -187,9 +187,13 @@ export interface LakeSeries {
   changeKm2: number
   methodHalfRangeKm2: number
   method: string
-  motion?: LakeMotion
+  coherence?: LakeCoherence
+  motion?: LakeMotion // written by older builds only; research output, never displayed
   scenario?: LakeScenario
 }
+
+// Written by processing/src/cascade_lens/motion.py add_coherence_layer: medians of one pair's coherence over the lake and the land.
+export interface LakeCoherence { pair: [string, string]; granule: string; sourceDataset: string; maskApplied: boolean; lake: number; land: number }
 
 // Written by processing/src/cascade_lens/scenario.py: what would happen IF the dam breached. Ranges, not predictions.
 export interface LakeScenarioCase {
@@ -217,7 +221,7 @@ export interface LakeScenario {
   dem: string
 }
 
-// Written by processing/src/cascade_lens/motion.py. Limits are "less than" values: movement smaller than this is hidden in noise.
+// Older builds wrote movement bounds into the manifest. They are now research only (data/qa) and the app never shows them.
 export interface LakeMotion {
   wavelengthCm: number
   zonesNote: string
@@ -260,16 +264,25 @@ export interface Observability {
   look: string
   compositeReleaseId: string
   productVersion: string
-  incidenceDeg5to95: [number, number]
+  incidenceDeg5to95: [number, number] | null
   postingM: number
+  methodVersion?: number // absent before version 2, which applies the product masks; see services/observability.ts
+  datasets?: Record<string, string>
+  geometryNotAssessedPct?: number | null
   classes: Record<string, { code: number; label: string; color: string; meaning: string }[]>
   thresholds: Record<string, { value: number | string; provenance: string }>
-  sensitivityUsableMovementPct: Record<string, number | null>
+  sensitivity?: { movementUsablePct: Record<string, number | null>; denominator: string; rule: string }
+  sensitivityUsableMovementPct?: Record<string, number | null> // version 1 only, computed without the unwrapping rule
   limitations: string[]
   zones: Record<string, Record<string, ObservabilityZone>>
 }
 
-// Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair (did.py).
+// Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair.
+// Version 2 is written by processing/scripts/prepare_control_series.py; earlier versions came from a script that is not in the repository.
+export interface ControlPair {
+  pair: [string, string]; days: number; inside: number; outside: number; insideCi95: [number, number] | null; validPct: number; granule: string
+  outsideCi95?: [number, number] | null; mode?: string | null; rangeBandwidthHz?: number | null
+}
 export interface ControlSeries {
   zone: string
   control: string
@@ -277,7 +290,11 @@ export interface ControlSeries {
   frame: number
   direction: string
   eventDate: string
-  pairs: { pair: [string, string]; days: number; inside: number; outside: number; insideCi95: [number, number]; validPct: number; granule: string }[]
+  methodVersion?: number
+  coherenceDataset?: string
+  ciMethod?: string
+  generator?: string
+  pairs: ControlPair[]
 }
 
 // Terrain screen and road exposure, written by processing/scripts/prepare_hazards.py

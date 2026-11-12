@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coherence, count, type SimData, type SimProps } from './simulation'
+import { coherence, count, replayAdvance, type SimData, type SimProps } from './simulation'
 
 const feature = (properties: SimProps) => ({ type: 'Feature' as const, properties, geometry: { type: 'Point' as const, coordinates: [0, 0] } })
 const data = { features: { type: 'FeatureCollection', features: [
@@ -28,5 +28,18 @@ describe('coherence', () => {
     expect(coherence(0)).toBeCloseTo(1)
     expect(coherence(0.5)).toBeLessThan(coherence(0.2))
     expect(coherence(1)).toBeLessThan(0.15)
+  })
+})
+
+describe('replayAdvance', () => {
+  it('never steps before the start, even when a frame timestamp precedes the start time', () => {
+    const s = replayAdvance(0, -5, 198, 24)
+    expect(s.km).toBe(0)
+    expect(s.pos).toBe(0)
+    expect(s.done).toBe(false)
+  })
+  it('moves in whole kilometres and stops exactly at the end', () => {
+    expect(replayAdvance(0, 1000, 198, 24).km).toBe(8)
+    expect(replayAdvance(197.5, 1000, 198, 24)).toEqual({ pos: 198, km: 198, done: true })
   })
 })
