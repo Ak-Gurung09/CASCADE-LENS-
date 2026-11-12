@@ -13,6 +13,8 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource/instrument-serif": "5.3.0",
     "geotiff": "3.0.5",
     "maplibre-gl": "6.16.0",
     "proj4": "2.22.0",
