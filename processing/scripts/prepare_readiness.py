@@ -87,7 +87,7 @@ def shipped_sources() -> None:
         b = [s["bounds"] for s in srcs]
         views = [m.get("observability") or {}, *(m.get("observabilityViews") or {}).values()]
         frames = sorted({f"{v['track']}/{f['frame']}" for v in views if v for f in v.get("frames") or [{"frame": v.get("frame")}]})
-        tracks = ", ".join(f"Track {l['track']} {str(l.get('orbitDirection', '')).lower()} frame {l['frames'][0]} ({len(l['timeSteps'])} pairs)" for l in series)
+        tracks = ", ".join(f"Track {l['track']} {str(l.get('orbitDirection', '')).lower()} frame{'s' if len(l['frames']) > 1 else ''} {' and '.join(map(str, l['frames']))} ({len(l['timeSteps'])} pairs)" for l in series)
         rd.write_source(SOURCES / "C7", dataset="C7", provider="NASA/JPL, ISRO via ASF DAAC", product=f"NISAR L2 GUNW repeat series: {tracks}",
                         version=", ".join(sorted({s["granule"].split("_")[-5] for s in srcs})), url_or_request_ref="data/metadata/catalogue.json",
                         licence="NASA open data (attribution required)", retrieved_at=None, available_at=None,
