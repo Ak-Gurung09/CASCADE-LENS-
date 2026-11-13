@@ -8,7 +8,7 @@ CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwa�
 
 > **Data status: real NISAR measurements are loaded.** For Rasuwa, Pair A (GUNW and GOFF) and Pair B (GOFF) passed QA. Tsho Rolpa uses GCOV on four dates; Rasuwa GCOV is not downloaded. All products are Provisional. No displacement is calculated anywhere.
 >
-> **Awaiting a rebuild.** The radar observability figures (“Can the radar see it?”) were computed by a first method that ignored the product’s own quality mask. That method is withdrawn, and the app withholds its figures until both cases are rebuilt from the raw files with the corrected method. The before/after control medians come from an earlier script that is not in the repository; the app says so, and a reproducible run will replace them. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) and [docs/RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md).
+> **Rebuilt on 13 November 2026** from the raw NISAR files, with the corrected method: the product's own quality mask is applied, frames 74 and 75 are both assessed, and the before/after comparison is reproducible from the repository. The first observability method, which ignored the mask, is withdrawn. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) and [docs/RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md).
 
 ![Coherence along the Bhote Koshi corridor, with the low-coherence channel beneath the UNOSAT extent](docs/screenshots/corridor-coherence.png)
 
@@ -21,8 +21,8 @@ Do not open `index.html` directly. Browsers block a page opened that way from lo
 ## What the radar shows
 
 - **Coherence** is much lower along the UNOSAT-mapped channel than on the terrain beside it: 0.19 against 0.46 in frame 74, and 0.16 against 0.52 in frame 75. Only pixels the product marks valid count, which is 37% and 44% of the mapped extent.
-- **At the source**, Pair A holds no usable measurement: the product’s own quality mask flags every pixel of the detachment zone in frame 74, as water or an invalid subswath. Which of the two has not been read from the raw mask yet. Pair B reaches the source, and image matching largely fails there: correlation peak 0.18 against 0.63.
-- **Before and after.** In the pair before the event, the mapped mudflow and the ground around it had similar coherence. Across the event, coherence fell inside the mapped area while the ground around it rose. That is consistent with surface change there, but it does not establish the cause. The pairs are not like for like, either: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes (4000 and 2000 in the file names).
+- **At the source**, Pair A holds no usable measurement. The product's own mask gives every detachment-zone pixel the value 10: not water, but no valid subswath in the 28 August acquisition. It is a gap in that acquisition's coverage. Pair B reaches the source, and image matching largely fails there: correlation peak 0.18 against 0.63.
+- **Before and after.** In the pair before the event, the mapped mudflow and the ground around it had similar median coherence (0.38 against 0.40). Across the event, coherence fell to 0.19 inside the mapped area while the ground around it rose to 0.50, and in that pair the 95% intervals of the two medians do not overlap. That is consistent with surface change there, but it does not establish the cause. The pairs are not like for like: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes (4000 and 2000 in the file names).
 - **Raw phase** is dominated by the ionosphere. Removing the product's own estimate cuts scatter by about half to two-thirds.
 - **Pixel offsets** show no large coherent shift. They come from the product layer with the smallest search window, which could miss a very large shift.
 
@@ -38,11 +38,12 @@ This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](
 - Observation-pair selection, with dates, tracks and frames verified from the files.
 - A measurement inspector that reads stored raster values, with quality alongside.
 - An evidence class on every layer, panel and report: Observed, Derived, Forecast, Hypothesis, Reference, Scenario or Unknown.
-- Radar observability (“Can the radar see it?”): for each spot, whether a surface change could be judged and whether movement could be measured, with the reasons kept separate. The figures are withheld until the rebuild, as described above.
+- Radar observability (“Can the radar see it?”): for each spot, whether a surface change could be judged and whether movement could be measured, with the reasons kept separate, over frames 74 and 75. At the detachment zone the answer is no on both counts: the product holds no valid data there.
+- Coherence through time: all five frame 74 pairs from 23 July to 3 October 2026 as one layer, so the inspector shows a clicked spot pair by pair.
 - “What could explain this?”, a rule-based panel that lists the checks for and against each explanation and never gives a probability, and an evidence report as a printable page, CSV, GeoJSON or JSON.
 - Experimental hazard screens: landslide-prone terrain and road exposure along the Rasuwa corridor. Each 250 m road stretch has a stable ID, and its evidence panel shows the rating, what the radar saw there, from which file, and what to verify next. Every report format carries the same record.
 - An experimental road access screen: which named places keep a road path to a health facility once roads OSM maps as destroyed and bridges reported washed out are closed, and which closures cause each loss. See [docs/ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md).
-- A readiness engine that records, from the files on disk, how far each flood and landslide capability could honestly go and what it needs next. Today none goes beyond context, so nothing is forecast. See [docs/READINESS.md](docs/READINESS.md).
+- A readiness engine that records, from the files on disk, how far each flood and landslide capability could honestly go and what it needs next. Today none goes beyond context or raw data, so nothing is forecast. See [docs/READINESS.md](docs/READINESS.md).
 - First model code (rainfall thresholds, logistic-regression susceptibility, the GR4J river model) and a verification harness (POD, FAR, CSI, chronological splits, a leakage guard), tested on synthetic data and not yet run on real data. See [docs/MODELS.md](docs/MODELS.md).
 - Layer statuses generated from the files on disk. A NISAR layer cannot be selected until it has been downloaded, inspected and passed QA.
 - A list of what is real (“What is real?”), read from `frontend/public/data/status.json`, which gives each capability its maturity. Each headline claim is listed in `frontend/public/data/claims.json` with its basis and status, and a test keeps withdrawn claims out of the app and the main docs.
@@ -188,7 +189,7 @@ cd frontend && npm run dev:fixture
 
 ## Known limitations
 
-All NISAR products are Provisional, and Rasuwa GCOV is not downloaded. Phase is not converted to displacement. The observability figures are withheld until the rebuild. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+All NISAR products are Provisional, and Rasuwa GCOV is not downloaded. Phase is not converted to displacement. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
 ## Documentation
 

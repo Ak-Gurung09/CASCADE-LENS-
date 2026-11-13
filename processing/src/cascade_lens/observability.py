@@ -11,7 +11,7 @@ Every cell of a 40 m analysis grid gets reason flags (uint16), never one blended
     LOWBASE       (64)  pre-event (baseline) coherence below COH_MIN
     MASKED       (128)  the event product's own mask flags the pixel: water, or an invalid subswath
     GEOM_UNKNOWN (256)  layover and shadow could not be assessed: DEM, incidence or line of sight missing or invalid
-    BASE_NODATA  (512)  the baseline product holds no valid value (non-finite, mask fill, water or invalid subswath)
+    BASE_NODATA  (512)  the baseline product holds no valid value (non-finite, mask fill, water, invalid subswath or image anomaly)
 
 Classes are then decided per task, because what spoils one task does not spoil another:
 
@@ -79,7 +79,7 @@ CLASSES = {
         (1, "Usable", "#5FE0C9", "The radar saw this ground clearly before and across the event, so a change here would show."),
         (2, "Seen, but not reliable", "#F2C46B", "The ground was already incoherent in the baseline pair, so a drop across the event cannot be told apart from normal noise."),
         (3, "Hidden by terrain", "#B07CFF", "Layover or radar shadow: the slope's geometry hides it from this viewing angle."),
-        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."),
+        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."),
         (5, "Outside the frame checked", "#2A3138", "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."),
         (6, "Not assessed", "#A39B8B", "An input needed for this check is missing or invalid here (terrain geometry, or the baseline pair). No conclusion."),
     ],
@@ -87,7 +87,7 @@ CLASSES = {
         (1, "Usable", "#5FE0C9", "Phase is coherent and reliably unwrapped, so ground movement could be measured here. Nothing has been measured yet."),
         (2, "Seen, but not reliable", "#F2C46B", "Phase is too noisy (low coherence) or was not reliably unwrapped here, so no movement value can be trusted."),
         (3, "Hidden by terrain", "#B07CFF", "Layover or radar shadow: the slope's geometry hides it from this viewing angle."),
-        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."),
+        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."),
         (5, "Outside the frame checked", "#2A3138", "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."),
         (6, "Not assessed", "#A39B8B", "The terrain geometry needed for this check is missing or invalid here. No conclusion."),
     ],

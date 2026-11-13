@@ -1,0 +1,32 @@
+{
+ "dataset": "C7",
+ "provider": "NASA/JPL, ISRO via ASF DAAC",
+ "product": "NISAR L2 GUNW repeat series, Track 48 descending",
+ "version": "P05023",
+ "url_or_request_ref": "data/metadata/catalogue.json",
+ "licence": "NASA open data (attribution required)",
+ "retrieved_at": null,
+ "available_at": null,
+ "spatial_extent": [
+  84.5359,
+  27.7176,
+  85.5594,
+  28.3671
+ ],
+ "time_extent": [
+  "2026-07-23",
+  "2026-10-03"
+ ],
+ "variables": [
+  "coherence"
+ ],
+ "units": {
+  "coherence": "1"
+ },
+ "crs": "EPSG:32645",
+ "resolution_m": 80,
+ "missing_fraction": null,
+ "quality_flags": true,
+ "maturity": "Provisional",
+ "notes": "5 consecutive frame 74 pairs as coherence through time; frames assessed for observability: 74, 75. Phase is not converted to displacement"
+}

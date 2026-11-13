@@ -1,0 +1,36 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import type { Manifest } from '../types/manifest'
+import { stepKind, stepLabel } from './timeLabels'
+
+// P0.5: coherence through time at any clicked spot. The shipped layer must hold every frame 74 pair in order, each step
+// read from its own granule, so the inspector chart shows one stored value per pair and nothing in between.
+const data = resolve(__dirname, '../../public/data')
+const shipped = JSON.parse(readFileSync(resolve(data, 'manifests/manifest.json'), 'utf8')) as Manifest
+const layer = shipped.layers.find((l) => l.id === 'rasuwa-2026:coherence-timeline')
+const compact = (iso: string) => iso.replace(/-/g, '')
+
+describe('coherence through time (shipped Rasuwa layer)', () => {
+  it('holds the five frame 74 pairs, 23 Jul to 3 Oct 2026, as consecutive pair steps', () => {
+    const steps = layer?.timeSteps ?? []
+    expect(steps.map((s) => s.label)).toEqual([
+      '2026-07-23/2026-08-16', '2026-08-16/2026-08-28', '2026-08-28/2026-09-09', '2026-09-09/2026-09-21', '2026-09-21/2026-10-03',
+    ])
+    expect(stepKind(steps.map((s) => s.label))).toBe('pairs')
+    for (let i = 1; i < steps.length; i++) expect(steps[i].label.split('/')[0]).toBe(steps[i - 1].label.split('/')[1])
+    expect(stepLabel(steps[1].label)).toBe('16–28 Aug')
+  })
+
+  it('reads each step from the granule of that pair, with its sampling raster and validity on disk', () => {
+    for (const step of layer?.timeSteps ?? []) {
+      const [ref, sec] = step.label.split('/').map(compact)
+      expect(step.sources).toHaveLength(1)
+      const src = step.sources[0]
+      expect(src.frame).toBe(74)
+      expect(src.granule).toMatch(new RegExp(`_${ref}T\\d{6}_${ref}T\\d{6}_${sec}T\\d{6}_${sec}T\\d{6}_`))
+      expect(src.sourceDataset).toMatch(/unwrappedInterferogram\/HH\/coherenceMagnitude$/)
+      for (const f of [src.sampling, src.validity]) expect(existsSync(resolve(data, String(f).replace(/^data\//, ''))), String(f)).toBe(true)
+    }
+  })
+})

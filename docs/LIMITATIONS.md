@@ -4,24 +4,17 @@
 
 NISAR measurements of the event are loaded, but they are Provisional. Rasuwa GCOV snapshots are not downloaded; the Tsho Rolpa case uses GCOV. Nothing here calculates displacement.
 
-## Awaiting a rebuild
+## Rebuilt with the corrected method
 
-The code now applies the radar product's own quality mask (method version 2), but the shipped outputs were built with the earlier code and have not been rebuilt from the raw files yet. Until they are:
-
-- The radar observability figures from version 1 are withheld in the app. Version 1 ignored the product's mask; at the Rasuwa detachment zone it reported a change as visible on 66% of ground that the product itself flags.
-- The before/after control medians come from an earlier script that is not in the repository, and their confidence intervals treated neighbouring pixels as independent. The app labels them as such.
-- The share of valid phase pixels in the shipped layers is slightly too high, because zero-filled phase was counted as valid (1,201 pixels in frame 74 and 1,217 in frame 75).
-- Whether the radar "can watch" each road stretch rests on the version 1 flags.
-
-The rebuild steps are listed in [RADAR_OBSERVABILITY.md](RADAR_OBSERVABILITY.md).
+All outputs were rebuilt from the raw files on 13 November 2026, with the product's own mask applied and frames 74 and 75 both assessed. The first observability method, which ignored the mask and reported a change as visible on 66% of the detachment zone, is withdrawn. The rebuild also fixed a decoding error in the mask: it is a 32-bit field, and its digits were read from the whole number. That moved about 0.1 percentage point of frame 75.
 
 ## Coverage gaps
 
-Pair A holds no usable measurement at the detachment zone: the product's own mask flags every frame-74 pixel there, as water or an invalid subswath. Which one has not been read from the raw mask yet. Pair B reaches the source with pixel offsets only.
+Pair A holds no usable measurement at the detachment zone. The product's own mask marks every pixel there as having no valid subswath in the 28 August acquisition (mask value 10), a gap in that acquisition's coverage; it is not water. Pair B reaches the source with pixel offsets only. Frame 75 covers the lower mudflow and the Trishuli corridor; 14% of the mudflow and 18% of the Trishuli corridor lie outside both frames.
 
 ## Coherence is not a damage map
 
-Coherence inside the mapped extent is much lower than nearby, and channels may be low anyway. One pre-event pair has been compared. Inside the mapped mudflow, coherence fell across the event while the ground around it rose. That is consistent with surface change there, but it does not establish the cause. The comparison is indicative only: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes.
+Coherence inside the mapped extent is much lower than nearby, and channels may be low anyway. One pre-event pair has been compared, reproducibly. Inside the mapped mudflow, median coherence fell from 0.38 to 0.19 across the event while the ground around it rose from 0.40 to 0.50. That is consistent with surface change there, but it does not establish the cause. The comparison is indicative only: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes.
 
 ## Derived phase
 

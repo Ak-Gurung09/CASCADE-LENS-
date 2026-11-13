@@ -18,10 +18,10 @@ There is no server API. The app reads static files. Types live in `frontend/src/
 | `layers` | Every layer, usable or not |
 | `granules` | Catalogue records with footprints and status |
 | `analysis` | Results of `analyse_pair.py`, per pair. The story reads its figures from here |
-
-| `controlSeries` | Rasuwa only. Median coherence inside the mapped mudflow against nearby ground, one entry per pair. `methodVersion` 2 is written by `prepare_control_series.py`; without it the medians come from an earlier script, and the app says so |
-| `observability` | Radar observability per task and zone, from `prepare_observability.py` and `merge_observability.py`. The app shows its figures only when `methodVersion` is 2 or more |
+| `controlSeries` | Rasuwa only. Median coherence inside the mapped mudflow against nearby ground, one entry per pair, with block-bootstrap 95% intervals and the valid share. `methodVersion` 2 is written by `prepare_control_series.py`; without it the medians come from an earlier script, and the app says so |
+| `observability` | Radar observability per task and zone, from `prepare_observability.py` and `merge_observability.py`. The app shows its figures only when `methodVersion` is 2 or more. `frames` lists each frame assessed, with its pair, granules, incidence, sensitivity and the number of cells it decided; the top-level `frame`, `granule` and `sensitivity` are the first frame's |
 | `hazards` | Rasuwa only. Terrain screen and road exposure, from `prepare_hazards.py` |
+| `access` | Rasuwa only. Summary of the road access screen, from `prepare_access.py`; the detail is in `data/access/<case>.json`, see [ACCESS_SCREEN.md](ACCESS_SCREEN.md) |
 | `lake` | Tsho Rolpa only. GCOV lake area by date, coherence and the what-if scenario, from `prepare_lake.py` and `prepare_scenario.py`. Older builds also hold `motion`, which the app never shows |
 
 Each case study has its own manifest, selected by `?case=`: `manifest.json` for Rasuwa (`rasuwa-2026`, the default) and `tsho-rolpa-2026.json` for Tsho Rolpa. The retired LANDMET case no longer ships; `processing/scripts/prepare_landmet.py` can rebuild it.
@@ -66,7 +66,7 @@ A layer with several frames takes its worst frame's status. NISAR measurement la
 
 `sources[]` holds `frame`, `granule`, `sourceFilename`, `sourceDataset`, `sha256`, `bounds`, `shape`, `validFraction`, `maskedFraction`, `sourceDtype`, `clipWindow`, `sampling`, `validity`, `tiles`, `maskTiles`. Picture layers have no `sampling` or `validity`.
 
-`category` is `gunw`, `goff`, `gcov`, `terrain`, `reference`, `preview` or `gridded`. A `gridded` layer may have `timeSteps`, each with a `label` and its own `sources`, and may carry its own `explanation`. A preview sets `previewOf` to the view it belongs in. A `reference` layer is either a `vector` or a raster with `sources` and a `legend` with `lowLabel` and `highLabel`.
+`category` is `gunw`, `goff`, `gcov`, `terrain`, `reference`, `preview` or `gridded`. A `gridded` or `gunw` layer may have `timeSteps`, each with a `label` and its own `sources`, and may carry its own `explanation`. A label is a date (`2026-08-16`) or a radar pair (`2026-07-23/2026-08-16`); `rasuwa-2026:coherence-timeline`, from `prepare_timeline.py`, has one step per frame 74 pair. A preview sets `previewOf` to the view it belongs in. A `reference` layer is either a `vector` or a raster with `sources` and a `legend` with `lowLabel` and `highLabel`.
 
 `processingHistory.provenance` records `pipelineVersion`, `configSha256`, `outputDtype`, `validityClasses`, `maskRule`, `tileResampling`, `nativeGridKept` and `displayTransform`. `measurementClass` is one of `measurement`, `derived`, `reference map`, `contextual`.
 

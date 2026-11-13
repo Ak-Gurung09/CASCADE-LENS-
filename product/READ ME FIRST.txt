@@ -42,8 +42,8 @@ HOW TO USE IT
 IMPORTANT LIMITS
   CascadeLens is a retrospective evidence explorer. It is not a warning system.
   NISAR products here are Provisional. No displacement is calculated.
-  Some radar observability figures are withheld until the data is rebuilt
-  with the corrected method; the app says where.
+  Radar observability was rebuilt on 13 November 2026 with the product's
+  own quality mask; figures from before that date are withdrawn.
   Low coherence is evidence to examine, not proof of what happened.
   Details are in source\docs\LIMITATIONS.md.
 

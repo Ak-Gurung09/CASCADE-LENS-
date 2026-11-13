@@ -762,12 +762,42 @@
    "capability": "landslide.L4",
    "name": "L4 Slope-movement monitoring from repeat InSAR",
    "family": "landslide",
-   "state": "NOT AVAILABLE",
+   "state": "DATA AVAILABLE, PROCESSING REQUIRED",
    "checks": [
     {
      "id": "C7.present",
+     "ok": true,
+     "reason": "Found at data/metadata/sources/C7/SOURCE.json"
+    },
+    {
+     "id": "C7.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C7.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C7.space",
+     "ok": true,
+     "reason": "Extent [84.5359, 27.7176, 85.5594, 28.3671] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+    },
+    {
+     "id": "C7.time",
      "ok": false,
-     "reason": "C7 (NISAR GUNW repeat series, frames 74 and 75) is not on disk"
+     "reason": "Time ['2026-07-23', '2026-10-03'] against window W1 ['2026-07-23', '2026-10-10']"
+    },
+    {
+     "id": "C7.crs",
+     "ok": true,
+     "reason": "CRS EPSG:32645"
+    },
+    {
+     "id": "C7.licence",
+     "ok": true,
+     "reason": "Licence NASA open data (attribution required)"
     },
     {
      "id": "landslide.L4.model",
@@ -1001,7 +1031,7 @@
    "name": "NISAR GUNW repeat series, frames 74 and 75",
    "group": "C",
    "source": "ASF (Earthdata login)",
-   "onDisk": false
+   "onDisk": true
   },
   "E1": {
    "name": "Field reports or photos for named places",

@@ -2,6 +2,19 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: rebuilt from the raw NISAR files
+
+- **Scientific correction (S13).** The Provisional (P05023) mask is a 32-bit field: the low byte holds the water and subswath digits, bits 8 to 23 flag image anomalies, and bit 24 marks an interpolated ionosphere screen (set on 37 to 39% of pixels). The decoder read the digits from the whole number. It now reads the low byte and also masks flagged anomalies. On the event pair, 0.14 to 0.15% of pixels had been wrongly kept; no headline figure moves.
+- **The source, settled.** All 307 detachment-zone pixels of the frame-74 event GUNW have mask value 10: no valid subswath in the 28 August acquisition, a gap in that acquisition's coverage, not water. Claim C26 records it; C03 stays withdrawn, because it was stated before the mask was read.
+- **Observability, method 2, rebuilt** over frames 74 and 75 (`prepare_observability.py --also`, `combine_frames`). Detachment zone: 0% usable for both tasks (version 1 said 66% for a change). Trishuli corridor outside the frames: 95% before, 18% now. Movement usable at thresholds 0.2, 0.3 and 0.4: 61.2%, 57.1% and 49.3% in frame 74 (version 1: 95%, 82%, 67%).
+- **Control series, rebuilt** with `prepare_control_series.py`, with block-bootstrap 95% intervals: the mapped mudflow 0.38 to 0.19 across the event against nearby ground 0.40 to 0.50. The earlier script's medians (0.41 to 0.28, 0.42 to 0.52) are gone.
+- **Coherence through time (P0.5).** All five frame 74 pairs, 23 July to 3 October, as one layer (`prepare_timeline.py`); the inspector chart shows a clicked spot pair by pair. The chart once labelled every Tsho Rolpa date "20"; it now shows dates or pair dates.
+- **Road exposure** re-run on the new flags: High-exposure road the radar could not watch fell from 34.7 to 13.1 km.
+- **Tsho Rolpa.** The coherence layer is rebuilt from the event pair (`prepare_lake.py --coherence-only`). The product marks 95% of the lake as water, so the story no longer quotes a lake median. The old movement block and the zones layer are gone.
+- Downloads resume with a range request and must answer 206; all six original granules matched their recorded SHA-256.
+- The NISAR GUNW series is registered for the readiness engine as dataset C7 (`prepare_readiness.py` writes its SOURCE.json from the shipped layer). L4 moves from not available to data available, processing required: the series ends on 3 October, a week before its window closes.
+- Docs, the status list and the claim register now state the rebuilt figures. `status.json`: observability, frame 75, the control comparison and coherence through time are complete and tested.
+
 ## 13 November 2026: first model code and verification (P2)
 
 - `cascade_lens/verify.py`: POD, FAR, CSI and bias, event matching, chronological splits, the `available_at` leakage guard, spatial-block folds, AUC and NSE.

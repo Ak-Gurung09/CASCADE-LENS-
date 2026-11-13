@@ -24,7 +24,7 @@ export const STALE_NOTE = 'These figures came from an earlier calculation that d
 const REASON: [number, string][] = [
   [FLAG.outside, 'Outside the radar frames checked here. Another frame may cover it, but it is not assessed.'],
   [FLAG.noData, 'Inside the frame, but the product holds no value here.'],
-  [FLAG.productMasked, 'The radar product’s own quality mask flags this spot (water or an invalid subswath), so its values are not used.'],
+  [FLAG.productMasked, 'The radar product’s own quality mask flags this spot (water, an invalid subswath or an image anomaly), so its values are not used.'],
   [FLAG.geometryNotAssessed, 'Terrain geometry could not be checked here (elevation or viewing angle missing), so this spot is not assessed.'],
   [FLAG.layover, 'Layover: the slope faces the radar more steeply than its viewing angle, so echoes from different heights pile up.'],
   [FLAG.shadow, 'Radar shadow: the slope faces away too steeply for the radar to reach it.'],

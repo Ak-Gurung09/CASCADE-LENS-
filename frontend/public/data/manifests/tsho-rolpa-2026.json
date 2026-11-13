@@ -10258,7 +10258,7 @@
      "code": 4,
      "label": "No valid data in the product",
      "color": "#6B7682",
-     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."
+     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."
     },
     {
      "code": 5,
@@ -10296,7 +10296,7 @@
      "code": 4,
      "label": "No valid data in the product",
      "color": "#6B7682",
-     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."
+     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."
     },
     {
      "code": 5,

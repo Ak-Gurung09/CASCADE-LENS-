@@ -26,7 +26,7 @@ All granules are PROVISIONAL, CRID P05023. `tests/integration/test_rasuwa_data.p
 
 **Descriptive evidence, not proof of cause.** Reproduce with `python processing/scripts/analyse_pair.py pair-a` and `pair-b`. Results are in `data/qa/`. "Nearby" means within 1 km of the UNOSAT extent, outside it.
 
-**Built before the November corrections.** The figures below come from the shipped outputs, which were built before the scientific corrections of 12 November (P0.1) and have not been rebuilt from the raw files yet. The corrections leave coherence validity unchanged apart from which rule wins when two apply, so the coherence medians are not expected to move. The valid-phase shares will fall slightly, because zero-filled phase is now masked. The rebuild steps are in [RADAR_OBSERVABILITY.md](RADAR_OBSERVABILITY.md).
+**Rebuilt on 13 November 2026** from the raw files, with the P0.1 corrections and the 32-bit mask fix below. All six original granules matched their recorded SHA-256. The coherence medians did not move. Whole-frame valid phase fell by 0.11 percentage points in each frame, where zero-filled phase is now masked.
 
 ### Coherence: clear contrast along the mapped channel
 
@@ -39,27 +39,27 @@ Two independent frames agree, and they agree with independent UNOSAT mapping. Lo
 
 ### Before and after, against ground nearby
 
-Track 48, frame 74. "Inside" is the UNOSAT mudflow extent. "Control" is ground 300 to 1,500 m outside it. Each value is a median coherence.
+Track 48, frame 74. "Inside" is the UNOSAT mudflow extent. "Control" is ground 300 to 1,500 m outside it. Each value is a median of the unwrapped-grid coherence with the product's mask applied, with a 95% interval from a spatial block bootstrap (1 km blocks, 1,000 resamples). Reproduce with `python processing/scripts/prepare_control_series.py`.
 
-| Pair | Days | Mode in file name | Inside | Control |
-|---|---|---|---|---|
-| 23 Jul → 16 Aug (before) | 24 | 4000 | 0.41 | 0.42 |
-| 16 → 28 Aug (across the event) | 12 | 2000 | 0.28 | 0.52 |
-| 28 Aug → 9 Sep | 12 | 2000 | 0.33 | 0.56 |
-| 9 → 21 Sep | 12 | 2000 | 0.42 | 0.55 |
-| 21 Sep → 3 Oct | 12 | 2000 | 0.43 | 0.53 |
+| Pair | Days | Mode in file name | Inside | Control | Valid inside |
+|---|---|---|---|---|---|
+| 23 Jul → 16 Aug (before) | 24 | 4000 | 0.38 (0.35–0.40) | 0.40 (0.39–0.41) | 55% |
+| 16 → 28 Aug (across the event) | 12 | 2000 | 0.19 (0.17–0.22) | 0.50 (0.49–0.51) | 37% |
+| 28 Aug → 9 Sep | 12 | 2000 | 0.32 (0.30–0.34) | 0.55 (0.53–0.56) | 40% |
+| 9 → 21 Sep | 12 | 2000 | 0.43 (0.41–0.46) | 0.55 (0.53–0.56) | 42% |
+| 21 Sep → 3 Oct | 12 | 2000 | 0.46 (0.44–0.47) | 0.54 (0.52–0.55) | 38% |
 
 The gap opens only inside the mapped area, then narrows. A seasonal change would be expected to lower both areas, so the pattern is **consistent with surface change in the mapped area. It does not establish the cause.** The comparison is indicative, not like for like: the pair before spans twice as many days and was acquired in a different radar mode, and either difference changes coherence by itself.
 
-These medians come from an earlier script that is not in the repository, and its confidence intervals treated neighbouring pixels as independent. The reproducible generator is now `processing/scripts/prepare_control_series.py`. It applies the product's mask and computes spatial block-bootstrap intervals. Its output will replace these figures at the rebuild. Until then, the app labels them as coming from the earlier script.
+These figures replace medians from an earlier script that was never in the repository (0.41 and 0.42 before, 0.28 and 0.52 across the event). That script did not apply the mask, and its intervals treated neighbouring pixels as independent. The across-event median inside now matches the pair analysis above (0.19).
 
 ### Phase: mostly unusable inside the extent
 
-Only 15% and 19% of phase pixels inside the extent are valid. 40% and 45% are masked, mostly because they could not be reliably unwrapped. These shares count zero-filled phase as valid, so after the rebuild they will be slightly lower.
+Only 15.2% and 19.0% of phase pixels inside the extent are valid. 40.5% and 45.3% are masked, mostly because they could not be reliably unwrapped.
 
 ### The source: nothing usable in Pair A, strong signal in Pair B
 
-Pair A's own mask flags every frame-74 pixel of the detachment zone (307 product pixels), and the shipped analysis finds no valid coherence, phase or GOFF value anywhere in it. The mask marks water or an invalid subswath; which of the two has not been read from the raw mask values yet. An earlier version of these documents called the area a swath gap. A later one said a change was visible on 66% of it, which came from an observability check that ignored the mask. Both went further than the evidence. Pair B frame 16 covers the source.
+Pair A's own mask flags every frame-74 pixel of the detachment zone (307 product pixels), and no valid coherence, phase or GOFF value exists anywhere in it. The raw mask settles why. Every one of those pixels has the value 10: water flag 0, reference subswath 1, secondary subswath 0. So the 28 August acquisition has no valid subswath over the source: it is a gap in that acquisition's coverage, not water. The same holds for the barrier lakes. An earlier version of these documents called it a swath gap without checking, which turns out to be right in substance. A later one said a change was visible on 66% of it, from an observability check that ignored the mask, which was wrong. Pair B frame 16 covers the source.
 
 | Pair B, frame 16 | Detachment zone | Nearby channel terrain |
 |---|---|---|
@@ -110,7 +110,7 @@ NASA's [public samples](https://science.nasa.gov/mission/nisar/sample-data/) (20
 
 ### Errors found in review, 12 November (P0.1)
 
-These were found in our own code, not in the files. The code is fixed. The shipped outputs await a rebuild.
+These were found in our own code, not in the files. The code is fixed and every output was rebuilt with it on 13 November.
 
 | Finding | Effect | Fix |
 |---|---|---|
@@ -122,6 +122,7 @@ These were found in our own code, not in the files. The code is fixed. The shipp
 | Sensitivity percentages ignored the unwrapping rule | Usable shares at 0.2, 0.3 and 0.4 were too high | Computed with the movement-class rule |
 | Tsho Rolpa movement bounds shown in the app | A dam movement limit in centimetres and a glacier limit extrapolated to "6 m a year", from 12-day pairs | Research output only; no yearly extrapolation |
 | "Best supported" could be reached without a radar value at the spot | Slope, height and area-wide figures could rank an explanation | Only radar values at the spot and independent mapping count |
+| The mask's digits were read from the whole 32-bit number (found at the rebuild, 13 Nov) | P05023 masks carry anomaly flags in bits 8–23 and an interpolated-ionosphere flag in bit 24 (set on 37–39% of pixels). Read from the whole number, a set bit 24 turned valid subswaths invalid and hid water | Digits read from the low byte; anomaly flags mask the pixel; the ionosphere flag is recorded. About 0.1 percentage point of frame 75 changed; no headline figure moved |
 
 ### Evidence for GOFF layer 3
 
@@ -180,7 +181,6 @@ The ATBD gives the magnitude, φ = (4π/λ)·δr, and the file gives `centerFreq
 
 **Worth doing next:**
 
-- Rebuild both cases from the raw files with the corrected code, and read the raw mask values at the detachment zone to tell water from an invalid subswath.
 - A like-for-like pre-event control pair, with the same length and radar mode as the event pair, if the catalogue holds one.
 - The Track 98 GUNW for 19→31 August, for coherence at the source.
 - Why every granule fails NISAR's `identification` QA check.

@@ -66,7 +66,7 @@ export function explain(c: Clues): Hypothesis[] {
   if (unseen) {
     const why = c.flags === null ? 'This spot lies outside the area the radar check covers.'
       : fl & FLAG.outside ? 'This spot is outside the radar frames checked here. Another frame may cover it, but it is not assessed.'
-        : fl & FLAG.productMasked ? 'The radar product’s own quality mask flags this spot (water or an invalid subswath), so its values cannot be used.'
+        : fl & FLAG.productMasked ? 'The radar product’s own quality mask flags this spot (water, an invalid subswath or an image anomaly), so its values cannot be used.'
           : 'The radar product holds no value at this spot.'
     return [{ id: 'unseen', title: 'No NISAR explanation from the frame checked', standing: 'Cannot judge here', for: [why], against: [], context: [],
       missing: ['A radar pair that covers this spot with valid data (the next frame along the track, or the other track in the download list).', field] }]
