@@ -4,9 +4,11 @@
 
 GAIA: Seeing Earth Dance. A Team GAIA project for NASA Space Apps Challenge 2026, Dancing with the SARs.
 
-CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwa–Bhote Koshi–Trishuli disaster in Nepal. It is designed to put NISAR radar measurements on a map with their quality, provenance and limits in view. It is not a warning system.
+CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwa–Bhote Koshi–Trishuli disaster in Nepal, with a second case on the Tsho Rolpa glacial lake. It is designed to put NISAR radar measurements on a map with their quality, provenance and limits in view. It is not a warning system.
 
-> **Data status: real NISAR measurements of the event are loaded.** Pair A (GUNW and GOFF) and Pair B (GOFF) passed QA. All are Provisional. GCOV is not downloaded. No displacement is calculated. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
+> **Data status: real NISAR measurements are loaded.** For Rasuwa, Pair A (GUNW and GOFF) and Pair B (GOFF) passed QA. Tsho Rolpa uses GCOV on four dates; Rasuwa GCOV is not downloaded. All products are Provisional. No displacement is calculated anywhere.
+>
+> **Awaiting a rebuild.** The radar observability figures (“Can the radar see it?”) were computed by a first method that ignored the product’s own quality mask. That method is withdrawn, and the app withholds its figures until both cases are rebuilt from the raw files with the corrected method. The before/after control medians come from an earlier script that is not in the repository; the app says so, and a reproducible run will replace them. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) and [docs/RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md).
 
 ![Coherence along the Bhote Koshi corridor, with the low-coherence channel beneath the UNOSAT extent](docs/screenshots/corridor-coherence.png)
 
@@ -19,7 +21,8 @@ Do not open `index.html` directly. Browsers block a page opened that way from lo
 ## What the radar shows
 
 - **Coherence** is much lower along the UNOSAT-mapped channel than on the terrain beside it: 0.19 against 0.46, and 0.16 against 0.52.
-- **At the source**, Pair A has no data, because it falls in a swath gap. Pair B reaches it, and image matching largely fails there: correlation peak 0.18 against 0.63.
+- **At the source**, Pair A holds no usable measurement: the product’s own quality mask flags every pixel of the detachment zone in frame 74, as water or an invalid subswath. Which of the two has not been read from the raw mask yet. Pair B reaches the source, and image matching largely fails there: correlation peak 0.18 against 0.63.
+- **Before and after.** In the pair before the event, the mapped mudflow and the ground around it had similar coherence. Across the event, coherence fell inside the mapped area while the ground around it rose. That is consistent with surface change there, but it does not establish the cause. The pairs are not like for like, either: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes (4000 and 2000 in the file names).
 - **Raw phase** is dominated by the ionosphere. Removing the product's own estimate cuts scatter by about half to two-thirds.
 - **Pixel offsets** show no large coherent shift.
 
@@ -28,22 +31,25 @@ This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](
 ## What works today
 
 - Interactive offline map with Copernicus DEM terrain, UNOSAT event layers, Sentinel-1 damage evidence, OSM geography and district boundaries.
-- Three geographic bookmarks and a four-step guided story.
+- Two cases: Rasuwa, which opens first, and the Tsho Rolpa glacial lake, which has GCOV lake area on four dates, a before/after swipe, a 3D terrain view and a labelled what-if dam-break scenario.
+- Geographic bookmarks and a guided story for each case. Every figure in the story is read from the shipped data, so the story cannot claim a result that is not loaded.
 - A Simulate mode with a flow replay along the rivers, a what-if flood and a radar explainer. All three are labelled illustrations, and they are not forecasts.
 - Real NISAR phase, coherence, connected components, ionosphere screen and pixel offsets, with a labelled ionosphere-removed phase layer.
 - Observation-pair selection, with dates, tracks and frames verified from the files.
 - A measurement inspector that reads stored raster values, with quality alongside.
-- A second case study, LANDMET, proving the product works on an unrelated dataset, with a time slider and a day chart.
+- An evidence class on every layer, panel and report: Observed, Derived, Forecast, Hypothesis, Reference, Scenario or Unknown.
+- Radar observability (“Can the radar see it?”): for each spot, whether a surface change could be judged and whether movement could be measured, with the reasons kept separate. The figures are withheld until the rebuild, as described above.
+- “What could explain this?”, a rule-based panel that lists the checks for and against each explanation and never gives a probability, and an evidence report as a printable page, CSV, GeoJSON or JSON.
+- Experimental hazard screens: landslide-prone terrain and road exposure along the Rasuwa corridor.
 - Layer statuses generated from the files on disk. A NISAR layer cannot be selected until it has been downloaded, inspected and passed QA.
+- A list of what is real (“What is real?”), read from `frontend/public/data/status.json`, which gives each capability its maturity.
 - A Python pipeline for GUNW, GOFF and GCOV, with QA gates and provenance.
 - A pre-download QA check, and a clearly labelled browse-preview fallback.
 - Automated tests at every level, including real browser tests with offline and accessibility checks.
 
-## The LANDMET test case
+## The retired LANDMET test case
 
-Global land weather from 31 December 2007, on a coarse equal-area grid. **It is not NISAR data and says nothing about Rasuwa**, and the app says so in a permanent banner. It proves the product can load a dataset it was never designed for.
-
-![LANDMET skin temperature with the time slider and day chart](docs/screenshots/landmet-time.png)
+LANDMET, a global land weather dataset from 31 December 2007, was once a third case that showed the product could load data it was not designed for. The team took it out of the app on 6 November 2026. Its processing script and pipeline tests remain in the repository, but the case selector no longer offers it. It was never NISAR data and said nothing about Rasuwa.
 
 ## Architecture
 
@@ -147,7 +153,7 @@ python -m pytest tests
 cd frontend && npm test
 ```
 
-Browser tests use the system Edge. Prepare the fixture and build first:
+Browser tests use the system Edge by default. To use another Chromium browser, set `CL_BROWSER_PATH` to its executable. Prepare the fixture and build first:
 
 ```bash
 python tests/integration/build_fixture.py
@@ -157,11 +163,7 @@ python tests/integration/build_fixture.py
 cd frontend && npm run build && npm run e2e
 ```
 
-To rebuild the LANDMET case:
-
-```bash
-python processing/scripts/prepare_landmet.py path/to/landmet_L3_20071231_v1.nc
-```
+Some Python tests are skipped unless the raw NISAR granules, NASA's samples or the LANDMET file are present. Passing tests check the code's behaviour. They do not validate a scientific result.
 
 To build the finished package:
 
@@ -181,7 +183,7 @@ cd frontend && npm run dev:fixture
 
 ## Known limitations
 
-All NISAR products are Provisional, and GCOV is not downloaded. Phase is not converted to displacement. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+All NISAR products are Provisional, and Rasuwa GCOV is not downloaded. Phase is not converted to displacement. The observability figures are withheld until the rebuild. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
 ## Documentation
 

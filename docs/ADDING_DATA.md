@@ -24,7 +24,7 @@ python processing/scripts/prepare_simulation.py processing/configs/simulation/yo
 
 ## Data that changes over time
 
-Any layer with `timeSteps` in its manifest gets Time replay automatically, as LANDMET does. Nothing else is needed.
+Any layer with `timeSteps` in its manifest gets Time replay automatically, as the Tsho Rolpa GCOV layers do. Nothing else is needed.
 
 ## A glacial lake
 

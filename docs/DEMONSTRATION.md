@@ -10,7 +10,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 
 **0:00 The problem.** After a mountain disaster, evidence is scattered and radar data is hard to read. CascadeLens puts NISAR measurements in one place, with their quality and limits visible.
 
-**0:25 The source.** Start the guided story. Show the UNOSAT detachment zone. Point out the honest finding: Pair A has no measurement here, because it falls in a swath gap. The story then shows that Pair B, viewing from the other side, does reach it, and that image matching largely fails there.
+**0:25 The source.** Start the guided story. Show the UNOSAT detachment zone. Point out the honest finding: Pair A holds no usable measurement here, because the radar product's own quality mask flags the whole zone. The story then shows that Pair B, viewing from the other side, does reach it, and that image matching largely fails there.
 
 **0:55 Interferometric evidence.** Choose *Bhote Koshi corridor* and Coherence. Show the dark ribbon along the river under the UNOSAT extent. Median coherence is 0.19 inside against 0.46 nearby, and frame 75 agrees. Say clearly that this agrees with independent mapping, but it is not proof.
 
@@ -24,11 +24,13 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 
 **2:30 Close.** CascadeLens makes advanced NISAR evidence understandable and inspectable. It does not predict disasters or replace field investigation.
 
-**If there is time.** Switch the Case study menu to the LANDMET test. It is a completely different global weather dataset, which shows the product is not tied to one file. Say clearly that it is not NISAR and not Rasuwa.
+**If there is time.** Switch the Case study menu to the Tsho Rolpa glacial lake. NISAR GCOV on four dates, through the monsoon, shows that the lake did not change size. Do not say the dam or the glacier moved or stayed still: the app shows where the surface stayed the same (coherence), not how far anything moved.
 
 ## Known demonstration limitations
 
-- GCOV snapshots are not downloaded, so that tab shows *Download required*.
+- Until the rebuild, the opening card and story step 3 ("Can the radar see it?") say the observability figures are withheld. Do not quote the old percentages. If asked, explain that the first method ignored the product's own quality mask and was withdrawn.
+- The before/after control figures are labelled as coming from an earlier script. Present them as consistent with surface change, not as proof of cause.
+- Rasuwa GCOV snapshots are not downloaded, so that tab shows *Download required*.
 - All NISAR products are Provisional.
 - Terrain stops at the search envelope.
 - Keep the browser window in front: browsers pause map drawing in hidden windows.
@@ -41,7 +43,7 @@ CascadeLens is built for NISAR's repeat-pass L-band observations and higher-leve
 
 ### How can you prove that the movement you display is real?
 
-We don't display movement. We display phase, coherence and pixel offsets, each with quality information. We mask what the product marks as unreliable, and we show what cannot be measured, such as the swath gap at the source. Low coherence along the channel agrees with independent UNOSAT mapping, but it is evidence, not proof. We have not yet compared a pre-event pair, and that is the proper next test.
+We don't display movement. We display phase, coherence and pixel offsets, each with quality information. We mask what the product marks as unreliable, and we show what cannot be measured, such as the masked ground at the source. Low coherence along the channel agrees with independent UNOSAT mapping, but it is evidence, not proof. Against a pair from before the event, coherence fell only inside the mapped area, which is consistent with surface change there. That comparison is indicative, because the pair before is longer and was acquired in a different radar mode. A like-for-like pre-event pair is the proper next test.
 
 ### Can CascadeLens predict another landslide or flood in Nepal?
 

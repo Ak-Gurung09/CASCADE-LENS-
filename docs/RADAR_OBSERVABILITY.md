@@ -55,7 +55,7 @@ python processing/scripts/prepare_observability.py frontend/public/data/manifest
 | Tsho Rolpa lake bookmark | 70% | 65% | 0% |
 | Tsho Rolpa dam and glacier zones | 73% | 56% | 0% |
 
-So at the Rasuwa source a surface change could be seen, but movement could not be measured: the unwrapped phase is zero-filled in strips there. An earlier version of the story said the source fell in a swath gap. That was wrong: wrapped coherence is present, only the unwrapped phase is missing, and the text now says so. About half the mudflow and nearly all the Trishuli corridor lie in frame 75, which has no baseline pair yet and is not assessed.
+The detachment-zone row is the clearest error in version 1. It says a surface change could be seen on 66% of the source, but the product's own mask flags every frame-74 pixel there, as water or an invalid subswath. Version 2 classes the whole zone as "No valid data in the product". Two earlier statements went too far: the story first called the area a swath gap without checking, and the 6 November correction then read the coherence values there without the mask. About half the mudflow and nearly all the Trishuli corridor lie in frame 75, which has no baseline pair yet and is not assessed.
 
 **Limits.** Passive shadow (cast by a distant ridge) is not modelled. Features smaller than the 40 m grid are smoothed. Coherence also falls for wet snow, vegetation or a long time gap, so "change visible" means a change *could* be seen, not that one happened. The products are Provisional.
 

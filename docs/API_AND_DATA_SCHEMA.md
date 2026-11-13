@@ -19,7 +19,12 @@ There is no server API. The app reads static files. Types live in `frontend/src/
 | `granules` | Catalogue records with footprints and status |
 | `analysis` | Results of `analyse_pair.py`, per pair. The story reads its figures from here |
 
-Each case study has its own manifest: `manifest.json` for Rasuwa and `landmet.json` for LANDMET, selected by `?case=`.
+| `controlSeries` | Rasuwa only. Median coherence inside the mapped mudflow against nearby ground, one entry per pair. `methodVersion` 2 is written by `prepare_control_series.py`; without it the medians come from an earlier script, and the app says so |
+| `observability` | Radar observability per task and zone, from `prepare_observability.py` and `merge_observability.py`. The app shows its figures only when `methodVersion` is 2 or more |
+| `hazards` | Rasuwa only. Terrain screen and road exposure, from `prepare_hazards.py` |
+| `lake` | Tsho Rolpa only. GCOV lake area by date, coherence and the what-if scenario, from `prepare_lake.py` and `prepare_scenario.py`. Older builds also hold `motion`, which the app never shows |
+
+Each case study has its own manifest, selected by `?case=`: `manifest.json` for Rasuwa (`rasuwa-2026`, the default) and `tsho-rolpa-2026.json` for Tsho Rolpa. `landmet.json` is still shipped from the retired LANDMET case, but the case selector no longer offers it.
 
 ## Observation relationships
 
