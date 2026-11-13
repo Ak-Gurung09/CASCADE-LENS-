@@ -193,7 +193,7 @@ export interface LakeSeries {
 }
 
 // Written by processing/src/cascade_lens/motion.py add_coherence_layer: medians of one pair's coherence over the lake and the land.
-export interface LakeCoherence { pair: [string, string]; granule: string; sourceDataset: string; maskApplied: boolean; lake: number; land: number }
+export interface LakeCoherence { pair: [string, string]; granule: string; sourceDataset: string; maskApplied: boolean; lake: number; land: number; lakeValidPct?: number | null; landValidPct?: number | null }
 
 // Written by processing/src/cascade_lens/scenario.py: what would happen IF the dam breached. Ranges, not predictions.
 export interface LakeScenarioCase {
@@ -277,6 +277,7 @@ export interface Observability {
   incidenceDeg5to95: [number, number] | null
   postingM: number
   methodVersion?: number // absent before version 2, which applies the product masks; see services/observability.ts
+  frames?: { frame: number; pair: [string, string]; baselinePair: [string, string] | null; granule: string; baselineGranule: string | null; cells: number }[]
   datasets?: Record<string, string>
   geometryNotAssessedPct?: number | null
   classes: Record<string, { code: number; label: string; color: string; meaning: string }[]>

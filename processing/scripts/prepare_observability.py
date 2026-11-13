@@ -1,6 +1,9 @@
 """Build the Radar Observability layers for one case.
 
     python prepare_observability.py <manifest.json> <gunw.h5> <baseline_gunw.h5|-> <dem.tif> <vectors dir> <out dir> [zone files...]
+        [--also <gunw.h5> <baseline_gunw.h5|->]...
+
+--also adds a neighbouring frame of the same pairs: cells outside the first frame take that frame's flags (combine_frames).
 
 Writes into <out dir> (laid out like frontend/public): the reason-flag raster for the inspector, map tiles for the two
 tasks, and observability-<case>.json, a fragment that merge_observability() folds into the case manifest.
@@ -34,6 +37,11 @@ def zones_for(manifest: dict, vectors: pathlib.Path, files: list[str]) -> dict:
 
 
 def main(argv: list[str]) -> None:
+    argv, extra = list(argv), []
+    while "--also" in argv:
+        i = argv.index("--also")
+        extra.append((pathlib.Path(argv[i + 1]), None if argv[i + 2] == "-" else pathlib.Path(argv[i + 2])))
+        del argv[i:i + 3]
     man, gunw, base, dem, vectors, out = (pathlib.Path(a) for a in argv[:6])
     zone_files = argv[6:]
     m = json.loads(man.read_text(encoding="utf-8"))
@@ -41,6 +49,19 @@ def main(argv: list[str]) -> None:
     baseline = None if str(base) == "-" else base
     r = ob.assess(gunw, baseline, dem, m["caseStudy"]["searchEnvelope"])
     flags, tr, epsg = r["flags"], r["transform"], r["epsg"]
+    frames = [{"frame": r["meta"]["frameNumber"], "pair": r["pair"], "baselinePair": r["baselinePair"], "granule": gunw.stem,
+               "baselineGranule": baseline.stem if baseline else None, "incidenceDeg5to95": r["incidenceDeg"], "sensitivity": r["sensitivity"],
+               "cells": int(((flags & ob.OUTSIDE) == 0).sum())}]
+    for g2, b2 in extra:
+        r2 = ob.assess(g2, b2, dem, m["caseStudy"]["searchEnvelope"])
+        if r2["epsg"] != epsg or r2["transform"] != tr:
+            raise SystemExit(f"{g2.name} is not on the same analysis grid")
+        if r2["pair"] != r["pair"] or r2["baselinePair"] != r["baselinePair"] or r2["meta"]["trackNumber"] != r["meta"]["trackNumber"]:
+            raise SystemExit(f"{g2.name} is not the same pairs on the same track; frames of different dates are never combined")
+        flags, took = ob.combine_frames(flags, r2["flags"])
+        frames.append({"frame": r2["meta"]["frameNumber"], "pair": r2["pair"], "baselinePair": r2["baselinePair"], "granule": g2.stem,
+                       "baselineGranule": b2.stem if b2 else None, "incidenceDeg5to95": r2["incidenceDeg"], "sensitivity": r2["sensitivity"], "cells": int(took.sum())})
+    granules = [f["granule"] for f in frames] + [f["baselineGranule"] for f in frames if f["baselineGranule"]]
     rel = lambda p: "data/" + p.relative_to(out).as_posix()  # noqa: E731  (paths as the app loads them)
 
     flag_tif = export.write_geotiff(out / f"_work/{case}-flags.tif", flags, tr, epsg, nodata=ob.FLAG_NODATA,
@@ -70,11 +91,11 @@ def main(argv: list[str]) -> None:
             "category": "gridded", "mission": "NISAR", "instrument": "L-SAR", "productType": "Derived here", "measurementClass": "derived",
             "measurementType": f"observability-{task}", "kind": "categorical", "units": None,
             "acquisition": {"reference": t1, "secondary": t2}, "orbitDirection": r["meta"]["orbitPassDirection"], "track": r["meta"]["trackNumber"],
-            "frames": [r["meta"]["frameNumber"]], "postingM": [40], "crs": f"EPSG:{epsg}", "qualityLayerIds": [], "status": "sampleable", "statusReason": None,
+            "frames": [f["frame"] for f in frames], "postingM": [40], "crs": f"EPSG:{epsg}", "qualityLayerIds": [], "status": "sampleable", "statusReason": None,
             "sources": [{"frame": r["meta"]["frameNumber"], "granule": gunw.stem, "sourceFilename": gunw.name, "sourceDataset": "reason flags (see observability block)",
                          "bounds": flag_bounds, "sampling": rel(flag_cog),
                          "tiles": {"url": f"{rel(folder)}/{{z}}/{{x}}/{{y}}.png", "minzoom": ZOOM[0], "maxzoom": ZOOM[1], "count": n}}],
-            "sourceGranules": [gunw.stem] + ([baseline.stem] if baseline else []), "productMaturity": "Derived from Provisional products",
+            "sourceGranules": granules, "productMaturity": "Derived from Provisional products",
             "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
             "legend": {"type": "categorical", "stops": [c[2] for c in ob.CLASSES[task]], "keys": [{"color": c[2], "label": c[1]} for c in ob.CLASSES[task]]},
             "explanation": {"what": question,
@@ -93,7 +114,8 @@ def main(argv: list[str]) -> None:
                                   "noConnectedComponent": ob.NOCC, "lowBaselineCoherence": ob.LOWBASE, "productMasked": ob.MASKED,
                                   "geometryNotAssessed": ob.GEOM_UNKNOWN, "baselineNoData": ob.BASE_NODATA},
         "classes": {t: [{"code": c[0], "label": c[1], "color": c[2], "meaning": c[3]} for c in ob.CLASSES[t]] for t in tasks},
-        "thresholds": ob.THRESHOLDS, "sensitivity": r["sensitivity"], "limitations": ob.LIMITS, "zones": summaries}}
+        "thresholds": ob.THRESHOLDS, "sensitivity": r["sensitivity"], "limitations": ob.LIMITS, "zones": summaries,
+        "frames": frames}}  # sensitivity above is the first frame's; each frame's own is in frames
     (out / f"observability-{case}.json").write_text(json.dumps(frag, indent=1), encoding="utf-8")
     print(json.dumps({t: summaries[t]["_case"] for t in tasks}), "| look", r["meta"]["lookDirection"], "| los E,N", round(r["losEast"], 3), round(r["losNorth"], 3), "| inc", r["incidenceDeg"])
 

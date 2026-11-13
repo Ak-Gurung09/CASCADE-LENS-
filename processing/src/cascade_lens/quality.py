@@ -33,19 +33,31 @@ def clean(a: np.ndarray, fill=None) -> np.ndarray:
 
 
 def decode_gunw_mask(m: np.ndarray) -> dict:
-    """GUNW Rev E and GOFF Rev C: three digits, water flag / reference subswath / secondary subswath, 0 subswath = invalid, 255 = fill."""
+    """GUNW and GOFF mask, a 32-bit field (the product's own mask description, P05023 files):
+      bits 0-7    three decimal digits: water flag / reference subswath / secondary subswath; a 0 subswath is invalid; 255 is fill
+      bits 8-15   anomaly flags for the secondary RSLC     bits 16-23  anomaly flags for the reference RSLC
+      bit 24      the ionosphere screen was interpolated here (not an estimate at this pixel)
+    Older 8-bit masks (Rev E samples) are the same digits with no higher bits. The digits must be read from the low byte only:
+    read from the whole number, a set bit 24 turns valid subswaths into invalid ones and hides water."""
     m = np.asarray(m)
-    fill = m == 255
-    ref, sec = (m // 10) % 10, m % 10
-    water = ((m // 100) == 1) & ~fill
-    return {"fill": fill, "water": water, "invalid_subswath": ((ref == 0) | (sec == 0)) & ~fill}
+    if not np.issubdtype(m.dtype, np.integer):
+        m = np.where(np.isfinite(m), m, 255)
+    m = m.astype(np.int64)
+    low = m & 0xFF
+    fill = low == 255
+    ref, sec = (low // 10) % 10, low % 10
+    water = ((low // 100) == 1) & ~fill
+    invalid = ((ref == 0) | (sec == 0)) & ~fill
+    anomaly = (((m >> 8) & 0xFFFF) != 0) & ~fill
+    return {"fill": fill, "water": water, "invalid_subswath": invalid, "anomaly": anomaly,
+            "iono_interpolated": (((m >> 24) & 1) == 1) & ~fill, "unusable": water | invalid | anomaly}
 
 
 def _mask_classes(shape, mask: np.ndarray | None) -> np.ndarray:
     v = np.full(shape, VALID, np.uint8)
     if mask is not None:
         d = decode_gunw_mask(mask)
-        v[d["water"] | d["invalid_subswath"]] = MASKED
+        v[d["unusable"]] = MASKED
         v[d["fill"]] = NODATA
     return v
 

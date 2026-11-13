@@ -8,6 +8,9 @@ import { Hypotheses } from './Hypotheses'
 import { ReportButtons } from './ReportButtons'
 import { HazardAt } from './HazardAt'
 import { isTerrainScreen } from '../../services/hazards'
+import { stepKind, stepLabel } from '../../services/timeLabels'
+
+const CAPTION = { dates: 'This location on each radar date', pairs: 'This location in each radar pair', hours: 'This location through the day (UTC)', steps: 'This location at each saved time' }
 import { isObservability } from '../../services/observability'
 
 const DayLineChart = lazy(() => import('../charts/LibraryCharts').then((m) => ({ default: m.DayLineChart })))
@@ -49,7 +52,7 @@ function DayChart({ layer, point }: { layer: Layer; point: [number, number] }) {
     let stale = false
     setData(null)
     Promise.all(steps.map((s) => samplePoint({ ...layer, sources: s.sources }, point[0], point[1]))).then((rs) => {
-      if (!stale) setData(rs.map((r, i) => ({ time: steps[i].label.slice(0, 2), value: r.state === 'valid' ? (r.value ?? null) : null })))
+      if (!stale) setData(rs.map((r, i) => ({ time: stepLabel(steps[i].label), value: r.state === 'valid' ? (r.value ?? null) : null })))
     })
     return () => { stale = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- layer changes object with each time step, and the chart covers every step
@@ -57,7 +60,7 @@ function DayChart({ layer, point }: { layer: Layer; point: [number, number] }) {
   if (!data || !data.some((d) => d.value !== null)) return null
   return (
     <figure className="histogram day-chart">
-      <figcaption>This location through the day (UTC){layer.units && layer.units !== '1' ? `, ${layer.units}` : ''}</figcaption>
+      <figcaption>{CAPTION[stepKind((steps ?? []).map((s) => s.label))]}{layer.units && layer.units !== '1' ? `, ${layer.units}` : ''}. Each point is a stored value; the line only joins them.</figcaption>
       <Suspense fallback={<div style={{ height: 110 }} />}><DayLineChart data={data} name={layer.name} /></Suspense>
     </figure>
   )

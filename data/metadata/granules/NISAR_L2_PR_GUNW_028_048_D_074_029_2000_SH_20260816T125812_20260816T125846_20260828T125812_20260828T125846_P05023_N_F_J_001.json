@@ -57,7 +57,7 @@
    "check": "valid-pixel fraction",
    "ok": true,
    "expected": ">= 0.01",
-   "found": 0.38886929991230634
+   "found": 0.38749543262204034
   }
  ],
  "sha256": "aa18c396262052814a9901275cd88aee8a99c4425c83be3168aa4b6e24d5568a",
@@ -84,10 +84,10 @@
   "radarBand": "L"
  },
  "validFraction": {
-  "gunw-phase": 0.38886929991230634,
-  "gunw-coherence": 0.4340826878105817,
-  "gunw-cc": 0.4340826878105817,
-  "gunw-iono": 0.4340826878105817,
-  "gunw-phase-iono": 0.38886929991230634
+  "gunw-phase": 0.38749543262204034,
+  "gunw-coherence": 0.43270699356913184,
+  "gunw-cc": 0.43270699356913184,
+  "gunw-iono": 0.43270699356913184,
+  "gunw-phase-iono": 0.38749543262204034
  }
 }

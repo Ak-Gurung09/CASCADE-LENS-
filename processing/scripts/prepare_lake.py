@@ -6,6 +6,10 @@ A GUNW pair of the same track and frame in any of the folders (data/raw/nisar is
 --research-motion also writes the dam and glacier movement bounds to data/qa/<id>-motion-research.json. They are research
 only: the phase sign convention and referencing are not established, so they never go into the app's manifest.
 Writes frontend/public/data/manifests/<id>.json, plus COGs, tiles, compare images and the lake edge. Refuses to write a broken manifest.
+
+usage: python prepare_lake.py processing/configs/lake/tsho-rolpa.json --coherence-only GUNW_FILE
+Rebuilds only the coherence layer of an existing case from one GUNW pair, keeping the lake series, compare images, 3D model
+and scenario as shipped, and drops any movement block from older builds. Needs no GCOV file.
 """
 import json
 import pathlib
@@ -21,6 +25,26 @@ from cascade_lens import motion  # noqa: E402
 RESEARCH = "--research-motion" in sys.argv
 sys.argv = [a for a in sys.argv if a != "--research-motion"]
 cfg = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+if len(sys.argv) > 3 and sys.argv[2] == "--coherence-only":
+    import tempfile
+    public = ROOT / "frontend/public/data"
+    path = public / f"manifests/{cfg['id']}.json"
+    m = json.loads(path.read_text(encoding="utf-8"))
+    gunw = pathlib.Path(sys.argv[3]).resolve()
+    grid, lake_mask = lake.research_inputs(cfg, public)
+    with tempfile.TemporaryDirectory() as tmp:  # exactly this pair, so the earliest pair on disk is not picked instead
+        (pathlib.Path(tmp) / gunw.name).symlink_to(gunw)
+        work = ROOT / "data/processed" / cfg["id"]
+        work.mkdir(parents=True, exist_ok=True)
+        m = motion.add_coherence_layer(m, cfg, [pathlib.Path(tmp)], public, work, grid, lake_mask)
+    if "coherence" not in m["lake"]:
+        sys.exit(f"{gunw.name} is not a GUNW pair for track {cfg['track']} frame {cfg['frame']}; nothing written")
+    errors = manifest.validate(m, ROOT / "frontend/public")
+    if errors:
+        sys.exit("Manifest not written:\n" + "\n".join(errors))
+    path.write_text(json.dumps(m, indent=1), encoding="utf-8")
+    print("Coherence-only update written:", path)
+    sys.exit(0)
 files = sorted(p for p in pathlib.Path(sys.argv[2]).glob("NISAR_L2_*GCOV*.h5") if f"_{cfg['track']:03d}_" in p.name and f"_{cfg['frame']:03d}_" in p.name)
 if len(files) < 2:
     sys.exit(f"Need at least 2 GCOV files for track {cfg['track']} frame {cfg['frame']} in {sys.argv[2]}, found {len(files)}")

@@ -10,10 +10,19 @@ export type Task = 'disturbance' | 'movement'
 // Version 2 applies the radar product's own quality mask. Figures from version 1 are withheld, never shown as current.
 export const OBSERVABILITY_METHOD = 2
 export const observabilityCurrent = (m: Manifest | undefined) => (m?.observability?.methodVersion ?? 1) >= OBSERVABILITY_METHOD
+
+// The radar frames the observability block assessed, such as [74, 75], and how to say where the rest lies
+export const framesChecked = (m: Manifest | undefined): number[] => m?.observability?.frames?.map((f) => f.frame) ?? (m?.observability ? [m.observability.frame] : [])
+export function beyondFrames(m: Manifest | undefined): string {
+  const f = framesChecked(m)
+  return f.length > 1
+    ? `beyond the radar frames checked (${f.slice(0, -1).join(', ')} and ${f[f.length - 1]}), where no frame of this pair was assessed`
+    : 'beyond this radar frame, in the neighbouring frame, which is not checked yet'
+}
 export const STALE_NOTE = 'These figures came from an earlier calculation that did not apply the radar product’s own quality mask. They are withheld until the corrected run.'
 
 const REASON: [number, string][] = [
-  [FLAG.outside, 'Outside the radar frame checked here. A neighbouring frame may cover it, but it is not assessed yet.'],
+  [FLAG.outside, 'Outside the radar frames checked here. Another frame may cover it, but it is not assessed.'],
   [FLAG.noData, 'Inside the frame, but the product holds no value here.'],
   [FLAG.productMasked, 'The radar product’s own quality mask flags this spot (water or an invalid subswath), so its values are not used.'],
   [FLAG.geometryNotAssessed, 'Terrain geometry could not be checked here (elevation or viewing angle missing), so this spot is not assessed.'],

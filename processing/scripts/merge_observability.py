@@ -24,7 +24,8 @@ def merge(fragment: dict, manifest: dict) -> dict:
 
 def main(frag_dir: str, man_dir: str) -> None:
     frags = pathlib.Path(frag_dir)
-    for f in sorted([*frags.glob("observability-*.json"), *frags.glob("hazards-*.json"), *frags.glob("control-*.json"), *frags.glob("access-*.json")]):
+    for f in sorted([*frags.glob("observability-*.json"), *frags.glob("hazards-*.json"), *frags.glob("control-*.json"), *frags.glob("access-*.json"),
+                    *frags.glob("timeline-*.json")]):
         frag = json.loads(f.read_text(encoding="utf-8"))
         path = pathlib.Path(man_dir) / FILES.get(frag["case"], f"{frag['case']}.json")
         raw = path.read_bytes()

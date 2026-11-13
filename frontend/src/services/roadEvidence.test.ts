@@ -34,11 +34,11 @@ describe('road-segment evidence', () => {
     const ev = roadEvidence(shipped, find((s) => s.exposure === 'High'))
     expect(ev.radar.pair).toBe('16 Aug 2026 to 28 Aug 2026')
     expect(ev.radar.baseline).toBe('23 Jul 2026 to 16 Aug 2026')
-    expect(ev.radar.trackFrame).toBe('Track 48 descending, frame 74')
+    expect(ev.radar.trackFrame).toBe('Track 48 descending, frames 74 and 75')
     expect(ev.radar.granule).toBe(shipped.observability!.granule)
-    expect(ev.radar.methodVersion).toBe(1)
-    expect(ev.radar.current).toBe(false)
-    expect(ev.verify.join(' ')).toContain('withdrawn first observability method')
+    expect(ev.radar.methodVersion).toBe(2)
+    expect(ev.radar.current).toBe(true)
+    expect(ev.verify.join(' ')).not.toContain('withdrawn first observability method')
   })
 
   it('accounts for the whole stretch across the observability classes', () => {

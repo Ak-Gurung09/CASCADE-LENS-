@@ -1,5 +1,5 @@
 import type { Manifest } from '../types/manifest'
-import { observabilityCurrent } from './observability'
+import { framesChecked, observabilityCurrent } from './observability'
 import type { RoadSegment } from './hazards'
 
 // The evidence behind one screened road stretch (audit P0.3). The inspector panel and every report format are built from
@@ -63,7 +63,7 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
     ...(s.osmStatus === 'Destroyed' ? ['Check with the road authority whether this stretch has been reopened or bypassed since it was mapped as destroyed.'] : []),
     ...(usable < 20 ? ['The event pair could not watch most of this stretch, so radar can neither confirm nor rule out a change here. Use optical images or field reports.']
       : usable < 50 ? ['The event pair watched only part of this stretch. Check the rest by other means.'] : []),
-    ...(outside !== null && outside >= 50 ? ['Most of this stretch lies beyond the radar frame checked. The neighbouring frame is not assessed yet.'] : []),
+    ...(outside !== null && outside >= 50 ? ['Most of this stretch lies beyond the radar frames checked, so this pair says nothing about it.'] : []),
     ...(!current ? ['These radar figures come from the withdrawn first observability method. Recheck them after the rebuild.'] : []),
     ...(s.exposure === 'Low' ? ['Low means no factor was found among those screened. It does not mean the road is safe.'] : []),
   ]
@@ -80,7 +80,7 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
     radar: {
       pair: span(o?.pair),
       baseline: span(o?.baselinePair),
-      trackFrame: o ? `Track ${o.track} ${String(o.orbit ?? '').toLowerCase()}, frame ${o.frame}`.replace('  ', ' ') : null,
+      trackFrame: o ? `Track ${o.track} ${String(o.orbit ?? '').toLowerCase()}, ${framesChecked(m).length > 1 ? `frames ${framesChecked(m).join(' and ')}` : `frame ${o.frame}`}`.replace('  ', ' ') : null,
       granule: o?.granule ?? null,
       baselineGranule: o?.baselineGranule ?? null,
       methodVersion: o?.methodVersion ?? 1,

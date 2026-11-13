@@ -187,11 +187,22 @@ def _pair_layers(path: pathlib.Path, pol: str, gxc: np.ndarray, gyc: np.ndarray,
         out["frame"] = int(np.asarray(h["/science/LSAR/identification/frameNumber"][()]).item())
     with np.errstate(invalid="ignore"):
         out["coh"][~(out["coh"] > 0)] = np.nan  # coherence of 0 or below is not an estimate here: no value
-    m = np.where(np.isfinite(out["mask"]), out["mask"], 255).astype(np.uint16)
+    m = np.where(np.isfinite(out["mask"]), out["mask"], 255).astype(np.int64)  # all 32 bits: anomaly flags sit above bit 8
     d = quality.decode_gunw_mask(m)
-    out["maskFill"], out["maskInvalid"] = d["fill"], d["water"] | d["invalid_subswath"]
+    out["maskFill"], out["maskInvalid"] = d["fill"], d["unusable"]
     out["datasets"] = paths
     return out
+
+
+def combine_frames(primary: np.ndarray, other: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Flags for two neighbouring frames of the same pair on one analysis grid. A cell keeps the primary frame's flags
+    wherever that frame covers it; a cell outside the primary frame takes the other frame's flags when that frame covers it.
+    Returns the combined flags and the cells taken from the other frame. Where both cover a cell, the primary frame wins,
+    so a reason is never mixed from two products."""
+    if primary.shape != other.shape:
+        raise ValueError("frames are not on one analysis grid")
+    take = ((primary & OUTSIDE) != 0) & ((other & OUTSIDE) == 0) & (other != FLAG_NODATA) & (primary != FLAG_NODATA)
+    return np.where(take, other, primary), take
 
 
 def assess(gunw: pathlib.Path, baseline: pathlib.Path | None, dem_path: pathlib.Path, bounds_lonlat, posting: float = 40.0, pol: str = "HH") -> dict:

@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-01T16:21:51+00:00",
+ "generatedAt": "2026-11-13T06:55:00+00:00",
  "fixture": false,
  "fixtureLabel": null,
  "analysis": {
@@ -229,16 +229,16 @@
       }
      },
      "ionosphere": {
-      "pixels": 425703,
-      "pearsonR": 0.842,
-      "stdPhase": 8.87,
-      "stdIono": 7.28,
-      "stdPhaseMinusIono": 4.79,
-      "stdPhasePlusIono": 15.5
+      "pixels": 424199,
+      "pearsonR": 0.986,
+      "stdPhase": 7.75,
+      "stdIono": 7.27,
+      "stdPhaseMinusIono": 1.35,
+      "stdPhasePlusIono": 14.96
      },
      "components": {
-      "0": 49496,
-      "1": 425703
+      "0": 49494,
+      "1": 424199
      }
     },
     "f075": {
@@ -252,7 +252,7 @@
        "mapped extent": {
         "pixels": 6754,
         "validPct": 44.0,
-        "maskedPct": 19.4,
+        "maskedPct": 19.5,
         "p25": 0.11,
         "median": 0.164,
         "p75": 0.262
@@ -260,7 +260,7 @@
        "1 km ring outside extent": {
         "pixels": 71261,
         "validPct": 52.3,
-        "maskedPct": 11.3,
+        "maskedPct": 11.4,
         "p25": 0.409,
         "median": 0.518,
         "p75": 0.619
@@ -380,19 +380,19 @@
      "phase": {
       "mapped extent": {
        "pixels": 6754,
-       "validPct": 19.1,
+       "validPct": 19.0,
        "maskedPct": 45.3,
-       "p25": 21.012,
-       "median": 23.598,
-       "p75": 26.593
+       "p25": 21.02,
+       "median": 23.601,
+       "p75": 26.595
       },
       "1 km ring outside extent": {
        "pixels": 71261,
-       "validPct": 50.9,
+       "validPct": 50.8,
        "maskedPct": 13.7,
-       "p25": 21.636,
-       "median": 24.833,
-       "p75": 27.135
+       "p25": 21.64,
+       "median": 24.836,
+       "p75": 27.136
       },
       "detachment zone": {
        "pixels": 0
@@ -402,16 +402,16 @@
       }
      },
      "ionosphere": {
-      "pixels": 401707,
-      "pearsonR": 0.951,
-      "stdPhase": 6.41,
+      "pixels": 400054,
+      "pearsonR": 0.972,
+      "stdPhase": 6.28,
       "stdIono": 6.3,
-      "stdPhaseMinusIono": 1.98,
-      "stdPhasePlusIono": 12.56
+      "stdPhaseMinusIono": 1.49,
+      "stdPhasePlusIono": 12.49
      },
      "components": {
       "0": 14462,
-      "1": 401707
+      "1": 400054
      }
     }
    }
@@ -871,14 +871,14 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
       1244
      ],
-     "validFraction": 0.38886929991230634,
-     "maskedFraction": 0.17829581993569132,
+     "validFraction": 0.38749543262204034,
+     "maskedFraction": 0.17966968722595733,
      "sourceDtype": "float32",
      "clipWindow": [
       2616,
@@ -886,7 +886,7 @@
       0,
       1244
      ],
-     "displayOffset": 75.9971694946289,
+     "displayOffset": 76.04257202148438,
      "sampling": "data/sampling/pair-a/gunw-phase_f074.tif",
      "validity": "data/sampling/pair-a/gunw-phase_f074_validity.tif",
      "tiles": {
@@ -905,16 +905,16 @@
      "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
       1432
      ],
-     "validFraction": 0.3691074316377536,
-     "maskedFraction": 0.17708762128785652,
+     "validFraction": 0.36758857688915025,
+     "maskedFraction": 0.17860647603645988,
      "sourceDtype": "float32",
      "clipWindow": [
       0,
@@ -922,7 +922,7 @@
       604,
       2036
      ],
-     "displayOffset": 22.311063766479492,
+     "displayOffset": 22.350086212158203,
      "sampling": "data/sampling/pair-a/gunw-phase_f075.tif",
      "validity": "data/sampling/pair-a/gunw-phase_f075_validity.tif",
      "tiles": {
@@ -953,100 +953,100 @@
    ],
    "crs": "EPSG:32645",
    "stats": {
-    "count": 827410,
-    "min": -75.9971694946289,
-    "max": 22.56273651123047,
-    "mean": 0.0018539025913923979,
+    "count": 824253,
+    "min": -40.723121643066406,
+    "max": 22.517333984375,
+    "mean": 0.132691890001297,
     "median": 0.0,
-    "p2": -12.66257553100586,
-    "p98": 14.451961364746088,
-    "displayMin": -14.451961517333984,
-    "displayMax": 14.451961517333984,
+    "p2": -12.374571228027344,
+    "p98": 14.417098388671867,
+    "displayMin": -14.417098045349121,
+    "displayMax": 14.417098045349121,
     "histogram": {
      "edges": [
-      -14.45196,
-      -13.72936,
-      -13.00677,
-      -12.28417,
-      -11.56157,
-      -10.83897,
-      -10.11637,
-      -9.39377,
-      -8.67118,
-      -7.94858,
-      -7.22598,
-      -6.50338,
-      -5.78078,
-      -5.05819,
-      -4.33559,
-      -3.61299,
-      -2.89039,
-      -2.16779,
-      -1.4452,
-      -0.7226,
+      -14.4171,
+      -13.69624,
+      -12.97539,
+      -12.25453,
+      -11.53368,
+      -10.81282,
+      -10.09197,
+      -9.37111,
+      -8.65026,
+      -7.9294,
+      -7.20855,
+      -6.48769,
+      -5.76684,
+      -5.04598,
+      -4.32513,
+      -3.60427,
+      -2.88342,
+      -2.16256,
+      -1.44171,
+      -0.72085,
       0.0,
-      0.7226,
-      1.4452,
-      2.16779,
-      2.89039,
-      3.61299,
-      4.33559,
-      5.05819,
-      5.78078,
-      6.50338,
-      7.22598,
-      7.94858,
-      8.67118,
-      9.39377,
-      10.11637,
-      10.83897,
-      11.56157,
-      12.28417,
-      13.00677,
-      13.72936,
-      14.45196
+      0.72085,
+      1.44171,
+      2.16256,
+      2.88342,
+      3.60427,
+      4.32513,
+      5.04598,
+      5.76684,
+      6.48769,
+      7.20855,
+      7.9294,
+      8.65026,
+      9.37111,
+      10.09197,
+      10.81282,
+      11.53368,
+      12.25453,
+      12.97539,
+      13.69624,
+      14.4171
      ],
      "counts": [
-      2614,
-      3150,
-      5806,
-      11638,
-      15142,
-      16845,
-      19197,
-      20596,
-      21501,
-      20716,
-      20942,
-      22604,
-      23152,
-      27099,
-      27955,
-      28784,
-      28978,
-      30804,
-      29573,
-      27999,
-      27266,
-      27637,
-      29436,
-      26747,
-      28916,
-      25439,
-      26360,
-      27149,
-      27179,
-      23964,
-      21845,
-      21067,
-      19743,
-      17096,
-      14892,
-      10972,
-      7813,
-      5537,
-      4498,
-      3601
+      2587,
+      3279,
+      6353,
+      11937,
+      15310,
+      17062,
+      19331,
+      20661,
+      21427,
+      20671,
+      20897,
+      22649,
+      23365,
+      27178,
+      27900,
+      28734,
+      29011,
+      30877,
+      29280,
+      27828,
+      27206,
+      27582,
+      29402,
+      26643,
+      28873,
+      25187,
+      26556,
+      26917,
+      27090,
+      23872,
+      21640,
+      21085,
+      19600,
+      17073,
+      14743,
+      10847,
+      7744,
+      5518,
+      4456,
+      3607
      ]
     }
    },
@@ -1065,13 +1065,13 @@
      "#ef8a62",
      "#b2182b"
     ],
-    "min": -14.451961517333984,
-    "max": 14.451961517333984,
+    "min": -14.417098045349121,
+    "max": 14.417098045349121,
     "labels": null,
     "unit": "radians, relative to frame median"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:11:52+00:00",
+    "processedAt": "2026-11-13T06:54:20+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -1138,14 +1138,14 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
       1244
      ],
-     "validFraction": 0.4340826878105817,
-     "maskedFraction": 0.13308243203741596,
+     "validFraction": 0.43270699356913184,
+     "maskedFraction": 0.13445812627886583,
      "sourceDtype": "float32",
      "clipWindow": [
       2616,
@@ -1172,16 +1172,16 @@
      "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
       1432
      ],
-     "validFraction": 0.38203928991473096,
-     "maskedFraction": 0.13892329461922964,
+     "validFraction": 0.38052135401352544,
+     "maskedFraction": 0.14044123052043517,
      "sourceDtype": "float32",
      "clipWindow": [
       0,
@@ -1216,13 +1216,13 @@
    ],
    "crs": "EPSG:32645",
    "stats": {
-    "count": 890980,
+    "count": 887822,
     "min": 0.0069569917395710945,
     "max": 0.9655233025550842,
-    "mean": 0.5220693349838257,
-    "median": 0.5365778207778931,
-    "p2": 0.13203868567943575,
-    "p98": 0.8530290281772613,
+    "mean": 0.5219790935516357,
+    "median": 0.5364722609519958,
+    "p2": 0.13188140869140624,
+    "p98": 0.8531434381008147,
     "displayMin": 0.0,
     "displayMax": 1.0,
     "histogram": {
@@ -1272,42 +1272,42 @@
      "counts": [
       36,
       576,
-      2379,
-      4975,
-      7392,
-      9381,
-      10817,
-      12459,
-      13874,
-      15963,
-      17905,
-      20231,
-      22718,
-      25516,
-      28448,
-      31305,
-      34615,
-      37417,
-      40624,
-      42318,
-      45376,
-      46528,
-      47589,
-      47614,
-      46844,
-      45078,
-      42261,
-      38814,
-      34628,
-      29783,
-      24424,
-      19240,
-      14271,
-      10729,
-      7630,
-      5409,
-      3746,
-      1843,
+      2378,
+      4970,
+      7390,
+      9377,
+      10807,
+      12438,
+      13854,
+      15935,
+      17871,
+      20175,
+      22654,
+      25434,
+      28344,
+      31181,
+      34475,
+      37286,
+      40473,
+      42147,
+      45221,
+      46348,
+      47389,
+      47389,
+      46636,
+      44868,
+      42083,
+      38636,
+      34498,
+      29688,
+      24313,
+      19176,
+      14238,
+      10711,
+      7617,
+      5404,
+      3740,
+      1842,
       224,
       0
      ]
@@ -1334,7 +1334,7 @@
     "unit": "1"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:11:54+00:00",
+    "processedAt": "2026-11-13T06:54:23+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -1401,14 +1401,14 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
       1244
      ],
-     "validFraction": 0.4340826878105817,
-     "maskedFraction": 0.5659173121894183,
+     "validFraction": 0.43270699356913184,
+     "maskedFraction": 0.13445812627886583,
      "sourceDtype": "uint16",
      "clipWindow": [
       2616,
@@ -1423,7 +1423,7 @@
       "url": "data/tiles/pair-a/gunw-cc/f074/{z}/{x}/{y}.png",
       "minzoom": 8,
       "maxzoom": 11,
-      "count": 86
+      "count": 70
      },
      "maskTiles": "data/tiles/pair-a/gunw-cc/f074_mask/{z}/{x}/{y}.png"
     },
@@ -1435,16 +1435,16 @@
      "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
       1432
      ],
-     "validFraction": 0.3823958027050867,
-     "maskedFraction": 0.6176041972949132,
+     "validFraction": 0.3808769479564834,
+     "maskedFraction": 0.16531810496912672,
      "sourceDtype": "uint16",
      "clipWindow": [
       0,
@@ -1459,7 +1459,7 @@
       "url": "data/tiles/pair-a/gunw-cc/f075/{z}/{x}/{y}.png",
       "minzoom": 8,
       "maxzoom": 11,
-      "count": 64
+      "count": 56
      },
      "maskTiles": "data/tiles/pair-a/gunw-cc/f075_mask/{z}/{x}/{y}.png"
     }
@@ -1479,7 +1479,7 @@
    ],
    "crs": "EPSG:32645",
    "stats": {
-    "count": 891368,
+    "count": 888209,
     "labels": [
      0,
      1
@@ -1512,7 +1512,7 @@
     "unit": "1"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:11:56+00:00",
+    "processedAt": "2026-11-13T06:54:24+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -1579,14 +1579,14 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
       1244
      ],
-     "validFraction": 0.4340826878105817,
-     "maskedFraction": 0.1326092516807951,
+     "validFraction": 0.43270699356913184,
+     "maskedFraction": 0.13398494592224497,
      "sourceDtype": "float32",
      "clipWindow": [
       2616,
@@ -1594,7 +1594,7 @@
       0,
       1244
      ],
-     "displayOffset": 71.26673126220703,
+     "displayOffset": 71.25041198730469,
      "sampling": "data/sampling/pair-a/gunw-iono_f074.tif",
      "validity": "data/sampling/pair-a/gunw-iono_f074_validity.tif",
      "tiles": {
@@ -1613,16 +1613,16 @@
      "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
       1432
      ],
-     "validFraction": 0.3823958027050867,
-     "maskedFraction": 0.1629594236989121,
+     "validFraction": 0.3808769479564834,
+     "maskedFraction": 0.16447827844751545,
      "sourceDtype": "float32",
      "clipWindow": [
       0,
@@ -1630,7 +1630,7 @@
       604,
       2036
      ],
-     "displayOffset": -10.451828956604004,
+     "displayOffset": -10.445494651794434,
      "sampling": "data/sampling/pair-a/gunw-iono_f075.tif",
      "validity": "data/sampling/pair-a/gunw-iono_f075_validity.tif",
      "tiles": {
@@ -1658,100 +1658,100 @@
    ],
    "crs": "EPSG:32645",
    "stats": {
-    "count": 891368,
-    "min": -13.20195484161377,
-    "max": 18.940879821777344,
-    "mean": 0.0015774910571053624,
+    "count": 888209,
+    "min": -13.20828914642334,
+    "max": 18.957199096679688,
+    "mean": 0.0020462526008486748,
     "median": 0.0,
-    "p2": -11.869435195922852,
-    "p98": 13.590352325439454,
-    "displayMin": -13.590352058410645,
-    "displayMax": 13.590352058410645,
+    "p2": -11.86051528930664,
+    "p98": 13.536895751953125,
+    "displayMin": -13.536895751953125,
+    "displayMax": 13.536895751953125,
     "histogram": {
      "edges": [
-      -13.59035,
-      -12.91083,
-      -12.23132,
-      -11.5518,
-      -10.87228,
-      -10.19276,
-      -9.51325,
-      -8.83373,
-      -8.15421,
-      -7.47469,
-      -6.79518,
-      -6.11566,
-      -5.43614,
-      -4.75662,
-      -4.07711,
-      -3.39759,
-      -2.71807,
-      -2.03855,
-      -1.35904,
-      -0.67952,
+      -13.5369,
+      -12.86005,
+      -12.18321,
+      -11.50636,
+      -10.82952,
+      -10.15267,
+      -9.47583,
+      -8.79898,
+      -8.12214,
+      -7.44529,
+      -6.76845,
+      -6.0916,
+      -5.41476,
+      -4.73791,
+      -4.06107,
+      -3.38422,
+      -2.70738,
+      -2.03053,
+      -1.35369,
+      -0.67684,
       0.0,
-      0.67952,
-      1.35904,
-      2.03855,
-      2.71807,
-      3.39759,
-      4.07711,
-      4.75662,
-      5.43614,
-      6.11566,
-      6.79518,
-      7.47469,
-      8.15421,
-      8.83373,
-      9.51325,
-      10.19276,
-      10.87228,
-      11.5518,
-      12.23132,
-      12.91083,
-      13.59035
+      0.67684,
+      1.35369,
+      2.03053,
+      2.70738,
+      3.38422,
+      4.06107,
+      4.73791,
+      5.41476,
+      6.0916,
+      6.76845,
+      7.44529,
+      8.12214,
+      8.79898,
+      9.47583,
+      10.15267,
+      10.82952,
+      11.50636,
+      12.18321,
+      12.86005,
+      13.5369
      ],
      "counts": [
-      1427,
-      8315,
-      16351,
-      20102,
-      20133,
-      21192,
-      21364,
-      22266,
-      24969,
-      23756,
-      25197,
-      25417,
-      25824,
-      25834,
-      28799,
-      27360,
-      26264,
-      27391,
-      27211,
-      26511,
-      27409,
-      29573,
-      27891,
-      25641,
-      26699,
-      27371,
-      27313,
-      29670,
-      28891,
-      28062,
-      27874,
-      25872,
-      21091,
-      19118,
-      17619,
-      12017,
-      9791,
-      7453,
-      4781,
-      3721
+      1752,
+      8697,
+      16637,
+      19903,
+      20078,
+      21078,
+      21242,
+      22257,
+      24829,
+      23574,
+      25124,
+      25274,
+      25789,
+      25549,
+      28660,
+      27063,
+      26100,
+      27170,
+      27040,
+      26288,
+      27180,
+      29345,
+      27772,
+      25427,
+      26472,
+      27123,
+      27009,
+      29345,
+      28890,
+      27840,
+      27779,
+      25816,
+      21215,
+      19077,
+      17700,
+      12224,
+      9724,
+      7597,
+      4935,
+      3871
      ]
     }
    },
@@ -1770,13 +1770,13 @@
      "#ef8a62",
      "#b2182b"
     ],
-    "min": -13.590352058410645,
-    "max": 13.590352058410645,
+    "min": -13.536895751953125,
+    "max": 13.536895751953125,
     "labels": null,
     "unit": "radians, relative to frame median"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:11:59+00:00",
+    "processedAt": "2026-11-13T06:54:28+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -1846,14 +1846,14 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
       1244
      ],
-     "validFraction": 0.38886929991230634,
-     "maskedFraction": 0.17782263957907044,
+     "validFraction": 0.38749543262204034,
+     "maskedFraction": 0.17919650686933644,
      "sourceDtype": "float32",
      "clipWindow": [
       2616,
@@ -1861,7 +1861,7 @@
       0,
       1244
      ],
-     "displayOffset": 4.804374694824219,
+     "displayOffset": 4.8086395263671875,
      "sampling": "data/sampling/pair-a/gunw-phase-iono_f074.tif",
      "validity": "data/sampling/pair-a/gunw-phase-iono_f074_validity.tif",
      "tiles": {
@@ -1880,16 +1880,16 @@
      "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
       1432
      ],
-     "validFraction": 0.3691074316377536,
-     "maskedFraction": 0.17624779476624522,
+     "validFraction": 0.36758857688915025,
+     "maskedFraction": 0.17776664951484858,
      "sourceDtype": "float32",
      "clipWindow": [
       0,
@@ -1897,7 +1897,7 @@
       604,
       2036
      ],
-     "displayOffset": 32.84978103637695,
+     "displayOffset": 32.854736328125,
      "sampling": "data/sampling/pair-a/gunw-phase-iono_f075.tif",
      "validity": "data/sampling/pair-a/gunw-phase-iono_f075_validity.tif",
      "tiles": {
@@ -1927,100 +1927,100 @@
    ],
    "crs": "EPSG:32645",
    "stats": {
-    "count": 827410,
-    "min": -92.87545013427734,
-    "max": 7.4850311279296875,
-    "mean": -0.3265171945095062,
+    "count": 824253,
+    "min": -43.579776763916016,
+    "max": 7.480766296386719,
+    "mean": -0.1532178521156311,
     "median": 0.0,
-    "p2": -4.134209480285644,
-    "p98": 2.1581681060791014,
-    "displayMin": -4.134209632873535,
-    "displayMax": 4.134209632873535,
+    "p2": -3.9848744964599607,
+    "p98": 2.155865631103513,
+    "displayMin": -3.9848744869232178,
+    "displayMax": 3.9848744869232178,
     "histogram": {
      "edges": [
-      -4.13421,
-      -3.9275,
-      -3.72079,
-      -3.51408,
-      -3.30737,
-      -3.10066,
-      -2.89395,
-      -2.68724,
-      -2.48053,
-      -2.27382,
-      -2.0671,
-      -1.86039,
-      -1.65368,
-      -1.44697,
-      -1.24026,
-      -1.03355,
-      -0.82684,
-      -0.62013,
-      -0.41342,
-      -0.20671,
+      -3.98487,
+      -3.78563,
+      -3.58639,
+      -3.38714,
+      -3.1879,
+      -2.98866,
+      -2.78941,
+      -2.59017,
+      -2.39092,
+      -2.19168,
+      -1.99244,
+      -1.79319,
+      -1.59395,
+      -1.39471,
+      -1.19546,
+      -0.99622,
+      -0.79697,
+      -0.59773,
+      -0.39849,
+      -0.19924,
       0.0,
-      0.20671,
-      0.41342,
-      0.62013,
-      0.82684,
-      1.03355,
-      1.24026,
-      1.44697,
-      1.65368,
-      1.86039,
-      2.0671,
-      2.27382,
-      2.48053,
-      2.68724,
-      2.89395,
-      3.10066,
-      3.30737,
-      3.51408,
-      3.72079,
-      3.9275,
-      4.13421
+      0.19924,
+      0.39849,
+      0.59773,
+      0.79697,
+      0.99622,
+      1.19546,
+      1.39471,
+      1.59395,
+      1.79319,
+      1.99244,
+      2.19168,
+      2.39092,
+      2.59017,
+      2.78941,
+      2.98866,
+      3.1879,
+      3.38714,
+      3.58639,
+      3.78563,
+      3.98487
      ],
      "counts": [
-      3933,
-      2833,
-      2706,
-      3212,
-      3976,
-      4866,
-      5765,
-      5904,
-      5823,
-      6544,
-      8334,
-      11256,
-      15207,
-      20969,
-      27716,
-      35291,
-      44725,
-      55340,
-      63878,
-      68875,
-      71532,
-      70420,
-      64138,
-      54099,
-      42873,
-      32451,
-      24128,
-      16854,
-      10961,
-      7246,
-      4979,
-      3495,
-      2590,
-      1959,
-      1404,
-      1194,
-      878,
-      720,
-      559,
-      413
+      2927,
+      2494,
+      2913,
+      3541,
+      4302,
+      5254,
+      5703,
+      5583,
+      5817,
+      6820,
+      8929,
+      12116,
+      15992,
+      21856,
+      28186,
+      35428,
+      44735,
+      54423,
+      61932,
+      66688,
+      68996,
+      67992,
+      62397,
+      53189,
+      42840,
+      32889,
+      24953,
+      17801,
+      11998,
+      7907,
+      5522,
+      3808,
+      2835,
+      2101,
+      1607,
+      1282,
+      1010,
+      764,
+      679,
+      475
      ]
     }
    },
@@ -2039,13 +2039,13 @@
      "#ef8a62",
      "#b2182b"
     ],
-    "min": -4.134209632873535,
-    "max": 4.134209632873535,
+    "min": -3.9848744869232178,
+    "max": 3.9848744869232178,
     "labels": null,
     "unit": "radians, relative to frame median"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:02+00:00",
+    "processedAt": "2026-11-13T06:54:31+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -2115,7 +2115,7 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -2149,9 +2149,9 @@
      "sha256": "64f31a0fbe011f4be6c09cd460fccf5fe73a2058a1123b95cdbea76d76d8f115",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
@@ -2313,7 +2313,7 @@
     "unit": "meters"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:04+00:00",
+    "processedAt": "2026-11-13T06:54:33+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -2383,7 +2383,7 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -2417,9 +2417,9 @@
      "sha256": "64f31a0fbe011f4be6c09cd460fccf5fe73a2058a1123b95cdbea76d76d8f115",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
@@ -2581,7 +2581,7 @@
     "unit": "meters"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:07+00:00",
+    "processedAt": "2026-11-13T06:54:36+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -2648,7 +2648,7 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -2682,9 +2682,9 @@
      "sha256": "64f31a0fbe011f4be6c09cd460fccf5fe73a2058a1123b95cdbea76d76d8f115",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
@@ -2844,7 +2844,7 @@
     "unit": "1"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:09+00:00",
+    "processedAt": "2026-11-13T06:54:39+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -2911,7 +2911,7 @@
       84.53594788265075,
       27.717578024937264,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -2945,9 +2945,9 @@
      "sha256": "64f31a0fbe011f4be6c09cd460fccf5fe73a2058a1123b95cdbea76d76d8f115",
      "bounds": [
       84.38475258192256,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.280449216353468
+      28.28044921635347
      ],
      "shape": [
       760,
@@ -3107,7 +3107,7 @@
     "unit": "1"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:12+00:00",
+    "processedAt": "2026-11-13T06:54:42+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -3175,7 +3175,7 @@
      "sha256": "29d60d0b8e9523f2625089f309b138a551a3b88654f7f2a0fd1bab738e0a5ce3",
      "bounds": [
       84.38522816387227,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
       28.260957273710105
      ],
@@ -3211,9 +3211,9 @@
      "sha256": "4dbe3d82c2e03422abf9fc3ead2ad70c0734a80ec52cad87cd6659716fce5371",
      "bounds": [
       84.38263314570466,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -3375,7 +3375,7 @@
     "unit": "meters"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:15+00:00",
+    "processedAt": "2026-11-13T06:54:46+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -3443,7 +3443,7 @@
      "sha256": "29d60d0b8e9523f2625089f309b138a551a3b88654f7f2a0fd1bab738e0a5ce3",
      "bounds": [
       84.38522816387227,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
       28.260957273710105
      ],
@@ -3479,9 +3479,9 @@
      "sha256": "4dbe3d82c2e03422abf9fc3ead2ad70c0734a80ec52cad87cd6659716fce5371",
      "bounds": [
       84.38263314570466,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -3643,7 +3643,7 @@
     "unit": "meters"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:18+00:00",
+    "processedAt": "2026-11-13T06:54:49+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -3708,7 +3708,7 @@
      "sha256": "29d60d0b8e9523f2625089f309b138a551a3b88654f7f2a0fd1bab738e0a5ce3",
      "bounds": [
       84.38522816387227,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
       28.260957273710105
      ],
@@ -3744,9 +3744,9 @@
      "sha256": "4dbe3d82c2e03422abf9fc3ead2ad70c0734a80ec52cad87cd6659716fce5371",
      "bounds": [
       84.38263314570466,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -3906,7 +3906,7 @@
     "unit": "1"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:21+00:00",
+    "processedAt": "2026-11-13T06:54:53+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -3971,7 +3971,7 @@
      "sha256": "29d60d0b8e9523f2625089f309b138a551a3b88654f7f2a0fd1bab738e0a5ce3",
      "bounds": [
       84.38522816387227,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
       28.260957273710105
      ],
@@ -4007,9 +4007,9 @@
      "sha256": "4dbe3d82c2e03422abf9fc3ead2ad70c0734a80ec52cad87cd6659716fce5371",
      "bounds": [
       84.38263314570466,
-      27.714795075127522,
+      27.714795075127526,
       85.55941176995117,
-      28.36707937156769
+      28.367079371567687
      ],
      "shape": [
       880,
@@ -4169,7 +4169,7 @@
     "unit": "1"
    },
    "processingHistory": {
-    "processedAt": "2026-11-01T16:12:24+00:00",
+    "processedAt": "2026-11-13T06:54:58+00:00",
     "parameters": {
      "gross_outlier_mad_k": 10,
      "snr_min": null,
@@ -5046,203 +5046,524 @@
    "page": "https://data.humdata.org/dataset/cod-ab-npl"
   },
   {
-   "id": "rasuwa-2026:observability-disturbance",
    "groupId": null,
-   "name": "Can the radar see it? (surface change)",
-   "category": "gridded",
-   "mission": "NISAR",
-   "instrument": "L-SAR",
-   "productType": "Derived here",
-   "measurementClass": "derived",
-   "measurementType": "observability-disturbance",
-   "kind": "categorical",
-   "units": null,
-   "acquisition": {
-    "reference": "2026-08-16",
-    "secondary": "2026-08-28"
-   },
-   "orbitDirection": "Descending",
-   "track": 48,
-   "frames": [
-    74
-   ],
-   "postingM": [
-    40
-   ],
-   "crs": "EPSG:32645",
+   "category": "reference",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
    "qualityLayerIds": [],
-   "status": "sampleable",
+   "status": "prepared",
    "statusReason": null,
-   "sources": [
-    {
-     "frame": 74,
-     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
-     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
-     "sourceDataset": "reason flags (see observability block)",
-     "bounds": [
-      84.38262429509216,
-      27.714795075127526,
-      85.55941176995117,
-      28.367440328151478
-     ],
-     "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
-     "tiles": {
-      "url": "data/tiles/rasuwa-2026/observability-disturbance/{z}/{x}/{y}.png",
-      "minzoom": 8,
-      "maxzoom": 12,
-      "count": 179
-     }
-    }
-   ],
-   "sourceGranules": [
-    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
-    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001"
-   ],
-   "productMaturity": "Derived from Provisional products",
-   "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
+   "sources": [],
+   "units": null,
+   "kind": "vector",
+   "measurementType": "reference",
+   "crs": "EPSG:4326",
+   "sourceGranules": [],
+   "page": "https://data.humdata.org/dataset/hot_flood_npl",
+   "id": "rasuwa-2026:road-states",
+   "name": "Road and bridge states (reported)",
+   "mission": "OpenStreetMap",
+   "instrument": "HOT export and HOT bridge damage assessment",
+   "productType": "Vector",
+   "measurementClass": "reference map",
+   "acquisition": {
+    "reference": "Post-event mapping, 2026",
+    "secondary": null
+   },
+   "vector": {
+    "url": "data/vectors/access-states-rasuwa-2026.geojson",
+    "type": "line",
+    "color": "#D9483B",
+    "opacity": 0.95,
+    "bounds": [
+     84.556508,
+     27.794728,
+     85.407896,
+     28.306441
+    ],
+    "colorProperty": "color",
+    "width": 3
+   },
+   "attribution": "\u00a9 OpenStreetMap contributors (ODbL), via HOT; bridge assessment by HOT volunteers",
    "legend": {
     "type": "categorical",
     "stops": [
-     "#5FE0C9",
-     "#F2C46B",
-     "#B07CFF",
-     "#6B7682",
-     "#2A3138"
+     "#D9483B",
+     "#E8B04A",
+     "#7FB8A8"
     ],
     "keys": [
      {
-      "color": "#5FE0C9",
-      "label": "Usable"
+      "color": "#D9483B",
+      "label": "Closed: mapped destroyed or reported washed out"
      },
      {
-      "color": "#F2C46B",
-      "label": "Seen, but not reliable"
+      "color": "#E8B04A",
+      "label": "Uncertain: reported damaged"
      },
      {
-      "color": "#B07CFF",
-      "label": "Hidden by terrain"
-     },
-     {
-      "color": "#6B7682",
-      "label": "No data in the product"
-     },
-     {
-      "color": "#2A3138",
-      "label": "Outside the frame checked"
+      "color": "#7FB8A8",
+      "label": "Open: reported intact"
      }
     ]
    },
-   "explanation": {
-    "what": "Could a surface change between these dates be seen here?",
-    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
-    "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
-    "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
-   },
    "limitations": [
-    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
-    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
-    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
-    "Products are Provisional."
-   ]
+    "Reports and mapping, not field verified here. Unmapped damage is not shown: a road with no report is Unknown, not open.",
+    "Bridge reports are points, matched to the nearest OSM bridge within 60 m; unmatched reports are listed in the access block."
+   ],
+   "productMaturity": "Community-maintained"
   },
   {
-   "id": "rasuwa-2026:observability-movement",
    "groupId": null,
-   "name": "Can the radar see it? (ground movement)",
-   "category": "gridded",
+   "category": "reference",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "prepared",
+   "statusReason": null,
+   "sources": [],
+   "units": null,
+   "kind": "vector",
+   "measurementType": "reference",
+   "crs": "EPSG:4326",
+   "sourceGranules": [],
+   "page": "https://data.humdata.org/dataset/hot_flood_npl",
+   "id": "rasuwa-2026:facilities",
+   "name": "Health facilities and helipads (OSM)",
+   "mission": "OpenStreetMap",
+   "instrument": "HOT export",
+   "productType": "Vector",
+   "measurementClass": "reference map",
+   "acquisition": {
+    "reference": "HOT export, 2026",
+    "secondary": null
+   },
+   "vector": {
+    "url": "data/vectors/facilities-rasuwa-2026.geojson",
+    "type": "circle",
+    "color": "#74c0fc",
+    "opacity": 0.95,
+    "radius": 4,
+    "bounds": [
+     84.589744,
+     27.801697,
+     85.376986,
+     28.280729
+    ]
+   },
+   "attribution": "\u00a9 OpenStreetMap contributors (ODbL), via HOT",
+   "limitations": [
+    "Only facilities mapped in OSM; small health posts may be missing."
+   ],
+   "productMaturity": "Community-maintained"
+  },
+  {
    "mission": "NISAR",
    "instrument": "L-SAR",
-   "productType": "Derived here",
-   "measurementClass": "derived",
-   "measurementType": "observability-movement",
-   "kind": "categorical",
-   "units": null,
-   "acquisition": {
-    "reference": "2026-08-16",
-    "secondary": "2026-08-28"
+   "productType": "GUNW",
+   "orbitDirection": "DESCENDING",
+   "crs": "EPSG:32645",
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "productMaturity": "Provisional (P05023)",
+   "postingM": [
+    80.0,
+    80.0
+   ],
+   "units": "1",
+   "kind": "continuous",
+   "stats": {
+    "count": 887822,
+    "min": 0.0069569917395710945,
+    "max": 0.9655233025550842,
+    "mean": 0.5219790935516357,
+    "median": 0.5364722609519958,
+    "p2": 0.13188140869140624,
+    "p98": 0.8531434381008147,
+    "displayMin": 0.0,
+    "displayMax": 1.0,
+    "histogram": {
+     "edges": [
+      0.0,
+      0.025,
+      0.05,
+      0.075,
+      0.1,
+      0.125,
+      0.15,
+      0.175,
+      0.2,
+      0.225,
+      0.25,
+      0.275,
+      0.3,
+      0.325,
+      0.35,
+      0.375,
+      0.4,
+      0.425,
+      0.45,
+      0.475,
+      0.5,
+      0.525,
+      0.55,
+      0.575,
+      0.6,
+      0.625,
+      0.65,
+      0.675,
+      0.7,
+      0.725,
+      0.75,
+      0.775,
+      0.8,
+      0.825,
+      0.85,
+      0.875,
+      0.9,
+      0.925,
+      0.95,
+      0.975,
+      1.0
+     ],
+     "counts": [
+      36,
+      576,
+      2378,
+      4970,
+      7390,
+      9377,
+      10807,
+      12438,
+      13854,
+      15935,
+      17871,
+      20175,
+      22654,
+      25434,
+      28344,
+      31181,
+      34475,
+      37286,
+      40473,
+      42147,
+      45221,
+      46348,
+      47389,
+      47389,
+      46636,
+      44868,
+      42083,
+      38636,
+      34498,
+      29688,
+      24313,
+      19176,
+      14238,
+      10711,
+      7617,
+      5404,
+      3740,
+      1842,
+      224,
+      0
+     ]
+    }
    },
-   "orbitDirection": "Descending",
+   "legend": {
+    "type": "continuous",
+    "stops": [
+     "#000004",
+     "#51127c",
+     "#b73779",
+     "#fc8961",
+     "#fcfdbf"
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "labels": null,
+    "unit": "1"
+   },
+   "id": "rasuwa-2026:coherence-timeline",
+   "groupId": null,
+   "name": "Coherence through time (Track 48, frame 74)",
+   "category": "gunw",
+   "measurementClass": "measurement",
+   "measurementType": "gunw-coherence",
    "track": 48,
    "frames": [
     74
    ],
-   "postingM": [
-    40
-   ],
-   "crs": "EPSG:32645",
    "qualityLayerIds": [],
    "status": "sampleable",
    "statusReason": null,
+   "sourceGranules": [
+    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_029_048_D_074_030_2000_SH_20260828T125812_20260828T125846_20260909T125811_20260909T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_030_048_D_074_031_2000_SH_20260909T125811_20260909T125846_20260921T125811_20260921T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001"
+   ],
+   "acquisition": {
+    "reference": "2026-07-23",
+    "secondary": "2026-10-03"
+   },
    "sources": [
     {
      "frame": 74,
-     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
-     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
-     "sourceDataset": "reason flags (see observability block)",
+     "granule": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001.h5",
+     "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+     "sha256": "2f7b50e7029651cbb96ba58eb4a6c89e8a75106f81abddc2b3a1590f8f609e13",
      "bounds": [
-      84.38262429509216,
-      27.714795075127526,
+      84.53594788265075,
+      27.717578024937264,
       85.55941176995117,
-      28.367440328151478
+      28.367079371567687
      ],
-     "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
+     "shape": [
+      880,
+      1244
+     ],
+     "validFraction": 0.5108192049108448,
+     "maskedFraction": 0.056092882198187664,
+     "sourceDtype": "float32",
+     "clipWindow": [
+      2616,
+      3496,
+      0,
+      1244
+     ],
+     "displayOffset": 0.0,
+     "sampling": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f074.tif",
+     "validity": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f074_validity.tif",
      "tiles": {
-      "url": "data/tiles/rasuwa-2026/observability-movement/{z}/{x}/{y}.png",
+      "url": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f074/{z}/{x}/{y}.png",
       "minzoom": 8,
-      "maxzoom": 12,
-      "count": 179
-     }
+      "maxzoom": 11,
+      "count": 67
+     },
+     "maskTiles": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
     }
    ],
-   "sourceGranules": [
-    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
-    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001"
+   "timeSteps": [
+    {
+     "label": "2026-07-23/2026-08-16",
+     "sources": [
+      {
+       "frame": 74,
+       "granule": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "2f7b50e7029651cbb96ba58eb4a6c89e8a75106f81abddc2b3a1590f8f609e13",
+       "bounds": [
+        84.53594788265075,
+        27.717578024937264,
+        85.55941176995117,
+        28.367079371567687
+       ],
+       "shape": [
+        880,
+        1244
+       ],
+       "validFraction": 0.5108192049108448,
+       "maskedFraction": 0.056092882198187664,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        2616,
+        3496,
+        0,
+        1244
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f074.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f074_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f074/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 67
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      }
+     ]
+    },
+    {
+     "label": "2026-08-16/2026-08-28",
+     "sources": [
+      {
+       "frame": 74,
+       "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "aa18c396262052814a9901275cd88aee8a99c4425c83be3168aa4b6e24d5568a",
+       "bounds": [
+        84.53594788265075,
+        27.717578024937264,
+        85.55941176995117,
+        28.367079371567687
+       ],
+       "shape": [
+        880,
+        1244
+       ],
+       "validFraction": 0.43270699356913184,
+       "maskedFraction": 0.13445812627886583,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        2616,
+        3496,
+        0,
+        1244
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260816/gunw-coherence_f074.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260816/gunw-coherence_f074_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260816/gunw-coherence/f074/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 70
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260816/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      }
+     ]
+    },
+    {
+     "label": "2026-08-28/2026-09-09",
+     "sources": [
+      {
+       "frame": 74,
+       "granule": "NISAR_L2_PR_GUNW_029_048_D_074_030_2000_SH_20260828T125812_20260828T125846_20260909T125811_20260909T125846_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_029_048_D_074_030_2000_SH_20260828T125812_20260828T125846_20260909T125811_20260909T125846_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "1eb6ce1fe7d78cd5cf316df01810d8296b05801ee4d64691ddc4832befcb7094",
+       "bounds": [
+        84.53594788265075,
+        27.717578024937264,
+        85.55941176995117,
+        28.367079371567687
+       ],
+       "shape": [
+        880,
+        1244
+       ],
+       "validFraction": 0.42477528500438466,
+       "maskedFraction": 0.15358539169833382,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        2616,
+        3496,
+        0,
+        1244
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260828/gunw-coherence_f074.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260828/gunw-coherence_f074_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260828/gunw-coherence/f074/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 70
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260828/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      }
+     ]
+    },
+    {
+     "label": "2026-09-09/2026-09-21",
+     "sources": [
+      {
+       "frame": 74,
+       "granule": "NISAR_L2_PR_GUNW_030_048_D_074_031_2000_SH_20260909T125811_20260909T125846_20260921T125811_20260921T125846_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_030_048_D_074_031_2000_SH_20260909T125811_20260909T125846_20260921T125811_20260921T125846_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "41d5cdce4af955bb0d074db5c85cee7813aa6bb2ccdac09f05493ee969ca5557",
+       "bounds": [
+        84.53594788265075,
+        27.717578024937264,
+        85.55941176995117,
+        28.367079371567687
+       ],
+       "shape": [
+        880,
+        1244
+       ],
+       "validFraction": 0.4579298816135633,
+       "maskedFraction": 0.14267027185033615,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        2616,
+        3496,
+        0,
+        1244
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260909/gunw-coherence_f074.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260909/gunw-coherence_f074_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260909/gunw-coherence/f074/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 73
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260909/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      }
+     ]
+    },
+    {
+     "label": "2026-09-21/2026-10-03",
+     "sources": [
+      {
+       "frame": 74,
+       "granule": "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "eb4eb89977525b7d2d0e3bf5adf70d4a3ebf7e9d0845785640c6986a5ffa021a",
+       "bounds": [
+        84.53594788265075,
+        27.717578024937264,
+        85.55941176995117,
+        28.367079371567687
+       ],
+       "shape": [
+        880,
+        1244
+       ],
+       "validFraction": 0.4144137313650979,
+       "maskedFraction": 0.14968850482315113,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        2616,
+        3496,
+        0,
+        1244
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260921/gunw-coherence_f074.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260921/gunw-coherence_f074_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260921/gunw-coherence/f074/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 70
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260921/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      }
+     ]
+    }
    ],
-   "productMaturity": "Derived from Provisional products",
-   "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
-   "legend": {
-    "type": "categorical",
-    "stops": [
-     "#5FE0C9",
-     "#F2C46B",
-     "#B07CFF",
-     "#6B7682",
-     "#2A3138"
-    ],
-    "keys": [
-     {
-      "color": "#5FE0C9",
-      "label": "Usable"
-     },
-     {
-      "color": "#F2C46B",
-      "label": "Seen, but not reliable"
-     },
-     {
-      "color": "#B07CFF",
-      "label": "Hidden by terrain"
-     },
-     {
-      "color": "#6B7682",
-      "label": "No data in the product"
-     },
-     {
-      "color": "#2A3138",
-      "label": "Outside the frame checked"
-     }
-    ]
-   },
    "explanation": {
-    "what": "Could ground movement be measured here?",
-    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
-    "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
-    "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
+    "what": "Coherence of every catalogued Track 48 frame 74 pair, one time step per pair, from 2026-07-23 to 2026-10-03.",
+    "measures": "How alike the radar echoes stayed between the two dates of each pair, 0 to 1, on the unwrapped grid, with the product's own mask applied.",
+    "inspect": "Click a spot and open the Inspector: the chart shows that spot in each pair. Play the steps under Simulate, Time replay.",
+    "establishes": "Whether a spot stayed coherent before, across and after the event. It does not say what changed, or measure movement."
    },
    "limitations": [
-    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
-    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
-    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
-    "Products are Provisional."
+    "Pairs are not alike: lengths 12, 24 days and radar modes 2000, 4000 in the file names. Longer pairs and different modes lower coherence by themselves.",
+    "One value per pair, nothing interpolated between pairs.",
+    "Provisional data."
    ]
   },
   {
@@ -5404,118 +5725,224 @@
    ]
   },
   {
+   "id": "rasuwa-2026:observability-disturbance",
    "groupId": null,
-   "category": "reference",
-   "orbitDirection": null,
-   "track": null,
-   "frames": [],
-   "qualityLayerIds": [],
-   "status": "prepared",
-   "statusReason": null,
-   "sources": [],
+   "name": "Can the radar see it? (surface change)",
+   "category": "gridded",
+   "mission": "NISAR",
+   "instrument": "L-SAR",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "observability-disturbance",
+   "kind": "categorical",
    "units": null,
-   "kind": "vector",
-   "measurementType": "reference",
-   "crs": "EPSG:4326",
-   "sourceGranules": [],
-   "page": "https://data.humdata.org/dataset/hot_flood_npl",
-   "id": "rasuwa-2026:road-states",
-   "name": "Road and bridge states (reported)",
-   "mission": "OpenStreetMap",
-   "instrument": "HOT export and HOT bridge damage assessment",
-   "productType": "Vector",
-   "measurementClass": "reference map",
    "acquisition": {
-    "reference": "Post-event mapping, 2026",
-    "secondary": null
+    "reference": "2026-08-16",
+    "secondary": "2026-08-28"
    },
-   "vector": {
-    "url": "data/vectors/access-states-rasuwa-2026.geojson",
-    "type": "line",
-    "color": "#D9483B",
-    "opacity": 0.95,
-    "bounds": [
-     84.556508,
-     27.794728,
-     85.407896,
-     28.306441
-    ],
-    "colorProperty": "color",
-    "width": 3
-   },
-   "attribution": "\u00a9 OpenStreetMap contributors (ODbL), via HOT; bridge assessment by HOT volunteers",
+   "orbitDirection": "Descending",
+   "track": 48,
+   "frames": [
+    74,
+    75
+   ],
+   "postingM": [
+    40
+   ],
+   "crs": "EPSG:32645",
+   "qualityLayerIds": [],
+   "status": "sampleable",
+   "statusReason": null,
+   "sources": [
+    {
+     "frame": 74,
+     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
+     "sourceDataset": "reason flags (see observability block)",
+     "bounds": [
+      84.382624295,
+      27.714795075,
+      85.55941177,
+      28.367440328
+     ],
+     "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026/observability-disturbance/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 12,
+      "count": 179
+     }
+    }
+   ],
+   "sourceGranules": [
+    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_028_048_D_075_029_2000_SH_20260816T125845_20260816T125920_20260828T125845_20260828T125920_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001"
+   ],
+   "productMaturity": "Derived from Provisional products",
+   "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
    "legend": {
     "type": "categorical",
     "stops": [
-     "#D9483B",
-     "#E8B04A",
-     "#7FB8A8"
+     "#5FE0C9",
+     "#F2C46B",
+     "#B07CFF",
+     "#6B7682",
+     "#2A3138",
+     "#A39B8B"
     ],
     "keys": [
      {
-      "color": "#D9483B",
-      "label": "Closed: mapped destroyed or reported washed out"
+      "color": "#5FE0C9",
+      "label": "Usable"
      },
      {
-      "color": "#E8B04A",
-      "label": "Uncertain: reported damaged"
+      "color": "#F2C46B",
+      "label": "Seen, but not reliable"
      },
      {
-      "color": "#7FB8A8",
-      "label": "Open: reported intact"
+      "color": "#B07CFF",
+      "label": "Hidden by terrain"
+     },
+     {
+      "color": "#6B7682",
+      "label": "No valid data in the product"
+     },
+     {
+      "color": "#2A3138",
+      "label": "Outside the frame checked"
+     },
+     {
+      "color": "#A39B8B",
+      "label": "Not assessed"
      }
     ]
    },
+   "explanation": {
+    "what": "Could a surface change between these dates be seen here?",
+    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present and unflagged by the product's own mask or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality. Missing inputs are marked Not assessed, never Usable.",
+    "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
+    "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
+   },
    "limitations": [
-    "Reports and mapping, not field verified here. Unmapped damage is not shown: a road with no report is Unknown, not open.",
-    "Bridge reports are points, matched to the nearest OSM bridge within 60 m; unmatched reports are listed in the access block."
-   ],
-   "productMaturity": "Community-maintained"
+    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
+    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+    "Coherence comes from the 80 m product, so features narrower than about 80 m are mixed with their surroundings.",
+    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+    "An exact zero in unwrapped phase is treated as unwrapping fill. A component's own reference pixel can be exactly zero, so at most one real pixel per component may be lost.",
+    "Products are Provisional."
+   ]
   },
   {
+   "id": "rasuwa-2026:observability-movement",
    "groupId": null,
-   "category": "reference",
-   "orbitDirection": null,
-   "track": null,
-   "frames": [],
-   "qualityLayerIds": [],
-   "status": "prepared",
-   "statusReason": null,
-   "sources": [],
+   "name": "Can the radar see it? (ground movement)",
+   "category": "gridded",
+   "mission": "NISAR",
+   "instrument": "L-SAR",
+   "productType": "Derived here",
+   "measurementClass": "derived",
+   "measurementType": "observability-movement",
+   "kind": "categorical",
    "units": null,
-   "kind": "vector",
-   "measurementType": "reference",
-   "crs": "EPSG:4326",
-   "sourceGranules": [],
-   "page": "https://data.humdata.org/dataset/hot_flood_npl",
-   "id": "rasuwa-2026:facilities",
-   "name": "Health facilities and helipads (OSM)",
-   "mission": "OpenStreetMap",
-   "instrument": "HOT export",
-   "productType": "Vector",
-   "measurementClass": "reference map",
    "acquisition": {
-    "reference": "HOT export, 2026",
-    "secondary": null
+    "reference": "2026-08-16",
+    "secondary": "2026-08-28"
    },
-   "vector": {
-    "url": "data/vectors/facilities-rasuwa-2026.geojson",
-    "type": "circle",
-    "color": "#74c0fc",
-    "opacity": 0.95,
-    "radius": 4,
-    "bounds": [
-     84.589744,
-     27.801697,
-     85.376986,
-     28.280729
+   "orbitDirection": "Descending",
+   "track": 48,
+   "frames": [
+    74,
+    75
+   ],
+   "postingM": [
+    40
+   ],
+   "crs": "EPSG:32645",
+   "qualityLayerIds": [],
+   "status": "sampleable",
+   "statusReason": null,
+   "sources": [
+    {
+     "frame": 74,
+     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
+     "sourceDataset": "reason flags (see observability block)",
+     "bounds": [
+      84.382624295,
+      27.714795075,
+      85.55941177,
+      28.367440328
+     ],
+     "sampling": "data/sampling/rasuwa-2026/observability-flags.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026/observability-movement/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 12,
+      "count": 179
+     }
+    }
+   ],
+   "sourceGranules": [
+    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_028_048_D_075_029_2000_SH_20260816T125845_20260816T125920_20260828T125845_20260828T125920_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001"
+   ],
+   "productMaturity": "Derived from Provisional products",
+   "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#5FE0C9",
+     "#F2C46B",
+     "#B07CFF",
+     "#6B7682",
+     "#2A3138",
+     "#A39B8B"
+    ],
+    "keys": [
+     {
+      "color": "#5FE0C9",
+      "label": "Usable"
+     },
+     {
+      "color": "#F2C46B",
+      "label": "Seen, but not reliable"
+     },
+     {
+      "color": "#B07CFF",
+      "label": "Hidden by terrain"
+     },
+     {
+      "color": "#6B7682",
+      "label": "No valid data in the product"
+     },
+     {
+      "color": "#2A3138",
+      "label": "Outside the frame checked"
+     },
+     {
+      "color": "#A39B8B",
+      "label": "Not assessed"
+     }
     ]
    },
-   "attribution": "\u00a9 OpenStreetMap contributors (ODbL), via HOT",
+   "explanation": {
+    "what": "Could ground movement be measured here?",
+    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present and unflagged by the product's own mask or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality. Missing inputs are marked Not assessed, never Usable.",
+    "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
+    "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
+   },
    "limitations": [
-    "Only facilities mapped in OSM; small health posts may be missing."
-   ],
-   "productMaturity": "Community-maintained"
+    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
+    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+    "Coherence comes from the 80 m product, so features narrower than about 80 m are mixed with their surroundings.",
+    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+    "An exact zero in unwrapped phase is treated as unwrapping fill. A component's own reference pixel can be exactly zero, so at most one real pixel per component may be lost.",
+    "Products are Provisional."
+   ]
   }
  ],
  "granules": [
@@ -5910,91 +6337,6 @@
    "status": "catalogued"
   }
  ],
- "controlSeries": {
-  "zone": "UNOSAT mudflow extent",
-  "control": "ground 300 to 1500 m outside the extent",
-  "track": 48,
-  "frame": 74,
-  "direction": "DESCENDING",
-  "eventDate": "2026-08-26",
-  "pairs": [
-   {
-    "pair": [
-     "2026-07-23",
-     "2026-08-16"
-    ],
-    "days": 24,
-    "inside": 0.407,
-    "outside": 0.425,
-    "insideCi95": [
-     0.399,
-     0.414
-    ],
-    "validPct": 55.8,
-    "granule": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001"
-   },
-   {
-    "pair": [
-     "2026-08-16",
-     "2026-08-28"
-    ],
-    "days": 12,
-    "inside": 0.276,
-    "outside": 0.517,
-    "insideCi95": [
-     0.272,
-     0.28
-    ],
-    "validPct": 55.8,
-    "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001"
-   },
-   {
-    "pair": [
-     "2026-08-28",
-     "2026-09-09"
-    ],
-    "days": 12,
-    "inside": 0.33,
-    "outside": 0.555,
-    "insideCi95": [
-     0.325,
-     0.336
-    ],
-    "validPct": 58.7,
-    "granule": "NISAR_L2_PR_GUNW_029_048_D_074_030_2000_SH_20260828T125812_20260828T125846_20260909T125811_20260909T125846_P05023_N_F_J_001"
-   },
-   {
-    "pair": [
-     "2026-09-09",
-     "2026-09-21"
-    ],
-    "days": 12,
-    "inside": 0.421,
-    "outside": 0.548,
-    "insideCi95": [
-     0.413,
-     0.428
-    ],
-    "validPct": 60.3,
-    "granule": "NISAR_L2_PR_GUNW_030_048_D_074_031_2000_SH_20260909T125811_20260909T125846_20260921T125811_20260921T125846_P05023_N_F_J_001"
-   },
-   {
-    "pair": [
-     "2026-09-21",
-     "2026-10-03"
-    ],
-    "days": 12,
-    "inside": 0.435,
-    "outside": 0.534,
-    "insideCi95": [
-     0.428,
-     0.443
-    ],
-    "validPct": 57.3,
-    "granule": "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001"
-   }
-  ]
- },
  "observability": {
   "pair": [
    "2026-08-16",
@@ -6012,6 +6354,15 @@
   "look": "Left",
   "compositeReleaseId": "P05023",
   "productVersion": "1.0.11",
+  "methodVersion": 2,
+  "datasets": {
+   "coh": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+   "cc": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/connectedComponents",
+   "phase": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/unwrappedPhase",
+   "mask": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/mask"
+  },
+  "ccFillValue": 65535,
+  "geometryNotAssessedPct": 3.38,
   "incidenceDeg5to95": [
    32.3,
    38.2
@@ -6029,7 +6380,10 @@
    "shadow": 8,
    "lowCoherence": 16,
    "noConnectedComponent": 32,
-   "lowBaselineCoherence": 64
+   "lowBaselineCoherence": 64,
+   "productMasked": 128,
+   "geometryNotAssessed": 256,
+   "baselineNoData": 512
   },
   "classes": {
    "disturbance": [
@@ -6053,15 +6407,21 @@
     },
     {
      "code": 4,
-     "label": "No data in the product",
+     "label": "No valid data in the product",
      "color": "#6B7682",
-     "meaning": "Inside the frame, but the product holds no value here."
+     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."
     },
     {
      "code": 5,
      "label": "Outside the frame checked",
      "color": "#2A3138",
      "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."
+    },
+    {
+     "code": 6,
+     "label": "Not assessed",
+     "color": "#A39B8B",
+     "meaning": "An input needed for this check is missing or invalid here (terrain geometry, or the baseline pair). No conclusion."
     }
    ],
    "movement": [
@@ -6069,13 +6429,13 @@
      "code": 1,
      "label": "Usable",
      "color": "#5FE0C9",
-     "meaning": "Phase is coherent and unwrapped, so ground movement could be measured here."
+     "meaning": "Phase is coherent and reliably unwrapped, so ground movement could be measured here. Nothing has been measured yet."
     },
     {
      "code": 2,
      "label": "Seen, but not reliable",
      "color": "#F2C46B",
-     "meaning": "Phase is too noisy (low coherence) or was not unwrapped here, so no movement value can be trusted."
+     "meaning": "Phase is too noisy (low coherence) or was not reliably unwrapped here, so no movement value can be trusted."
     },
     {
      "code": 3,
@@ -6085,15 +6445,21 @@
     },
     {
      "code": 4,
-     "label": "No data in the product",
+     "label": "No valid data in the product",
      "color": "#6B7682",
-     "meaning": "Inside the frame, but the product holds no value here."
+     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."
     },
     {
      "code": 5,
      "label": "Outside the frame checked",
      "color": "#2A3138",
      "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."
+    },
+    {
+     "code": 6,
+     "label": "Not assessed",
+     "color": "#A39B8B",
+     "meaning": "The terrain geometry needed for this check is missing or invalid here. No conclusion."
     }
    ]
   },
@@ -6109,17 +6475,27 @@
    "shadow": {
     "value": "range slope away from the radar > 90 deg - incidence angle",
     "provenance": "Standard SAR geometry (active radar shadow)."
+   },
+   "coherenceProduct": {
+    "value": "unwrappedInterferogram coherenceMagnitude, 80 m, sampled nearest onto the 40 m grid",
+    "provenance": "The coherence that belongs to the unwrapped phase and shares its mask; the same layer the app shows."
    }
   },
-  "sensitivityUsableMovementPct": {
-   "0.2": 95.0,
-   "0.3": 82.4,
-   "0.4": 67.2
+  "sensitivity": {
+   "movementUsablePct": {
+    "0.2": 61.2,
+    "0.3": 57.1,
+    "0.4": 49.3
+   },
+   "denominator": "All analysis cells inside the frame footprint, over the whole case area.",
+   "rule": "The same rule as the movement class, with only the coherence threshold changed."
   },
   "limitations": [
    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+   "Coherence comes from the 80 m product, so features narrower than about 80 m are mixed with their surroundings.",
    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+   "An exact zero in unwrapped phase is treated as unwrapping fill. A component's own reference pixel can be exactly zero, so at most one real pixel per component may be lost.",
    "Products are Provisional."
   ],
   "zones": {
@@ -6128,24 +6504,26 @@
      "name": "Mountain source area",
      "pixels": 79881,
      "percent": {
-      "Usable": 68.5,
-      "Seen, but not reliable": 21.5,
-      "Hidden by terrain": 10.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "Usable": 21.9,
+      "Seen, but not reliable": 9.5,
+      "Hidden by terrain": 3.6,
+      "No valid data in the product": 58.2,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 6.7
      },
-     "verdict": "Enough evidence",
+     "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "bookmark:bhote-koshi": {
      "name": "Bhote Koshi corridor",
      "pixels": 79843,
      "percent": {
-      "Usable": 70.0,
-      "Seen, but not reliable": 21.2,
+      "Usable": 64.0,
+      "Seen, but not reliable": 27.2,
       "Hidden by terrain": 8.8,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 0.0,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -6154,24 +6532,26 @@
      "name": "Trishuli downstream corridor",
      "pixels": 1479716,
      "percent": {
-      "Usable": 3.4,
-      "Seen, but not reliable": 1.2,
-      "Hidden by terrain": 0.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 95.3
+      "Usable": 49.7,
+      "Seen, but not reliable": 10.9,
+      "Hidden by terrain": 0.9,
+      "No valid data in the product": 17.8,
+      "Outside the frame checked": 18.3,
+      "Not assessed": 2.3
      },
-     "verdict": "Insufficient evidence",
+     "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "vector:unosat_mudflow_extent.geojson": {
      "name": "unosat_mudflow_extent",
      "pixels": 36940,
      "percent": {
-      "Usable": 33.6,
-      "Seen, but not reliable": 11.6,
-      "Hidden by terrain": 2.9,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 52.0
+      "Usable": 29.7,
+      "Seen, but not reliable": 24.5,
+      "Hidden by terrain": 2.0,
+      "No valid data in the product": 29.9,
+      "Outside the frame checked": 14.0,
+      "Not assessed": 0.0
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -6180,24 +6560,26 @@
      "name": "unosat_detachment_zone",
      "pixels": 1219,
      "percent": {
-      "Usable": 66.4,
-      "Seen, but not reliable": 20.6,
-      "Hidden by terrain": 13.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "Usable": 0.0,
+      "Seen, but not reliable": 0.0,
+      "Hidden by terrain": 0.0,
+      "No valid data in the product": 100.0,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
-     "verdict": "Enough evidence",
+     "verdict": "Insufficient evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "_case": {
      "name": "Whole case area",
      "pixels": 5043504,
      "percent": {
-      "Usable": 38.8,
-      "Seen, but not reliable": 7.2,
-      "Hidden by terrain": 3.2,
-      "No data in the product": 0.1,
-      "Outside the frame checked": 50.7
+      "Usable": 44.0,
+      "Seen, but not reliable": 11.2,
+      "Hidden by terrain": 2.8,
+      "No valid data in the product": 20.4,
+      "Outside the frame checked": 19.3,
+      "Not assessed": 2.3
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -6208,24 +6590,26 @@
      "name": "Mountain source area",
      "pixels": 79881,
      "percent": {
-      "Usable": 25.3,
-      "Seen, but not reliable": 64.8,
-      "Hidden by terrain": 10.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "Usable": 19.5,
+      "Seen, but not reliable": 12.0,
+      "Hidden by terrain": 3.6,
+      "No valid data in the product": 58.2,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 6.7
      },
-     "verdict": "Partial evidence",
+     "verdict": "Insufficient evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "bookmark:bhote-koshi": {
      "name": "Bhote Koshi corridor",
      "pixels": 79843,
      "percent": {
-      "Usable": 75.8,
-      "Seen, but not reliable": 15.4,
+      "Usable": 72.5,
+      "Seen, but not reliable": 18.7,
       "Hidden by terrain": 8.8,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 0.0,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -6234,24 +6618,26 @@
      "name": "Trishuli downstream corridor",
      "pixels": 1479716,
      "percent": {
-      "Usable": 3.9,
-      "Seen, but not reliable": 0.8,
-      "Hidden by terrain": 0.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 95.3
+      "Usable": 56.5,
+      "Seen, but not reliable": 4.3,
+      "Hidden by terrain": 0.9,
+      "No valid data in the product": 17.8,
+      "Outside the frame checked": 18.3,
+      "Not assessed": 2.2
      },
-     "verdict": "Insufficient evidence",
+     "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "vector:unosat_mudflow_extent.geojson": {
      "name": "unosat_mudflow_extent",
      "pixels": 36940,
      "percent": {
-      "Usable": 9.0,
-      "Seen, but not reliable": 36.1,
-      "Hidden by terrain": 2.9,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 52.0
+      "Usable": 11.8,
+      "Seen, but not reliable": 42.4,
+      "Hidden by terrain": 2.0,
+      "No valid data in the product": 29.9,
+      "Outside the frame checked": 14.0,
+      "Not assessed": 0.0
      },
      "verdict": "Insufficient evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -6261,10 +6647,11 @@
      "pixels": 1219,
      "percent": {
       "Usable": 0.0,
-      "Seen, but not reliable": 87.0,
-      "Hidden by terrain": 13.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "Seen, but not reliable": 0.0,
+      "Hidden by terrain": 0.0,
+      "No valid data in the product": 100.0,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Insufficient evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -6273,17 +6660,223 @@
      "name": "Whole case area",
      "pixels": 5043504,
      "percent": {
-      "Usable": 30.0,
-      "Seen, but not reliable": 16.0,
-      "Hidden by terrain": 3.2,
-      "No data in the product": 0.1,
-      "Outside the frame checked": 50.7
+      "Usable": 48.1,
+      "Seen, but not reliable": 7.2,
+      "Hidden by terrain": 2.8,
+      "No valid data in the product": 20.4,
+      "Outside the frame checked": 19.3,
+      "Not assessed": 2.2
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     }
    }
-  }
+  },
+  "frames": [
+   {
+    "frame": 74,
+    "pair": [
+     "2026-08-16",
+     "2026-08-28"
+    ],
+    "baselinePair": [
+     "2026-07-23",
+     "2026-08-16"
+    ],
+    "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "baselineGranule": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+    "incidenceDeg5to95": [
+     32.3,
+     38.2
+    ],
+    "sensitivity": {
+     "movementUsablePct": {
+      "0.2": 61.2,
+      "0.3": 57.1,
+      "0.4": 49.3
+     },
+     "denominator": "All analysis cells inside the frame footprint, over the whole case area.",
+     "rule": "The same rule as the movement class, with only the coherence threshold changed."
+    },
+    "cells": 2485353
+   },
+   {
+    "frame": 75,
+    "pair": [
+     "2026-08-16",
+     "2026-08-28"
+    ],
+    "baselinePair": [
+     "2026-07-23",
+     "2026-08-16"
+    ],
+    "granule": "NISAR_L2_PR_GUNW_028_048_D_075_029_2000_SH_20260816T125845_20260816T125920_20260828T125845_20260828T125920_P05023_N_F_J_001",
+    "baselineGranule": "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001",
+    "incidenceDeg5to95": [
+     32.1,
+     38.2
+    ],
+    "sensitivity": {
+     "movementUsablePct": {
+      "0.2": 63.6,
+      "0.3": 60.6,
+      "0.4": 53.6
+     },
+     "denominator": "All analysis cells inside the frame footprint, over the whole case area.",
+     "rule": "The same rule as the movement class, with only the coherence threshold changed."
+    },
+    "cells": 1584616
+   }
+  ]
+ },
+ "controlSeries": {
+  "zone": "UNOSAT mudflow extent",
+  "control": "ground 300 to 1500 m outside the extent",
+  "track": 48,
+  "frame": 74,
+  "direction": "DESCENDING",
+  "eventDate": "2026-08-26",
+  "methodVersion": 2,
+  "coherenceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude, product mask applied",
+  "ciMethod": "Spatial block bootstrap of the median: 1000 m blocks, 1000 resamples, seed 0",
+  "generator": "processing/scripts/prepare_control_series.py",
+  "pairs": [
+   {
+    "pair": [
+     "2026-07-23",
+     "2026-08-16"
+    ],
+    "days": 24,
+    "inside": 0.375,
+    "insideCi95": [
+     0.352,
+     0.4
+    ],
+    "insideValidPct": 54.7,
+    "outside": 0.403,
+    "outsideCi95": [
+     0.389,
+     0.414
+    ],
+    "outsideValidPct": 44.1,
+    "validPct": 54.7,
+    "granule": "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+    "mode": "4000",
+    "rangeBandwidthHz": 40000000.0,
+    "postingM": 80.0,
+    "track": 48,
+    "frame": 74,
+    "direction": "Descending"
+   },
+   {
+    "pair": [
+     "2026-08-16",
+     "2026-08-28"
+    ],
+    "days": 12,
+    "inside": 0.193,
+    "insideCi95": [
+     0.172,
+     0.217
+    ],
+    "insideValidPct": 36.5,
+    "outside": 0.5,
+    "outsideCi95": [
+     0.485,
+     0.513
+    ],
+    "outsideValidPct": 39.7,
+    "validPct": 36.5,
+    "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "mode": "2000",
+    "rangeBandwidthHz": 20000000.0,
+    "postingM": 80.0,
+    "track": 48,
+    "frame": 74,
+    "direction": "Descending"
+   },
+   {
+    "pair": [
+     "2026-08-28",
+     "2026-09-09"
+    ],
+    "days": 12,
+    "inside": 0.315,
+    "insideCi95": [
+     0.297,
+     0.336
+    ],
+    "insideValidPct": 39.6,
+    "outside": 0.55,
+    "outsideCi95": [
+     0.533,
+     0.564
+    ],
+    "outsideValidPct": 43.4,
+    "validPct": 39.6,
+    "granule": "NISAR_L2_PR_GUNW_029_048_D_074_030_2000_SH_20260828T125812_20260828T125846_20260909T125811_20260909T125846_P05023_N_F_J_001",
+    "mode": "2000",
+    "rangeBandwidthHz": 20000000.0,
+    "postingM": 80.0,
+    "track": 48,
+    "frame": 74,
+    "direction": "Descending"
+   },
+   {
+    "pair": [
+     "2026-09-09",
+     "2026-09-21"
+    ],
+    "days": 12,
+    "inside": 0.434,
+    "insideCi95": [
+     0.413,
+     0.455
+    ],
+    "insideValidPct": 41.5,
+    "outside": 0.545,
+    "outsideCi95": [
+     0.532,
+     0.557
+    ],
+    "outsideValidPct": 44.6,
+    "validPct": 41.5,
+    "granule": "NISAR_L2_PR_GUNW_030_048_D_074_031_2000_SH_20260909T125811_20260909T125846_20260921T125811_20260921T125846_P05023_N_F_J_001",
+    "mode": "2000",
+    "rangeBandwidthHz": 20000000.0,
+    "postingM": 80.0,
+    "track": 48,
+    "frame": 74,
+    "direction": "Descending"
+   },
+   {
+    "pair": [
+     "2026-09-21",
+     "2026-10-03"
+    ],
+    "days": 12,
+    "inside": 0.456,
+    "insideCi95": [
+     0.438,
+     0.473
+    ],
+    "insideValidPct": 38.3,
+    "outside": 0.537,
+    "outsideCi95": [
+     0.521,
+     0.552
+    ],
+    "outsideValidPct": 41.2,
+    "validPct": 38.3,
+    "granule": "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001",
+    "mode": "2000",
+    "rangeBandwidthHz": 20000000.0,
+    "postingM": 80.0,
+    "track": 48,
+    "frame": 74,
+    "direction": "Descending"
+   }
+  ]
  },
  "hazards": {
   "terrain": {
@@ -6397,15 +6990,15 @@
    "kmByExposure": {
     "High": {
      "km": 73.3,
-     "unwatchedKm": 32.7
+     "unwatchedKm": 13.1
     },
     "Low": {
      "km": 32.5,
-     "unwatchedKm": 31.5
+     "unwatchedKm": 3.2
     },
     "Moderate": {
      "km": 47.6,
-     "unwatchedKm": 44.8
+     "unwatchedKm": 11.9
     }
    },
    "rules": {

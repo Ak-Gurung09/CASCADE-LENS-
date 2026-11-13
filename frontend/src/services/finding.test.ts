@@ -16,7 +16,7 @@ describe('first-minute finding', () => {
     expect(text).toContain(co.inside.toFixed(2))
     expect(text).toContain(co.outside.toFixed(2))
     expect(f.points).toHaveLength(3)
-    expect(text).toMatch(/beyond this radar frame/)
+    expect(text).toMatch(/beyond the radar frames checked \(74 and 75\)/)
   })
   it('follows the data rather than fixed numbers', () => {
     const m = shipped()

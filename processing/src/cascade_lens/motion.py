@@ -122,7 +122,7 @@ def dam_test(path: pathlib.Path, dam: tuple[float, float]) -> dict:
     if mask is None:
         return {"ok": False, "reason": "The product has no unwrappedInterferogram mask, so pixel validity cannot be checked."}
     md = quality.decode_gunw_mask(mask)
-    usable = (~(md["fill"] | md["water"] | md["invalid_subswath"]) & np.isfinite(ph) & ~quality.zero_filled_phase(raw_phase)
+    usable = (~(md["fill"] | md["unusable"]) & np.isfinite(ph) & ~quality.zero_filled_phase(raw_phase)
               & ~quality.unreliable_component(cc, cc_fill))
     d = np.hypot(X - dam[0], Y - dam[1])
     on_dam = usable & (d < DAM_RADIUS_M) & (coh > DAM_COH_MIN)
@@ -159,7 +159,7 @@ def glacier_test(path: pathlib.Path, dam: tuple[float, float], far: tuple[float,
     ok = np.ones(rng.shape, bool)
     if mask is not None:
         md = quality.decode_gunw_mask(mask)
-        ok = ~(md["fill"] | md["water"] | md["invalid_subswath"])
+        ok = ~(md["fill"] | md["unusable"])
     dd, dfar = np.hypot(X - dam[0], Y - dam[1]), np.hypot(X - far[0], Y - far[1])
     glacier = ok & (dfar < GLACIER_RADIUS_M) & (dd > length + 300) & (snr > GOFF_SNR_MIN)
     ref = ok & (dd > REF_RING_M[0]) & (dd < REF_RING_M[1]) & (dfar > length) & (snr > GOFF_SNR_MIN)
@@ -212,7 +212,10 @@ def add_coherence_layer(m: dict, cfg: dict, folders: list[pathlib.Path], public:
         Image.fromarray(export.colorize(shown, COH_STOPS, 0.0, 1.0)[..., :3], "RGB").save(out, quality=90)
         terrain["drapeCoherence"] = rel(out)
     m["lake"]["coherence"] = {"pair": [t1, t2], "granule": p.stem, "sourceDataset": dataset, "maskApplied": validity is not None,
-                              "lake": round(float(np.nanmedian(shown[lake])), 2), "land": round(float(np.nanmedian(shown[~lake])), 2)}
+                              "lake": round(float(np.nanmedian(shown[lake])), 2), "land": round(float(np.nanmedian(shown[~lake])), 2),
+                              # How much of each the median rests on: the product's water mask usually covers most of a lake
+                              "lakeValidPct": None if validity is None else round(100 * float((validity[lake] == quality.VALID).mean()), 1),
+                              "landValidPct": None if validity is None else round(100 * float((validity[~lake] == quality.VALID).mean()), 1)}
     hh = next(l for l in m["layers"] if l["id"] == f"{case}:hh")
     limits = ["Provisional data.", "Steep slopes facing away from the radar are dark because of radar shadow, not change.",
               "Twelve days in the monsoon: wet snow and rain lower coherence even on stable ground.",

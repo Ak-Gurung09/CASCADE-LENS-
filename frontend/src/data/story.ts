@@ -1,7 +1,7 @@
 import type { Manifest } from '../types/manifest'
 import { isUsable } from '../services/manifest'
 import { comparability } from '../services/finding'
-import { observabilityCurrent, STALE_NOTE } from '../services/observability'
+import { beyondFrames, observabilityCurrent, STALE_NOTE } from '../services/observability'
 
 export interface StoryStep {
   id: string
@@ -88,7 +88,7 @@ function observabilityStep(m: Manifest): StoryStep[] {
     'Before reading any radar result, CascadeLens checks whether the radar could judge the place at all, for the question being asked. Each spot keeps its own reasons: outside the frame, no data or flagged by the product’s own quality mask, hidden by the mountain’s own slope (layover or shadow), a weak signal, or an input missing so the spot is not assessed.',
     ...(!current ? [STALE_NOTE] : []),
     ...(current && src.every((v) => v != null) ? [`At the detachment zone, a surface change could be judged on ${src[0]!.toFixed(0)}% of the ground and ground movement could be measured on ${src[1]!.toFixed(0)}%. Click the zone to see the reason for each spot.`] : []),
-    ...(current && flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for judging change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies beyond this frame, in the neighbouring one, which is not checked yet. No conclusion there is different from no damage.` : ''}`] : []),
+    ...(current && flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for judging change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies ${beyondFrames(m)}. No conclusion there is different from no damage.` : ''}`] : []),
     'Click anywhere on the map to see the reasons for that exact spot.',
   ]
   const inc = o.incidenceDeg5to95 ? ` (incidence ${o.incidenceDeg5to95[0]}–${o.incidenceDeg5to95[1]}°)` : ''
@@ -206,12 +206,16 @@ function lakeStory(m: Manifest): StoryStep[] {
       ],
     },
   ]
-  const coh = lake.coherence ?? (mo?.pair && mo.coherenceLake !== undefined && mo.coherenceLand !== undefined ? { pair: mo.pair, lake: mo.coherenceLake, land: mo.coherenceLand } : null)
+  const coh: { pair: [string, string]; lake: number; land: number; lakeValidPct?: number | null } | null = lake.coherence ?? (mo?.pair && mo.coherenceLake !== undefined && mo.coherenceLand !== undefined ? { pair: mo.pair, lake: mo.coherenceLake, land: mo.coherenceLand } : null)
+  // When the product's water mask covers most of the lake, a lake median would rest on its shoreline: say what is masked instead
+  const lakeMasked = coh?.lakeValidPct != null && coh.lakeValidPct < 50
   if (coh && has(`${id}:coherence`)) {
     steps.push({
       id: 'coherence', title: 'Where did the ground stay the same?', bookmarkId: 'valley', layerId: `${id}:coherence`, references: ['ref:lake-edge'],
       paragraphs: [
-        `The map shows how alike the radar echoes were on ${day(coh.pair[0])} and ${day(coh.pair[1])}. Bright means the surface stayed the same; dark means it changed, or is water or radar shadow. The lake is dark (median ${coh.lake.toFixed(2)}); the land around it has a median of ${coh.land.toFixed(2)}.`,
+        lakeMasked
+          ? `The map shows how alike the radar echoes were on ${day(coh.pair[0])} and ${day(coh.pair[1])}. Bright means the surface stayed the same; dark means it changed, or is radar shadow. The radar product's own water mask covers ${Math.round(100 - coh.lakeValidPct!)}% of the lake, so the lake itself has no usable value here; the land around it has a median of ${coh.land.toFixed(2)}.`
+          : `The map shows how alike the radar echoes were on ${day(coh.pair[0])} and ${day(coh.pair[1])}. Bright means the surface stayed the same; dark means it changed, or is water or radar shadow. The lake is dark (median ${coh.lake.toFixed(2)}); the land around it has a median of ${coh.land.toFixed(2)}.`,
         'Coherence says where the surface stayed the same between two passes. It does not measure how far anything moved: turning radar phase into movement needs a confirmed sign convention and reference, which CascadeLens does not have yet.',
       ],
     })

@@ -1,5 +1,5 @@
 import type { ControlPair, Manifest } from '../types/manifest'
-import { observabilityCurrent, STALE_NOTE } from './observability'
+import { beyondFrames, observabilityCurrent, STALE_NOTE } from './observability'
 
 export interface Finding { headline: string; points: { label: string; text: string }[]; source: string }
 
@@ -39,7 +39,7 @@ export function finding(m: Manifest): Finding | null {
   } else {
     points.push({ label: 'What the radar could judge', text: STALE_NOTE })
   }
-  if (outside?.percent) points.push({ label: 'What it could not see', text: `${pct(outside.percent['Outside the frame checked'])} of the mapped mudflow lies beyond this radar frame, in the neighbouring frame, which is not checked yet. CascadeLens marks it as unchecked rather than letting it look unchanged.` })
+  if (outside?.percent) points.push({ label: 'What it could not see', text: `${pct(outside.percent['Outside the frame checked'])} of the mapped mudflow lies ${beyondFrames(m)}. CascadeLens marks it as unchecked rather than letting it look unchanged.` })
   return {
     headline: dropped
       ? 'NISAR coherence fell inside the mapped Rasuwa mudflow across the event, and CascadeLens shows where the radar could and could not judge the ground.'
