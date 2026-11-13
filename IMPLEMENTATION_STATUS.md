@@ -106,6 +106,8 @@ npx playwright test                          28 passed, 1 failed: the fixture te
 
 Passing tests check the code's behaviour. They do not validate a scientific result, and the real-data tests that need raw granules were skipped.
 
+Later on 2026-11-13, after the P0.2 to P2 work on the same branch: Python 158 passed, 35 skipped; type check clean; unit 81 passed; browser 30 passed. The finished package was then built, unzipped fresh, started with its own `serve.py` (what `Start CascadeLens.bat` runs) and tested with `CL_BASE_URL`: all 20 real-data browser tests passed under the offline policy. The `.bat` was not run, because there is no Windows machine here.
+
 Re-run on 2026-11-10 in a cloud copy (Chromium, not Edge or Brave):
 
 ```text
