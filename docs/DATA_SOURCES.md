@@ -27,6 +27,7 @@ Every source keeps its own identity in the app. Only NISAR layers are NISAR resu
 | Type | Derived reference map, EPSG:4326 |
 | Licence | CC BY-SA |
 | Limitations | `FieldValidation = 0`, "Not yet field validated", in the source's own coded domain |
+| Attributes kept | `SiteID`, `SensorDate`, `SensorID`, `ConfidenceID`, `FieldValidation`, `Settlement_Name`, `Notes`, `Main_Damage_Site_Class`, `Grouped_Damage_Classes`, `EventCode`, `ImageID_Num`; for roads `SourceID`, `RoadID`, `ONme`, `RteNme`, `FClass`, `OpStatus`. `StaffID` is left out |
 
 Source issues found and how they are handled:
 
@@ -59,6 +60,7 @@ Source issues found and how they are handled:
 | Type | Contextual, EPSG:4326 |
 | Licence | ODbL, © OpenStreetMap contributors |
 | Limitations | Community data; features may predate or postdate the event. HydroRIVERS was not needed |
+| Attributes kept | OSM `id` (for example `way/345313941`) on every feature; roads also keep `highway`, `name`, `name_en`, `bridge`, `layer` and `surface`. The export has no `tunnel` tag |
 
 ## Sentinel-1 damage proxy map
 

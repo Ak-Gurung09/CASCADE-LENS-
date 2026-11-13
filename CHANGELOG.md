@@ -2,6 +2,14 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: engineering fixes (E3, E4, E6) and S10 to S12
+
+- Map errors stay visible while the failing layer is on the map. Before, any other layer loading or the map going idle cleared the warning within a moment, which also made a browser test flaky (E4).
+- Browser tests write screenshots to the gitignored `frontend/test-results/screenshots`; `CL_SCREENSHOTS_DIR` refreshes the documentation pictures on purpose (E3).
+- UNOSAT layers keep their source attributes (sensor date, field validation, damage class, confidence), without staff IDs. OSM roads keep their way ID, name, bridge, layer and surface tags; rivers and places keep their IDs. Geometries are unchanged (E6).
+- Road-exposure stretches have stable IDs such as `way/345313941:1`, and carry their OSM way, name and bridge tag.
+- The terrain screen's AUC is labelled a one-event consistency check, not a validation; road steep shares leave out ground with no valid elevation (S10). The river rule reads "within 100 m of a mapped river" (S11). The lake case reads its product maturity from the file, with no hard-coded fallback (S12), which also removes a crash the P0.1 change had left in the Tsho Rolpa rebuild.
+
 ## 13 November 2026: documentation reconciliation (P0.2)
 
 - The docs, the product readme and the status registry now match the P0.1 corrections. No document calls the Rasuwa source a swath gap or says a change was visible on 66% of it, and none presents the before/after control comparison as proof of cause. LANDMET is described as retired.

@@ -163,6 +163,8 @@ python tests/integration/build_fixture.py
 cd frontend && npm run build && npm run e2e
 ```
 
+Browser tests save their screenshots in `frontend/test-results/screenshots`, which git ignores. To refresh the pictures in `docs/screenshots` on purpose, set `CL_SCREENSHOTS_DIR=../docs/screenshots` for that run.
+
 Some Python tests are skipped unless the raw NISAR granules, NASA's samples or the LANDMET file are present. Passing tests check the code's behaviour. They do not validate a scientific result.
 
 To build the finished package:

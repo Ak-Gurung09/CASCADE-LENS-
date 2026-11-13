@@ -31,6 +31,16 @@ ROAD_TYPES = {"trunk", "primary", "secondary", "tertiary"}
 EXPOSURE = [("High", "#D9483B"), ("Moderate", "#E8B04A"), ("Low", "#7FB8A8")]
 
 
+def segment_id(props: dict, geometry: dict, index: int) -> str:
+    """'way/123:4' is the 5th 250 m stretch of OSM way 123, counted from the way's first vertex. Without an OSM ID, a hash of
+    the rounded source geometry stands in, so the ID stays the same as long as the road's shape does."""
+    if props.get("id"):
+        return f"{props['id']}:{index}"
+    import hashlib
+    coords = json.dumps([[round(x, 5), round(y, 5)] for x, y, *_ in geometry["coordinates"]])
+    return f"geom-{hashlib.sha1(coords.encode()).hexdigest()[:12]}:{index}"
+
+
 def read_fc(p: pathlib.Path):
     return json.loads(p.read_text(encoding="utf-8"))["features"]
 
@@ -96,7 +106,8 @@ def main(argv: list[str]) -> None:
     feats, tally = [], {}
     inv = ~tr
     for f in read_fc(vectors / "osm_roads.geojson"):
-        kind = f["properties"].get("highway")
+        props = f["properties"]
+        kind = props.get("highway")
         if kind not in ROAD_TYPES or f["geometry"]["type"] != "LineString":
             continue
         line = stransform(to_utm, shape(f["geometry"]))
@@ -143,7 +154,9 @@ def main(argv: list[str]) -> None:
             if watch == "Radar cannot watch":
                 t["unwatchedKm"] += km
             feats.append({"type": "Feature", "geometry": mapping(stransform(to_ll, seg)), "properties": {
-                "road": kind, "exposure": level, "color": dict(EXPOSURE)[level], "reasons": reasons,
+                # Stable ID (E6): the OSM way and the stretch's place along it, so a report row can be traced back
+                "id": segment_id(props, f["geometry"], i), "osmId": props.get("id"), "name": props.get("name_en") or props.get("name"),
+                "bridge": props.get("bridge"), "road": kind, "exposure": level, "color": dict(EXPOSURE)[level], "reasons": reasons,
                 "steepSharePct": steep, "nearRiver": near_river, "mapped2026": mapped,
                 "radarWatch": watch, "radarUsablePct": usable, "radarHiddenPct": hidden, "radarUnseenPct": unseen,
                 "lengthM": round(seg.length)}})

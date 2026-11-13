@@ -5,7 +5,9 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type ConsoleMessage, type Page } from '@playwright/test'
 
 // The production build with its real data, served under a CSP that blocks every request off this origin.
-const SHOTS = '../docs/screenshots'
+// Screenshots go to the gitignored test-results folder. To refresh the documentation pictures on purpose, run with
+// CL_SCREENSHOTS_DIR=../docs/screenshots, look at them, and commit them as a change of their own.
+const SHOTS = process.env.CL_SCREENSHOTS_DIR ?? 'test-results/screenshots'
 const TSHO = '/?case=tsho-rolpa-2026'
 
 async function open(page: Page, path = '/') {
