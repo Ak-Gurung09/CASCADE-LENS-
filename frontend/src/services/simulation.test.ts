@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coherence, count, replayAdvance, type SimData, type SimProps } from './simulation'
+import { coherence, count, elapsedMs, replayAdvance, type SimData, type SimProps } from './simulation'
 
 const feature = (properties: SimProps) => ({ type: 'Feature' as const, properties, geometry: { type: 'Point' as const, coordinates: [0, 0] } })
 const data = { features: { type: 'FeatureCollection', features: [
@@ -20,6 +20,13 @@ describe('count', () => {
   it('the what-if counts only what sits below the water and within reach', () => {
     expect(count(data, 10, 20)).toEqual({ buildings: 1, roadKm: 3, places: ['Low'] })
     expect(count(data, 60, 20).buildings).toBe(2)
+  })
+})
+
+describe('elapsed time between frames', () => {
+  it('is never negative when a frame is stamped earlier than a recorded moment', () => {
+    expect(elapsedMs(1180, 1000)).toBe(180)
+    expect(elapsedMs(1000, 1180)).toBe(0)
   })
 })
 

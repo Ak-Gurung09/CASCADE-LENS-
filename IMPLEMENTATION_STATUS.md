@@ -2,7 +2,7 @@
 
 **Status: the minimum scientific MVP threshold is met.** The product runs real NISAR measurements of the Rasuwa event, offline, from a one-click package. It is a first prototype on Provisional data, and its limits below are real.
 
-Report date: 2026-11-10. Two main cases now ship: Rasuwa (flagship, opens first) and Tsho Rolpa glacial lake.
+Report date: 2026-11-13. Two main cases now ship: Rasuwa (flagship, opens first) and Tsho Rolpa glacial lake.
 
 ## Minimum completion threshold (brief, section 25.4)
 
@@ -66,14 +66,14 @@ Report date: 2026-11-10. Two main cases now ship: Rasuwa (flagship, opens first)
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
 | LANDMET test case | Implemented and tested | Real file, browser | Real, test only | |
 | Offline operation | Implemented and tested | CSP-enforced browser test | Real | |
-| One-click package | Implemented and tested | Fresh unzip, via the `.bat` | Real | Needs Python 3 |
+| One-click package | Implemented and tested | Fresh unzip, via the `.bat`; `start.sh` run on Linux only | Real | Needs Python 3 |
 | Accessibility | Implemented and tested | axe, keyboard | n/a | No serious findings |
-| Responsive layout | Implemented and tested | 375 px emulation | n/a | Not on a physical phone |
+| Responsive layout | Implemented and tested | 375 px emulation, with the story's place checked to be in view | n/a | Not on a physical phone |
 | Evidence classes on every layer | Implemented and tested | Unit, browser | Real | Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown |
 | Radar Observability ("Can the radar see it?") | Implemented and tested | 7 Python, 4 frontend, browser | Real, derived | Both cases, frame 74 only; see [RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md) |
 | Pre-event control comparison | Implemented | Run on real files | Real, derived | Rasuwa story step 2 chart |
 | "What could explain this?" | Implemented and tested | 7 unit, browser | Real inputs, rule-based | Hypotheses, never probabilities |
-| Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | 3 unit, browser downloads | Real | Built in the browser |
+| Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | 5 unit, browser downloads and print | Real | Built in the browser |
 | Landslide-prone terrain screen (Model A) | Experimental | 5 Python, 2 unit, browser | Real DEM, derived | Rasuwa only; AUC 0.66 on one event |
 | Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch |
 | Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
@@ -83,6 +83,37 @@ Report date: 2026-11-10. Two main cases now ship: Rasuwa (flagship, opens first)
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 
 ## Commands executed and results
+
+Re-run on 2026-11-13 in a cloud copy (Chromium, not Edge or Brave), after the review below:
+
+```text
+python -m pytest tests                       72 passed, 35 skipped (skips need the raw NISAR files)
+npx tsc --noEmit                             no errors
+npm test                                     57 passed
+npx playwright test                          30 passed: 20 on the real build, 10 on the synthetic fixture
+python processing/scripts/build_product.py   8,116 files, 222 MB
+```
+
+These now also run on every pull request, see `.github/workflows/ci.yml`.
+
+### Review of 13 Nov: problems found and fixed
+
+| Problem | Effect | Fix |
+|---|---|---|
+| The report's "Print or save as PDF" button did nothing in the packaged app | The offline policy blocks a script written into the report window | The app wires the button from outside; browser test added |
+| On a phone, the story's sheet covered the place its text describes | The detachment zone sat under the sheet | The map frames each place in the strip above the sheet; the sheet is shorter with one row of buttons; browser test added |
+| On a phone, the story's map could be left undrawn | Headless Chromium treated the solid scrolling sheet as hiding the whole map | The sheet's background stops just short of solid. Seen only in headless Chromium, and not checked on a physical phone |
+| On a phone, the case menu, "What is real?" and the dam-failure scenario could not be reached | The top bar hides them at that width | The Layers sheet now carries them |
+| Pressing Play in the flow replay could blank the whole app on a busy computer | The first animation frame can be stamped earlier than the moment Play was pressed, which made the position negative | Elapsed time is never negative, in every animation; a fault anywhere now shows a message with a restart button instead of a blank page. Found by the first CI run |
+| The chosen tab's label vanished under the pointer | White text on the white pill, straight after the click | Hover rule corrected; browser test added |
+| The opening finding card stayed over the map while the reader explored | It hid the map behind the inspector's readings | It steps aside once a place, layer or spot is picked |
+| `scipy` was missing from `processing/requirements.txt` | A fresh install failed one hazard test | Added |
+| The README and package notes described the LANDMET case | It left the app on 6 Nov | They now describe Tsho Rolpa |
+| A package built on Linux shipped a Windows launcher with Unix line endings | `.bat` files can misread their labels that way | `.gitattributes` fixes the endings; `start.sh` added for macOS and Linux |
+
+Not changed by this review: what the documents and the app say about the source area. The app on this branch says a surface change was visible on 66% of the detachment zone, while four documents say Pair A has no data there. The audit in pull requests #6 to #8 settles it with the product's own mask applied: Pair A holds no usable measurement at the source, and the 66% figure is withdrawn. Those pull requests carry the corrected app and documents.
+
+Still open from this review: the LANDMET tiles and rasters (about 28 MB) still ship in `frontend/public/data` although the app no longer lists that case. Removing them is a team decision.
 
 Re-run on 2026-11-10 in a cloud copy (Chromium, not Edge or Brave):
 

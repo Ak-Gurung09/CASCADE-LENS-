@@ -1,6 +1,6 @@
 import type { Bookmark, Layer, Manifest, ObservationGroup } from '../../types/manifest'
 import type { CSSProperties } from 'react'
-import { formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
+import { CASES, currentCase, formatDate, isUsable, STATUS_LABEL } from '../../services/manifest'
 import { evidenceOf } from '../../services/evidence'
 import { isObservability } from '../../services/observability'
 import { isTerrainScreen } from '../../services/hazards'
@@ -40,6 +40,10 @@ interface Props {
   onCompare?: () => void
   can3d?: boolean
   on3d?: () => void
+  canScenario?: boolean
+  scenarioActive?: boolean
+  onScenario?: () => void
+  onStatus?: () => void
   onBookmark: (b: Bookmark) => void
   onGroup: (id: string) => void
   onView: (v: EvidenceView) => void
@@ -114,9 +118,21 @@ export function LeftPanel(p: Props) {
             {!p.hasStory && p.canCompare && <p><strong>New here?</strong> Compare the lake on two radar dates.</p>}
             {p.canCompare && <button className={p.hasStory ? '' : 'primary'} onClick={p.onCompare} disabled={p.compareActive}>{!p.hasStory && <Play />}Compare two dates</button>}
             {p.can3d && <button onClick={p.on3d}>See it in 3D</button>}
+            {p.canScenario && <button onClick={p.onScenario} disabled={p.scenarioActive}>What if the dam failed?</button>}
             {p.canSimulate && <button onClick={p.onSimulate} disabled={p.simActive}>Try the simulations</button>}
           </div>
         )}
+        {/* A phone has no room for the top bar's case menu and status button, so this sheet carries them. */}
+        <div className="phone-only phone-tools">
+          {CASES.length > 1 && (
+            <label className="select">Change case
+              <select value={currentCase().id} onChange={(e) => { window.location.search = `?case=${e.target.value}` }}>
+                {CASES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+              </select>
+            </label>
+          )}
+          {p.onStatus && <button onClick={p.onStatus}>What is real here?</button>}
+        </div>
       </section>
 
       <section>

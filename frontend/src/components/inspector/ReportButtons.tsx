@@ -18,7 +18,11 @@ export function ReportButtons({ manifest, point }: { manifest: Manifest; point: 
       if (kind === 'geojson') save(`${base}.geojson`, toGeoJson(r), 'application/geo+json')
       if (kind === 'json') save(`${base}.json`, JSON.stringify(r, null, 1), 'application/json')
       if (kind === 'pdf') {
-        if (win) { win.document.open(); win.document.write(toHtml(r)); win.document.close() } else save(`${base}.html`, toHtml(r), 'text/html')
+        if (win) {
+          win.document.open(); win.document.write(toHtml(r)); win.document.close()
+          // The new window inherits the offline policy, which blocks a script inside the page. A listener added from here is allowed.
+          win.document.getElementById('print')?.addEventListener('click', () => win.print())
+        } else save(`${base}.html`, toHtml(r, true), 'text/html')
       }
     } finally { setBusy(false) }
   }

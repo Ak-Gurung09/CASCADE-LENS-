@@ -24,7 +24,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 
 **2:30 Close.** CascadeLens makes advanced NISAR evidence understandable and inspectable. It does not predict disasters or replace field investigation.
 
-**If there is time.** Switch the Case study menu to the LANDMET test. It is a completely different global weather dataset, which shows the product is not tied to one file. Say clearly that it is not NISAR and not Rasuwa.
+**If there is time.** Switch the Case study menu to Tsho Rolpa glacial lake. It is a second NISAR case with its own story, a two-date comparison, a 3D view and a labelled dam-failure scenario, which shows the product is not tied to one event.
 
 ## Known demonstration limitations
 

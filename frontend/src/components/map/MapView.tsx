@@ -275,13 +275,15 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     const phone = window.matchMedia('(max-width: 980px)').matches
     // On a large screen the story is a headline across the bottom left with its text card on the right, and the left panel covers the left side.
     const guided = !phone && document.querySelector('.story.guided')
-    const sheet = (guided ? document.querySelector('.story-hero') : document.querySelector('.story'))?.getBoundingClientRect()
-    const covered = sheet && sheet.top > 100 ? Math.min(window.innerHeight - sheet.top, window.innerHeight * 0.42) : 0
+    // On a phone that sheet (story, simulations or comparison) takes more than half the screen. The place must sit in the strip above it,
+    // or the text would describe something the sheet hides.
+    const sheet = document.querySelector(guided ? '.story-hero' : '.story')?.getBoundingClientRect()
+    const covered = sheet && sheet.top > 100 ? Math.min(window.innerHeight - sheet.top, window.innerHeight * (phone ? 0.62 : 0.42)) : 0
     const card = guided ? (document.querySelector('.story-card')?.getBoundingClientRect().width ?? 0) + 20 : 0
     const left = !phone && document.querySelector('.app:not(.hide-left) .left') ? 350 : 0
     const dock = !phone && document.querySelector('.app:not(.hide-right) .compare-dock') ? 450 : 0
     const panels = !phone && document.querySelector('.sim-panel') // The whole path should clear the side panels and the top bar
-    mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: panels ? { top: 100, left: 360, right: 400, bottom: 40 } : { top: 90, left: 40 + left, right: 60 + dock + card, bottom: 30 + covered }, duration: calm ? 0 : 900 })
+    mapRef.current?.fitBounds(focus.bounds as LngLatBoundsLike, { padding: panels ? { top: 100, left: 360, right: 400, bottom: 40 } : phone ? { top: 112, left: 28, right: 28, bottom: 18 + covered } : { top: 90, left: 40 + left, right: 60 + dock + card, bottom: 30 + covered }, duration: calm ? 0 : 900 })
   }, [focus, ready])
 
   return <div ref={host} className="map" role="application" aria-label="Study area map. Click to inspect a location." data-testid="map" />
