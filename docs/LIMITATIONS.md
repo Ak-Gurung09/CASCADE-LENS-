@@ -6,7 +6,7 @@ NISAR measurements of the event are loaded, but they are Provisional. GCOV snaps
 
 ## Coverage gaps
 
-Pair A has no data at the detachment zone or barrier lakes, which fall in a swath gap. Pair B reaches them with pixel offsets only.
+Pair A has no unwrapped phase at the detachment zone or barrier lakes: it is zero-filled there, so movement cannot be measured. Its wrapped coherence is present, so a surface change can still be judged on about two-thirds of the detachment zone. Pair B reaches them with pixel offsets only. About half the mapped mudflow and nearly all the Trishuli corridor lie in frame 75, which is not assessed for observability yet.
 
 ## Coherence is not a damage map
 

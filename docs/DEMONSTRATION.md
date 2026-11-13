@@ -10,7 +10,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 
 **0:00 The problem.** After a mountain disaster, evidence is scattered and radar data is hard to read. CascadeLens puts NISAR measurements in one place, with their quality and limits visible.
 
-**0:25 The source.** Start the guided story. Show the UNOSAT detachment zone. Point out the honest finding: Pair A has no measurement here, because it falls in a swath gap. The story then shows that Pair B, viewing from the other side, does reach it, and that image matching largely fails there.
+**0:25 The source.** Start the guided story. Show the UNOSAT detachment zone. Point out the honest finding: Pair A recorded the source, but its phase was not unwrapped there, so it can show that the ground changed and not how far it moved. The story then shows that Pair B, viewing from the other side, also reaches it, and that image matching largely fails there.
 
 **0:55 Interferometric evidence.** Choose *Bhote Koshi corridor* and Coherence. Show the dark ribbon along the river under the UNOSAT extent. Median coherence is 0.19 inside against 0.46 nearby, and frame 75 agrees. Say clearly that this agrees with independent mapping, but it is not proof.
 
@@ -24,7 +24,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 
 **2:30 Close.** CascadeLens makes advanced NISAR evidence understandable and inspectable. It does not predict disasters or replace field investigation.
 
-**If there is time.** Switch the Case study menu to the LANDMET test. It is a completely different global weather dataset, which shows the product is not tied to one file. Say clearly that it is not NISAR and not Rasuwa.
+**If there is time.** Switch the Case study menu to Tsho Rolpa glacial lake. It is a second NISAR case with its own story, a two-date comparison, a 3D view and a labelled dam-failure scenario, which shows the product is not tied to one event.
 
 ## Known demonstration limitations
 
@@ -41,7 +41,7 @@ CascadeLens is built for NISAR's repeat-pass L-band observations and higher-leve
 
 ### How can you prove that the movement you display is real?
 
-We don't display movement. We display phase, coherence and pixel offsets, each with quality information. We mask what the product marks as unreliable, and we show what cannot be measured, such as the swath gap at the source. Low coherence along the channel agrees with independent UNOSAT mapping, but it is evidence, not proof. We have not yet compared a pre-event pair, and that is the proper next test.
+We don't display movement. We display phase, coherence and pixel offsets, each with quality information. We mask what the product marks as unreliable, and we show what cannot be measured, such as ground movement at the source, where the phase was not unwrapped. Low coherence along the channel agrees with independent UNOSAT mapping, but it is evidence, not proof. Against a pre-event pair the drop is specific to the mudflow: its coherence falls from 0.41 to 0.28 while untouched ground nearby rises from 0.42 to 0.52.
 
 ### Can CascadeLens predict another landslide or flood in Nepal?
 

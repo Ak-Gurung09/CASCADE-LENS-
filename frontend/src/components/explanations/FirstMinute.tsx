@@ -5,11 +5,13 @@ import { assetUrl } from '../../services/manifest'
 
 const KEY = 'cascadelens.finding.seen'
 
-export function FindingCard({ manifest, onStory, onStatus }: { manifest: Manifest; onStory: () => void; onStatus: () => void }) {
+// `exploring` turns true once the reader picks a place, a layer or a spot: the card then steps aside instead of covering the map they asked for.
+export function FindingCard({ manifest, exploring = false, onStory, onStatus }: { manifest: Manifest; exploring?: boolean; onStory: () => void; onStatus: () => void }) {
   const f = finding(manifest)
   const [open, setOpen] = useState(() => { try { return localStorage.getItem(KEY) !== '1' } catch { return true } })
-  if (!f || !open) return null
   const close = () => { setOpen(false); try { localStorage.setItem(KEY, '1') } catch { /* private window */ } }
+  useEffect(() => { if (exploring) close() }, [exploring])
+  if (!f || !open) return null
   return (
     <section className="finding" role="dialog" aria-label="The key finding">
       <p className="eyebrow">The finding</p>

@@ -39,9 +39,9 @@ Two independent frames agree, and they agree with independent UNOSAT mapping. Lo
 
 Only 15% and 19% of phase pixels inside the extent are valid. 40% and 45% are masked, mostly because they could not be reliably unwrapped.
 
-### The source: no data in Pair A, strong signal in Pair B
+### The source: change visible but no movement value in Pair A, strong signal in Pair B
 
-The detachment zone and barrier lakes are 100% masked in Pair A: they fall in a swath gap. Pair B frame 16 covers them.
+In Pair A the unwrapped phase is 100% masked at the detachment zone and barrier lakes: it is zero-filled in strips there, so no movement value exists. The radar did record the ground: wrapped coherence is present, and a surface change would be visible on 66% of the detachment zone. An earlier version of this page called this a swath gap. That was wrong, see [RADAR_OBSERVABILITY.md](RADAR_OBSERVABILITY.md). Pair B frame 16 also covers the source, from the opposite side.
 
 | Pair B, frame 16 | Detachment zone | Nearby channel terrain |
 |---|---|---|

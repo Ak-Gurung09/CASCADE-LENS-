@@ -98,6 +98,18 @@ describe('honest layer availability', () => {
   })
 })
 
+describe('opening finding', () => {
+  it('steps aside once the reader picks a place, and does not come back', async () => {
+    localStorage.removeItem('cascadelens.finding.seen')
+    const m = shipped()
+    start(m)
+    expect(await screen.findByRole('dialog', { name: 'The key finding' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: m.bookmarks[0].name }))
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'The key finding' })).toBeNull())
+    expect(localStorage.getItem('cascadelens.finding.seen')).toBe('1')
+  })
+})
+
 describe('bookmarks and references', () => {
   it('moves the map to each bookmark and marks it active', async () => {
     const m = noNisar()

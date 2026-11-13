@@ -27,7 +27,7 @@ Written 2026-11-10, after the master-prompt build. The goal is to find the weakn
 |---|---|
 | Open the actual study area | `e2e/real.spec.ts`: opens on Rasuwa with real NISAR measurements |
 | Inspect an authentic observation, with source and dates | Inspector tests read real values and name the granule |
-| Inspect validity and quality | Masked pixels, quality overlays and "refuses the swath gap" tests |
+| Inspect validity and quality | Masked pixels, quality overlays and "masks the source" tests |
 | Compare compatible observations | Before/after control series (5 pairs, same track and frame) in story step 2 |
 | Examine the method | Every layer's notes; `docs/RADAR_OBSERVABILITY.md` |
 | Understand alternative explanations | "What could explain this?" unit and browser tests |

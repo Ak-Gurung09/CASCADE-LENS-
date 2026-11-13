@@ -19,7 +19,7 @@ There is no server API. The app reads static files. Types live in `frontend/src/
 | `granules` | Catalogue records with footprints and status |
 | `analysis` | Results of `analyse_pair.py`, per pair. The story reads its figures from here |
 
-Each case study has its own manifest: `manifest.json` for Rasuwa and `landmet.json` for LANDMET, selected by `?case=`.
+Each case study has its own manifest: `manifest.json` for Rasuwa and `tsho-rolpa-2026.json` for Tsho Rolpa, selected by `?case=`. The case list is `CASES` in `frontend/src/services/manifest.ts`. `landmet.json` is the retired LANDMET test case: its data and pipeline remain, but the app no longer lists it.
 
 ## Observation relationships
 
