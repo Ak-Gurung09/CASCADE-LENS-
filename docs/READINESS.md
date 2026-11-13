@@ -12,7 +12,7 @@ A capability earns the first state on this ladder that it does not get past:
 | Data available, processing required | Every essential dataset is present, but one fails a condition |
 | Model required | The data is fit for use, but no model output is recorded |
 | Calibration required | A model output exists, with no calibration record |
-| Validation required | No independent validation record, or the validation data is missing |
+| Validation required | No independent validation record, the validation data is missing, or the validation ran and missed the criterion it stated beforehand (`"criterionMet": false`) |
 | Experimental | Validated out of sample, with its metrics recorded |
 | Operationally evaluated | A full season evaluated with partners |
 | Context only | For context capabilities (F0, L0): the data is fit, and nothing is predicted |
@@ -84,4 +84,6 @@ A model, calibration, validation or operational record is a JSON file in `data/m
 {"key": "flood.F3.validation", "summary": "Chronological test 2025-2026: POD 0.71, FAR 0.32, CSI 0.53 at the danger level", "needsDatasets": ["B2"], "report": "data/qa/f3-validation.json"}
 ```
 
-A validation record counts only while the datasets it names are on disk. There are no such records today, so no capability is above *Model required*. A unit test (`frontend/src/services/readiness.test.ts`) fails if one appears there without evidence.
+A record counts only while the datasets it names are on disk. A validation record states its pass criterion before it is scored, and carries `"criterionMet"`. When it is false, the record is kept and shown, but the capability stays at *Validation required*: a model that ran and missed its own bar has not been validated. A unit test (`frontend/src/services/readiness.test.ts`) fails if a capability sits above a rung whose record is missing or failed, or above *Data available, processing required* while any data check fails.
+
+The app lists recorded model work under each capability ("Model work recorded"), passed or not, next to whatever still blocks it.

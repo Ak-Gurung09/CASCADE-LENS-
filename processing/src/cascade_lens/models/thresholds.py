@@ -68,3 +68,42 @@ def api(rain_mm: np.ndarray, k: float = 0.9) -> np.ndarray:
     for t in range(1, len(r)):
         out[t] = k * out[t - 1] + r[t - 1]
     return out
+
+
+def event_at(rain_mm: np.ndarray, t: int, dry_days: int = 2, wet_mm: float = 1.0) -> tuple[float, int] | None:
+    """The rainfall event behind day t, from the days up to t only (nothing later is read): the event still running on
+    day t, or one that stopped fewer than dry_days days before. Returns (event rainfall in mm, duration in days) or None."""
+    ev = events(np.asarray(rain_mm, float)[: t + 1], dry_days, wet_mm)
+    if not ev or ev[-1][1] < t - (dry_days - 1):
+        return None
+    start, end, total = ev[-1]
+    return total, end - start + 1
+
+
+def ongoing(rain_mm: np.ndarray, dry_days: int = 2, wet_mm: float = 1.0) -> tuple[np.ndarray, np.ndarray]:
+    """event_at for every day in one pass: (rainfall so far, duration so far) of the event behind each day, 0 where none.
+    Only past and present days are used, so it can run as a monitor."""
+    r = np.nan_to_num(np.asarray(rain_mm, float))
+    e_out, d_out = np.zeros(len(r)), np.zeros(len(r), dtype=int)
+    start = end = None
+    total = pending = 0.0
+    gap = dry_days
+    for t, v in enumerate(r):
+        if v >= wet_mm:
+            if gap < dry_days and start is not None:  # the event goes on: dry-day drizzle in between counts
+                total += pending + v
+            else:
+                start, total = t, v
+            end, gap, pending = t, 0, 0.0
+        else:
+            gap += 1
+            pending += v
+        if start is not None and gap < dry_days:
+            e_out[t], d_out[t] = total, end - start + 1
+    return e_out, d_out
+
+
+def warnings(rain_mm: np.ndarray, th: Threshold, dry_days: int = 2, wet_mm: float = 1.0) -> np.ndarray:
+    """True on each day the event so far reaches the threshold line."""
+    e, d = ongoing(rain_mm, dry_days, wet_mm)
+    return (d > 0) & (e >= th.alpha * np.maximum(d, 1) ** th.beta)

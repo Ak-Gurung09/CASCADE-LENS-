@@ -115,6 +115,40 @@ Source issues found and how they are handled:
 | Type | Contextual. District (admin 2) outlines clipped to the search envelope |
 | Licence | CC BY-IGO |
 
+## GPM IMERG Late daily rainfall
+
+| | |
+|---|---|
+| Provider | NASA GES DISC |
+| Dataset | GPM IMERG Late Precipitation L3 1 day 0.1° V07 (`GPM_3IMERGDL.07`), DOI [10.5067/GPM/IMERGDL/DAY/07](https://doi.org/10.5067/GPM/IMERGDL/DAY/07) |
+| Retrieved | 13 November 2026, by OPeNDAP subset of 84.0–86.5° E, 27.5–29.5° N (`fetch_imerg.py`), with an Earthdata Login token |
+| Coverage | 1 June 2016 to 31 October 2026, every UTC day, 20 × 25 cells of 0.1° |
+| Stored | `data/reference/rainfall/GPM_3IMERGDL.07`: one GeoTIFF per year, mean rate in mm/h (× 24 for the day's total), the valid half-hour count per day, and `days.csv` with each day's file version and publication time (`prepare_rainfall.py`) |
+| Why Late, not Final | Late is what a warning could have used on the day: it appears about 14 h after the UTC day ends. Final is gauge-adjusted but appears about 3.5 months later, and in November 2026 it stops at September 2025 |
+| Licence | NASA open data, no restrictions on reuse; cite the DOI |
+| Limitations | Satellite estimate at about 11 km, with no gauge adjustment in the Late run. History is the V07 reprocessing, not what was issued at the time. Days are UTC; Nepal is UTC+5:45 |
+| Used for | Datasets B1 and C5 of the readiness engine, and the rainfall-trigger threshold run ([MODELS.md](MODELS.md)) |
+
+## BIPAD landslide incidents
+
+| | |
+|---|---|
+| Provider | National Disaster Risk Reduction and Management Authority (NDRRMA), Government of Nepal, through the [BIPAD portal](https://bipadportal.gov.np) |
+| Dataset | Incident records, hazard "Landslide", from the public API (`fetch_bipad.py`): 6,672 incidents, 14 May 2011 to 11 November 2026, retrieved 13 November 2026 |
+| Location | Each record's point is BIPAD's reference point for a ward or municipality, not the landslide. In the Trishuli area, 1,826 reports share 431 points |
+| Licence | **Not stated.** No licence or terms of reuse were found on the portal or its API (13 November 2026). The records are kept under `data/raw` (not committed), and the readiness engine marks the licence as not established until NDRRMA confirms terms |
+| Limitations | Reports, not a mapped inventory: a day without a report is not a day without a landslide. Reporting grew strongly (57 reports in the Trishuli area in 2016, 293 in 2024, 531 in 2026), so years are not comparable. Records before 2020 were backfilled |
+| Used for | Dataset C1 and the rainfall-trigger threshold run |
+
+## Checked and not used
+
+| Source | What it is | Why not used |
+|---|---|---|
+| Durham University 3 × 3 km landslide grid ([Zenodo 22709999](https://doi.org/10.5281/zenodo.22709999), CC BY 4.0) | Active landslide cells per 3 km cell each year, 2000 to 2021, all Nepal | No dates within a year, so it cannot pair landslides with rainfall. Ends in 2021, before the readiness window closes. A candidate for a coarse susceptibility model once a geological map exists |
+| USGS geologic map of South Asia ([OFR 97-470C](https://doi.org/10.3133/ofr97470C), public domain) | Generalised geology from UNESCO 1:5 M and 1:10 M maps | Its own use constraint: "not intended to be used at a scale of larger than 1:5,000,000". Far too coarse for a 100 km corridor, so L1 still waits for the DMG Nepal map |
+| DHM river and rainfall observations ([hydrology.gov.np](https://hydrology.gov.np)) | Station list is public; Trishuli River at Betrawati is station 4783 | The observation API answers "Permission denied or Api Keys required". Needs a key from DHM |
+| NASA Global Landslide Catalog, COOLR | Point inventory | The catalogue ends in October 2016 (already registered as C1, not fit). The COOLR map server did not answer from this environment |
+
 ## LANDMET, test case only
 
 | | |

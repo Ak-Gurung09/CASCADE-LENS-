@@ -140,3 +140,45 @@ def nse(sim: np.ndarray, obs: np.ndarray) -> float:
     ok = np.isfinite(s) & np.isfinite(o)
     den = float(((o[ok] - o[ok].mean()) ** 2).sum())
     return math.nan if den == 0 else 1 - float(((s[ok] - o[ok]) ** 2).sum()) / den
+
+
+def windowed(warn: np.ndarray, obs: np.ndarray, lead_min: int, lead_max: int) -> Contingency:
+    """Scoring on a grid of days (axis 0) by places (other axes). An observed event on day t is hit when the same place
+    had a warning issued on a day from t - lead_max to t - lead_min; a warning on day t is a false alarm when no event
+    follows at that place from t + lead_min to t + lead_max. Hits and misses count events, false alarms count warnings
+    (as match_events does). Events too early to have a warning in range, and warnings whose range runs past the end, are
+    left out, so the edges never count against or for a forecast."""
+    w, o = np.asarray(warn, bool), np.asarray(obs, bool)
+    if w.shape != o.shape:
+        raise ValueError("warn and obs differ in shape")
+    n = w.shape[0]
+    covered = np.zeros_like(o)  # an event day with a warning in range before it
+    followed = np.zeros_like(w)  # a warning day with an event in range after it
+    for k in range(lead_min, lead_max + 1):
+        if k < n:
+            covered[k:] |= w[: n - k]
+            followed[: n - k] |= o[k:]
+    ev = o[lead_max:]
+    hits = int((ev & covered[lead_max:]).sum())
+    misses = int((ev & ~covered[lead_max:]).sum())
+    fa = int((w[: n - lead_max] & ~followed[: n - lead_max]).sum())
+    quiet = int((~w[: n - lead_max] & ~followed[: n - lead_max]).sum())
+    return Contingency(hits, misses, fa, quiet)
+
+
+def shuffled_csi(warn: np.ndarray, obs: np.ndarray, blocks: np.ndarray, lead_min: int, lead_max: int, n: int = 1000,
+                 seed: int = 0) -> np.ndarray:
+    """CSI of random warnings that keep each place's number of warnings in each block of days (such as each calendar month):
+    the chance level a real warning must beat. blocks gives a block label per day (axis 0)."""
+    w = np.asarray(warn, bool).reshape(warn.shape[0], -1)
+    rng = np.random.default_rng(seed)
+    idx = [np.flatnonzero(blocks == b) for b in np.unique(blocks)]
+    out = np.empty(n)
+    for i in range(n):
+        s = np.empty_like(w)
+        for rows in idx:
+            sub = w[rows]
+            s[rows] = sub[rng.permuted(np.tile(np.arange(len(rows))[:, None], (1, sub.shape[1])), axis=0), np.arange(sub.shape[1])]
+        c = windowed(s.reshape(warn.shape), obs, lead_min, lead_max).csi
+        out[i] = np.nan if c is None else c
+    return out

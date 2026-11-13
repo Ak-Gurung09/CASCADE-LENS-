@@ -60,3 +60,27 @@ def test_auc_by_ranks():
 def test_nse():
     o = np.array([1.0, 2.0, 3.0])
     assert v.nse(o, o) == 1.0 and v.nse(np.full(3, 2.0), o) == 0.0
+
+
+def test_windowed_scoring_counts_leads_and_ignores_the_edges():
+    w = np.zeros((10, 2), bool)
+    o = np.zeros((10, 2), bool)
+    w[2, 0] = True; o[4, 0] = True   # lead 2: a hit
+    w[5, 1] = True                   # nothing follows at place 1: a false alarm
+    o[9, 1] = True                   # no warning 2 to 3 days before (day 5 is 4 days back): a miss
+    o[1, 0] = True                   # too early to have had a warning: left out
+    c = v.windowed(w, o, lead_min=2, lead_max=3)
+    assert (c.hits, c.misses, c.false_alarms) == (1, 1, 1)
+    same_day = v.windowed(w, o, lead_min=0, lead_max=1)
+    assert same_day.hits == 0 and same_day.false_alarms == 2
+
+
+def test_shuffled_warnings_keep_each_places_count_per_block_and_are_reproducible():
+    rng = np.random.default_rng(0)
+    o = rng.random((60, 3)) < 0.1
+    w = np.roll(o, -2, axis=0)  # perfect warnings, two days ahead
+    blocks = np.repeat(np.arange(2), 30)
+    real = v.windowed(w, o, 2, 2).csi
+    chance = v.shuffled_csi(w, o, blocks, 2, 2, n=200, seed=1)
+    assert real == 1.0 and np.nanmax(chance) < real
+    assert np.array_equal(chance, v.shuffled_csi(w, o, blocks, 2, 2, n=200, seed=1), equal_nan=True)

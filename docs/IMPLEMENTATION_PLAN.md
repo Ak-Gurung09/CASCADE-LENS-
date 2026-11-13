@@ -29,6 +29,9 @@ Progress is reported in [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md).
 | 3 | Download Rasuwa GCOV | Needs 31 GB | Neilhancy Dev |
 | 4 | Rehearse the demonstration | The script is in DEMONSTRATION.md | Sugam Ghimire, Samyak Timalsena |
 | 5 | Test on another computer, a physical phone and the Windows `.bat` | Only tested in one place so far | Akash Gurung |
+| 6 | Ask NDRRMA for written terms of reuse for BIPAD incident records | BIPAD states no licence, so the readiness engine holds the landslide-trigger capability (L2) at "data available, processing required" whatever its scores. See [MODELS.md](MODELS.md) | To assign |
+| 7 | Request a DHM API key (hydrology.gov.np) for Trishuli discharge and daily gauges | F2, F3 and F5 cannot start without discharge; the API refuses requests without a key | To assign |
+| 8 | Obtain the DMG Nepal geological map (1:1 M or finer) | L1 susceptibility needs geology; the only open map (USGS) is meant for 1:5 M and coarser | To assign |
 
 ## Team decisions
 

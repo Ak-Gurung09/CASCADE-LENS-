@@ -9,7 +9,8 @@ first rung of the ladder that is not met:
   DATA AVAILABLE, PROCESSING REQUIRED   every essential dataset is present, but one fails a condition (coverage, units ...)
   MODEL REQUIRED                        the data is fit for use, but no model output is registered
   CALIBRATION REQUIRED                  a model output exists, with no calibration record
-  VALIDATION REQUIRED                   calibrated, but no independent validation record, or its validation data is missing
+  VALIDATION REQUIRED                   calibrated, but no independent validation record, its validation data is missing, or
+                                        the validation ran and missed the criterion it stated beforehand ("criterionMet": false)
   EXPERIMENTAL                          validated out of sample, with its metrics recorded; not yet evaluated in operation
   OPERATIONALLY EVALUATED               a full season evaluated with partners
 
@@ -141,8 +142,12 @@ def assess(cap: dict, sources: dict[str, list[dict]], catalogue: dict, evidence:
     rungs = [("model", "MODEL REQUIRED"), ("calibration", "CALIBRATION REQUIRED"), ("validation", "VALIDATION REQUIRED"), ("operational", "EXPERIMENTAL")]
     for key, state_if_missing in rungs:
         ev = evidence.get(f"{cap['id']}.{key}")
-        ok = ev is not None and all(sources.get(d) for d in (ev.get("needsDatasets") or []))
-        checks.append({"id": f"{cap['id']}.{key}", "ok": ok, "reason": ev.get("summary", "Recorded") if ok else f"No {key} record"})
+        has_data = ev is not None and all(sources.get(d) for d in (ev.get("needsDatasets") or []))
+        failed = has_data and ev.get("criterionMet") is False  # a record that ran and missed its own stated criterion
+        ok = has_data and not failed
+        reason = (f"Ran, and missed its criterion: {ev.get('summary', '')}" if failed else ev.get("summary", "Recorded") if ok
+                  else f"No {key} record" if ev is None else f"The {key} record needs {', '.join(ev.get('needsDatasets') or [])} on disk")
+        checks.append({"id": f"{cap['id']}.{key}", "ok": ok, "reason": reason})
     if essential_missing:
         state = "NOT AVAILABLE"
         nxt = essential_missing[0]
