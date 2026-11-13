@@ -31,7 +31,7 @@ export const roadLayer = (m: Manifest) => m.layers.find((l) => l.measurementType
 export interface RoadSegment {
   road: string; exposure: string; color: string; reasons: string[]; steepSharePct: number | null; nearRiver: boolean; mapped2026: boolean
   radarWatch: string; radarUsablePct: number; radarHiddenPct: number; radarUnseenPct: number; lengthM: number; distanceM: number
-  id?: string; osmId?: string | null; name?: string | null; bridge?: string | null
+  id?: string; osmId?: string | null; name?: string | null; bridge?: string | null; osmStatus?: string | null
   radarUnreliablePct?: number; radarNoValidPct?: number; radarOutsidePct?: number; radarNotAssessedPct?: number
 }
 

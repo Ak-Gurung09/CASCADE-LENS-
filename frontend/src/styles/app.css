@@ -212,6 +212,12 @@ input:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Interpretation */
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.access-panel { margin-top: 12px; border-top: 1px solid var(--line-strong); padding-top: 10px; }
+.access-panel > summary { cursor: pointer; font-weight: 600; font-size: 13px; min-height: 36px; display: flex; align-items: center; gap: 8px; }
+.access-panel .tabs { margin: 8px 0; }
+.access-list { padding-left: 18px; margin: 4px 0 10px; }
+.access-list li { margin: 4px 0; overflow-wrap: anywhere; }
+.access-panel details > summary { cursor: pointer; }
 .road-evidence { grid-column: 1 / -1; margin-top: 10px; border-top: 1px solid var(--line-strong); padding-top: 8px; }
 .road-evidence summary { cursor: pointer; font-weight: 600; font-size: 12.5px; min-height: 32px; display: flex; align-items: center; }
 .ev-facts { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 4px 12px; margin: 8px 0; font-size: 12px; }

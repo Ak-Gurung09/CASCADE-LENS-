@@ -286,6 +286,19 @@ test('the first minute leads with the finding and an honest status list', async 
   await expect(card).toHaveCount(0)
 })
 
+test('the access screen names places that lose their road path, and what closed it', async ({ page }) => {
+  await open(page)
+  await page.getByText('Road access to health care').click()
+  const panel = page.locator('.access-panel')
+  await expect(panel).toContainText('No road path in this network', { timeout: 20000 })
+  await expect(panel).toContainText('Trishuli')
+  await expect(panel).toContainText('Closed on those routes')
+  await expect(panel).toContainText('Furke Khola Bridge')
+  await expect(panel).not.toContainText(/isolated|cut off/i)
+  await panel.getByRole('checkbox', { name: 'Show road and bridge states' }).check()
+  await expect(page.locator('.legend')).toContainText('Closed: mapped destroyed or reported washed out')
+})
+
 test('hazard screens explain a road stretch and say whether the radar could watch it', async ({ page }) => {
   await open(page)
   await page.getByRole('radio', { name: /Landslide-prone terrain/ }).check()

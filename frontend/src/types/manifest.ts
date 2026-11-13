@@ -248,6 +248,16 @@ export interface Manifest {
   controlSeries?: ControlSeries
   observability?: Observability
   hazards?: Hazards
+  access?: AccessSummary
+}
+
+// Written by processing/scripts/prepare_access.py. The detail (per-place results) is a separate file at url, fetched on demand.
+export interface AccessSummary {
+  url: string
+  maturity: string
+  states: Record<string, { ways: number; km: number }>
+  summary: Record<string, { name: string; placesWithHealthPath: number; places: number; pieces: number }>
+  limitations: string[]
 }
 
 export interface ObservabilityZone { name: string; pixels: number; percent?: Record<string, number>; verdict?: string; verdictRule?: string }

@@ -62,6 +62,16 @@ Source issues found and how they are handled:
 | Limitations | Community data; features may predate or postdate the event. HydroRIVERS was not needed |
 | Attributes kept | OSM `id` (for example `way/345313941`) on every feature; roads also keep `highway`, `name`, `name_en`, `bridge`, `layer` and `surface`. The export has no `tunnel` tag |
 
+## HOT post-event mapping and bridge reports
+
+| | |
+|---|---|
+| Provider | Humanitarian OpenStreetMap Team, [HOT export on HDX](https://data.humdata.org/dataset/hot_flood_npl) |
+| Layers used | Health facilities, education facilities, helipads, destroyed and damaged features (OSM), and the volunteer bridge damage assessment |
+| Type | Contextual and reported, EPSG:4326 |
+| Licence | ODbL, © OpenStreetMap contributors |
+| Limitations | Volunteer reports and mapping, not field verified here. The bridge assessment gives points with a status (washed out, damaged, intact) and no link to OSM, so CascadeLens matches each to the nearest OSM bridge within 60 m and leaves the rest unused |
+
 ## Sentinel-1 damage proxy map
 
 | | |

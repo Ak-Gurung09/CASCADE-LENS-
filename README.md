@@ -41,6 +41,7 @@ This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](
 - Radar observability (“Can the radar see it?”): for each spot, whether a surface change could be judged and whether movement could be measured, with the reasons kept separate. The figures are withheld until the rebuild, as described above.
 - “What could explain this?”, a rule-based panel that lists the checks for and against each explanation and never gives a probability, and an evidence report as a printable page, CSV, GeoJSON or JSON.
 - Experimental hazard screens: landslide-prone terrain and road exposure along the Rasuwa corridor. Each 250 m road stretch has a stable ID, and its evidence panel shows the rating, what the radar saw there, from which file, and what to verify next. Every report format carries the same record.
+- An experimental road access screen: which named places keep a road path to a health facility once roads OSM maps as destroyed and bridges reported washed out are closed, and which closures cause each loss. See [docs/ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md).
 - Layer statuses generated from the files on disk. A NISAR layer cannot be selected until it has been downloaded, inspected and passed QA.
 - A list of what is real (“What is real?”), read from `frontend/public/data/status.json`, which gives each capability its maturity. Each headline claim is listed in `frontend/public/data/claims.json` with its basis and status, and a test keeps withdrawn claims out of the app and the main docs.
 - A Python pipeline for GUNW, GOFF and GCOV, with QA gates and provenance.
@@ -189,7 +190,7 @@ All NISAR products are Provisional, and Rasuwa GCOV is not downloaded. Phase is 
 
 ## Documentation
 
-[Data acquisition](docs/DATA_ACQUISITION.md) · [Adding data to Simulate](docs/ADDING_DATA.md) · [Data sources](docs/DATA_SOURCES.md) · [Methodology](docs/METHODOLOGY.md) · [Scientific validation](docs/SCIENTIFIC_VALIDATION.md) · [Limitations](docs/LIMITATIONS.md) · [Data schema](docs/API_AND_DATA_SCHEMA.md) · [Demonstration](docs/DEMONSTRATION.md) · [Plan](docs/IMPLEMENTATION_PLAN.md)
+[Data acquisition](docs/DATA_ACQUISITION.md) · [Road access screen](docs/ACCESS_SCREEN.md) · [Adding data to Simulate](docs/ADDING_DATA.md) · [Data sources](docs/DATA_SOURCES.md) · [Methodology](docs/METHODOLOGY.md) · [Scientific validation](docs/SCIENTIFIC_VALIDATION.md) · [Limitations](docs/LIMITATIONS.md) · [Data schema](docs/API_AND_DATA_SCHEMA.md) · [Demonstration](docs/DEMONSTRATION.md) · [Plan](docs/IMPLEMENTATION_PLAN.md)
 
 ## Licence
 

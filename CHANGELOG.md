@@ -2,6 +2,12 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: road access screen (P0.4)
+
+- New screen, Hazard screens → Road access to health care: which named places keep a road path to a health facility once reported damage is closed (roads OSM maps as destroyed, bridges volunteers report washed out), the detour or loss for each, and the closures on each old route with their sources. Results say "no road path in this network", never "isolated", and state that the network stops at the study area. Method and limits in [docs/ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md).
+- Road and bridge states (closed, uncertain, open; unknown by default) and health facilities and helipads can be shown on the map.
+- The shipped roads keep OSM's status tag, and a road stretch's evidence says when OSM maps it as destroyed.
+
 ## 13 November 2026: road-segment evidence inspector (P0.3)
 
 - Clicking near a screened road opens "Evidence for this stretch": its stable ID and OSM way, the rating and its reasons, the radar pair, the before pair, the source file, the observability method version, the share of the stretch in each observability class, the context, and what to verify next.

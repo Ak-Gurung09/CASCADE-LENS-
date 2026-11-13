@@ -52,6 +52,7 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
     s.nearRiver ? 'Within 100 m of a mapped river (OpenStreetMap).' : 'More than 100 m from a mapped river.',
     s.mapped2026 ? 'Crosses ground UNOSAT mapped as hit by the 2026 mudflow, or a road UNOSAT mapped as affected.' : 'Not on ground UNOSAT mapped as hit in 2026.',
     ...(s.bridge ? [`A bridge in OpenStreetMap (bridge=${s.bridge}).`] : []),
+    ...(s.osmStatus === 'Destroyed' ? ['OpenStreetMap maps this road as destroyed after the event (HOT export).'] : []),
   ]
   const verify = [
     ...(s.mapped2026 ? ['Compare with UNOSAT’s affected-road record and any field report for this stretch. UNOSAT’s mapping is not field validated.'] : []),
@@ -59,6 +60,7 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
     ...(steep === null || steep === undefined ? ['Check the elevation model here: the terrain screen could not be computed.'] : []),
     ...(s.nearRiver ? ['Check the river bank and the road edge on recent imagery for erosion or new deposits.'] : []),
     ...(s.bridge ? ['Confirm the bridge is standing and passable, with the road authority or a field report.'] : []),
+    ...(s.osmStatus === 'Destroyed' ? ['Check with the road authority whether this stretch has been reopened or bypassed since it was mapped as destroyed.'] : []),
     ...(usable < 20 ? ['The event pair could not watch most of this stretch, so radar can neither confirm nor rule out a change here. Use optical images or field reports.']
       : usable < 50 ? ['The event pair watched only part of this stretch. Check the rest by other means.'] : []),
     ...(outside !== null && outside >= 50 ? ['Most of this stretch lies beyond the radar frame checked. The neighbouring frame is not assessed yet.'] : []),
