@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-13T00:00:00+00:00",
+ "generatedAt": "2026-11-13T14:05:31+00:00",
  "states": [
   "NOT AVAILABLE",
   "DATA AVAILABLE, PROCESSING REQUIRED",
@@ -214,8 +214,48 @@
    "checks": [
     {
      "id": "B1.present",
-     "ok": false,
-     "reason": "B1 (GPM IMERG V07 rainfall, Late or Final) is not on disk"
+     "ok": true,
+     "reason": "Found at data/reference/rainfall/GPM_3IMERGDL.07/SOURCE.json"
+    },
+    {
+     "id": "B1.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "B1.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "B1.space",
+     "ok": true,
+     "reason": "Extent [84.0, 27.5, 86.5, 29.5] against area R2 [84.0, 27.5, 86.5, 29.5]"
+    },
+    {
+     "id": "B1.time",
+     "ok": true,
+     "reason": "Time ['2016-06-01', '2026-10-31'] against window W2 ['2026-06-01', '2026-10-10']"
+    },
+    {
+     "id": "B1.resolution",
+     "ok": true,
+     "reason": "Resolution 11132.0 m, needs 11200 m or finer"
+    },
+    {
+     "id": "B1.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "B1.quality",
+     "ok": true,
+     "reason": "Quality flags recorded"
+    },
+    {
+     "id": "B1.licence",
+     "ok": true,
+     "reason": "Licence NASA open data: no restrictions on reuse, cite the dataset DOI (EOSDIS data use guidance)"
     },
     {
      "id": "B2.present",
@@ -244,7 +284,7 @@
     }
    ],
    "partial": [],
-   "next_requirement": "B1: GPM IMERG V07 rainfall, Late or Final",
+   "next_requirement": "B2: DHM discharge and stage, with station metadata and danger levels",
    "decision": "Start after data supply",
    "ceiling": null
   },
@@ -256,8 +296,43 @@
    "checks": [
     {
      "id": "B1.present",
+     "ok": true,
+     "reason": "Found at data/reference/rainfall/GPM_3IMERGDL.07/SOURCE.json"
+    },
+    {
+     "id": "B1.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "B1.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "B1.space",
+     "ok": true,
+     "reason": "Extent [84.0, 27.5, 86.5, 29.5] against area R2 [84.0, 27.5, 86.5, 29.5]"
+    },
+    {
+     "id": "B1.time",
      "ok": false,
-     "reason": "B1 (GPM IMERG V07 rainfall, Late or Final) is not on disk"
+     "reason": "Time ['2016-06-01', '2026-10-31'] against window W4 ['2014-01-01', '2026-10-31']"
+    },
+    {
+     "id": "B1.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "B1.quality",
+     "ok": true,
+     "reason": "Quality flags recorded"
+    },
+    {
+     "id": "B1.licence",
+     "ok": true,
+     "reason": "Licence NASA open data: no restrictions on reuse, cite the dataset DOI (EOSDIS data use guidance)"
     },
     {
      "id": "B2.present",
@@ -303,7 +378,7 @@
    "partial": [
     "B6: GloFAS reforecasts and historical discharge"
    ],
-   "next_requirement": "B1: GPM IMERG V07 rainfall, Late or Final",
+   "next_requirement": "B2: DHM discharge and stage, with station metadata and danger levels",
    "decision": "Start after data supply, then after validation",
    "ceiling": null
   },
@@ -496,7 +571,7 @@
     {
      "id": "C1.present",
      "ok": true,
-     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+     "reason": "Found at data/raw/hazard/bipad/SOURCE.json"
     },
     {
      "id": "C1.variables",
@@ -511,12 +586,12 @@
     {
      "id": "C1.space",
      "ok": true,
-     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+     "reason": "Extent [80.1645, 26.4178, 88.1516, 30.1012] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
     },
     {
      "id": "C1.time",
-     "ok": false,
-     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+     "ok": true,
+     "reason": "Time ['2011-05-14', '2026-11-11'] against window W3 ['2016-06-01', '2024-10-31']"
     },
     {
      "id": "C1.crs",
@@ -526,7 +601,7 @@
     {
      "id": "C1.licence",
      "ok": false,
-     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
+     "reason": "Licence not established (Not stated: no licence or terms of reuse found on bipadportal.gov.np or its API (checked 13 November 2026); confirm with NDRRMA before publishing or relying on it): confirm the terms before use"
     },
     {
      "id": "C2.present",
@@ -606,12 +681,12 @@
    "capability": "landslide.L2",
    "name": "L2 Rainfall-trigger monitoring",
    "family": "landslide",
-   "state": "NOT AVAILABLE",
+   "state": "DATA AVAILABLE, PROCESSING REQUIRED",
    "checks": [
     {
      "id": "C1.present",
      "ok": true,
-     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+     "reason": "Found at data/raw/hazard/bipad/SOURCE.json"
     },
     {
      "id": "C1.variables",
@@ -626,12 +701,12 @@
     {
      "id": "C1.space",
      "ok": true,
-     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+     "reason": "Extent [80.1645, 26.4178, 88.1516, 30.1012] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
     },
     {
      "id": "C1.time",
-     "ok": false,
-     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+     "ok": true,
+     "reason": "Time ['2011-05-14', '2026-11-11'] against window W3 ['2016-06-01', '2024-10-31']"
     },
     {
      "id": "C1.crs",
@@ -641,12 +716,42 @@
     {
      "id": "C1.licence",
      "ok": false,
-     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
+     "reason": "Licence not established (Not stated: no licence or terms of reuse found on bipadportal.gov.np or its API (checked 13 November 2026); confirm with NDRRMA before publishing or relying on it): confirm the terms before use"
     },
     {
      "id": "C5.present",
-     "ok": false,
-     "reason": "C5 (Rainfall for thresholds: IMERG plus DHM daily gauges) is not on disk"
+     "ok": true,
+     "reason": "Found at data/metadata/sources/C5/SOURCE.json"
+    },
+    {
+     "id": "C5.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C5.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C5.space",
+     "ok": true,
+     "reason": "Extent [84.0, 27.5, 86.5, 29.5] against area R2 [84.0, 27.5, 86.5, 29.5]"
+    },
+    {
+     "id": "C5.time",
+     "ok": true,
+     "reason": "Time ['2016-06-01', '2026-10-31'] against window W3 ['2016-06-01', '2024-10-31']"
+    },
+    {
+     "id": "C5.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "C5.licence",
+     "ok": true,
+     "reason": "Licence NASA open data: no restrictions on reuse, cite the dataset DOI (EOSDIS data use guidance)"
     },
     {
      "id": "C6.present",
@@ -655,18 +760,18 @@
     },
     {
      "id": "landslide.L2.model",
-     "ok": false,
-     "reason": "No model record"
+     "ok": true,
+     "reason": "Rainfall event-duration threshold E = 6.7 x D^1.17 mm, fitted to 820 triggering events (20% below the line), BIPAD 2016-2024 with IMERG Late"
     },
     {
      "id": "landslide.L2.calibration",
-     "ok": false,
-     "reason": "No calibration record"
+     "ok": true,
+     "reason": "Exceedance level 20% and a corridor warning when 50% of cells is over the line, chosen on 2023-2024 (as published: CSI 0.285)"
     },
     {
      "id": "landslide.L2.validation",
      "ok": false,
-     "reason": "No validation record"
+     "reason": "Ran, and missed its criterion: 2025-2026 held out, corridor (R1), as published: POD 0.346, FAR 0.669, CSI 0.203; chance CSI 95th percentile 0.2085 (p = 0.1209)"
     },
     {
      "id": "landslide.L2.operational",
@@ -677,7 +782,7 @@
    "partial": [
     "C6: Soil moisture, SMAP L4"
    ],
-   "next_requirement": "C5: Rainfall for thresholds: IMERG plus DHM daily gauges",
+   "next_requirement": "C1: Dated landslide inventory with completeness notes",
    "decision": "Start after data supply, then after validation",
    "ceiling": null
   },
@@ -690,7 +795,7 @@
     {
      "id": "C1.present",
      "ok": true,
-     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+     "reason": "Found at data/raw/hazard/bipad/SOURCE.json"
     },
     {
      "id": "C1.variables",
@@ -705,12 +810,12 @@
     {
      "id": "C1.space",
      "ok": true,
-     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+     "reason": "Extent [80.1645, 26.4178, 88.1516, 30.1012] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
     },
     {
      "id": "C1.time",
-     "ok": false,
-     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+     "ok": true,
+     "reason": "Time ['2011-05-14', '2026-11-11'] against window W3 ['2016-06-01', '2024-10-31']"
     },
     {
      "id": "C1.crs",
@@ -720,12 +825,42 @@
     {
      "id": "C1.licence",
      "ok": false,
-     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
+     "reason": "Licence not established (Not stated: no licence or terms of reuse found on bipadportal.gov.np or its API (checked 13 November 2026); confirm with NDRRMA before publishing or relying on it): confirm the terms before use"
     },
     {
      "id": "C5.present",
-     "ok": false,
-     "reason": "C5 (Rainfall for thresholds: IMERG plus DHM daily gauges) is not on disk"
+     "ok": true,
+     "reason": "Found at data/metadata/sources/C5/SOURCE.json"
+    },
+    {
+     "id": "C5.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C5.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C5.space",
+     "ok": true,
+     "reason": "Extent [84.0, 27.5, 86.5, 29.5] against area R2 [84.0, 27.5, 86.5, 29.5]"
+    },
+    {
+     "id": "C5.time",
+     "ok": true,
+     "reason": "Time ['2016-06-01', '2026-10-31'] against window W3 ['2016-06-01', '2024-10-31']"
+    },
+    {
+     "id": "C5.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "C5.licence",
+     "ok": true,
+     "reason": "Licence NASA open data: no restrictions on reuse, cite the dataset DOI (EOSDIS data use guidance)"
     },
     {
      "id": "B3.present",
@@ -754,7 +889,7 @@
     }
    ],
    "partial": [],
-   "next_requirement": "C5: Rainfall for thresholds: IMERG plus DHM daily gauges",
+   "next_requirement": "B3: Archived rainfall forecasts, as issued",
    "decision": "Start after data supply, then after validation",
    "ceiling": null
   },
@@ -864,7 +999,7 @@
     {
      "id": "C1.present",
      "ok": true,
-     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+     "reason": "Found at data/raw/hazard/bipad/SOURCE.json"
     },
     {
      "id": "C1.variables",
@@ -879,12 +1014,12 @@
     {
      "id": "C1.space",
      "ok": true,
-     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+     "reason": "Extent [80.1645, 26.4178, 88.1516, 30.1012] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
     },
     {
      "id": "C1.time",
-     "ok": false,
-     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+     "ok": true,
+     "reason": "Time ['2011-05-14', '2026-11-11'] against window W3 ['2016-06-01', '2024-10-31']"
     },
     {
      "id": "C1.crs",
@@ -894,7 +1029,7 @@
     {
      "id": "C1.licence",
      "ok": false,
-     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
+     "reason": "Licence not established (Not stated: no licence or terms of reuse found on bipadportal.gov.np or its API (checked 13 November 2026); confirm with NDRRMA before publishing or relying on it): confirm the terms before use"
     },
     {
      "id": "E1.present",
@@ -953,7 +1088,7 @@
    "name": "GPM IMERG V07 rainfall, Late or Final",
    "group": "B",
    "source": "NASA GES DISC (Earthdata login)",
-   "onDisk": false
+   "onDisk": true
   },
   "B2": {
    "name": "DHM discharge and stage, with station metadata and danger levels",
@@ -1019,7 +1154,7 @@
    "name": "Rainfall for thresholds: IMERG plus DHM daily gauges",
    "group": "C",
    "source": "NASA GES DISC; DHM",
-   "onDisk": false
+   "onDisk": true
   },
   "C6": {
    "name": "Soil moisture, SMAP L4",

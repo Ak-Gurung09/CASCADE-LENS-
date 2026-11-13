@@ -2,6 +2,14 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: the first model run on real data (P2, L2)
+
+- **Result.** A rainfall event-duration threshold missed its criterion, which was stated before scoring. It was fitted on 2016–2022, calibrated on 2023–2024 and scored on held-out 2025–2026 data with the rainfall's real publication delay. In the corridor it scored CSI 0.20 against a chance 95th percentile of 0.21 (p = 0.12); POD 0.35, FAR 0.67. Daily IMERG Late rainfall, used this way, adds little to knowing which months are wet. No landslide warning is offered, and claim C30 guards that wording.
+- **Rule change.** A validation record that missed its own criterion (`"criterionMet": false`) is now shown but does not count, so a capability cannot reach *Experimental* on a failed test. The app lists recorded model work under each capability.
+- **Rainfall (B1, C5).** GPM IMERG Late V07 daily rainfall over the Trishuli area for every day from 1 June 2016 to 31 October 2026 is committed as yearly GeoTIFFs. Each day's publication time is recorded, about 14 hours after the UTC day ends (`fetch_imerg.py`, `prepare_rainfall.py`).
+- **Landslide reports (C1).** BIPAD incident records from NDRRMA: 6,672 reports, 2011 to 2026 (`fetch_bipad.py`, `prepare_bipad_inventory.py`). BIPAD states no licence, so the records are not committed and the readiness engine marks the licence as not established. That holds L2 at *data available, processing required* until NDRRMA confirms terms.
+- **Blocked, with reasons recorded.** L1: the only open geological map (USGS) is meant for 1:5,000,000 and coarser. F2, F3 and F5: DHM's observation API needs a key. L3: no archived rainfall forecasts. See [docs/MODELS.md](docs/MODELS.md) and [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
+
 ## 13 November 2026: the later frame 75 pairs
 
 - Downloaded the three later Track 48 frame 75 pairs (28 Aug to 3 Oct, 12 days, mode 2000), so coherence through time now reaches the lower mudflow and the Trishuli corridor. The frame 75 24-day pair (9 Sep to 3 Oct) overlaps them and is not used.

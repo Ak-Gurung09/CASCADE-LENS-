@@ -43,14 +43,14 @@ Every check is recorded with its reason. A copy of a dataset that fails a check 
 |---|---|---|
 | F0 Geographic context | Context only | B5: DEM for the whole Trishuli catchment |
 | F1 Flood susceptibility | Not available | B5 |
-| F2 Rainfall monitoring | Not available | B1: GPM IMERG rainfall |
-| F3 24-hour threshold forecast | Not available | B1 |
+| F2 Rainfall monitoring | Not available | B2: DHM discharge (IMERG rainfall, B1, is now on disk) |
+| F3 24-hour threshold forecast | Not available | B2: DHM discharge; B1 covers 2016 to 2026 but its window starts in 2014 |
 | F4 Inundation forecast | Not available (ceiling: validation required) | B7: cross-sections |
 | F5 Infrastructure impact | Not available | B2: DHM discharge |
 | L0 Terrain and geology | Context only | C2: geological map |
 | L1 Susceptibility | Not available | C2: geological map (the NASA catalogue is present as C1 but ends in 2016) |
-| L2 Rainfall-trigger monitoring | Not available | C5: IMERG and DHM gauge rainfall |
-| L3 24-hour threshold forecast | Not available | C5 |
+| L2 Rainfall-trigger monitoring | Data available, processing required | C1: the BIPAD inventory has no stated licence. A threshold was fitted, calibrated and validated on real data, and missed its criterion (see [MODELS.md](MODELS.md)) |
+| L3 24-hour threshold forecast | Not available | B3: archived rainfall forecasts |
 | L4 InSAR movement | Data available, processing required (ceiling: validation required) | C7: the NISAR GUNW series is registered (five Track 48 pairs over frames 74 and 75, 23 Jul to 3 Oct 2026, and five Track 98 pairs, 26 Jul to 6 Oct) but ends before window W1 closes on 10 Oct. Phase is not converted to displacement |
 | L5 Infrastructure impact | Not available | E1: field reports for named places |
 
