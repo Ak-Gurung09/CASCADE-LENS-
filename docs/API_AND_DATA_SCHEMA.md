@@ -24,7 +24,7 @@ There is no server API. The app reads static files. Types live in `frontend/src/
 | `hazards` | Rasuwa only. Terrain screen and road exposure, from `prepare_hazards.py` |
 | `lake` | Tsho Rolpa only. GCOV lake area by date, coherence and the what-if scenario, from `prepare_lake.py` and `prepare_scenario.py`. Older builds also hold `motion`, which the app never shows |
 
-Each case study has its own manifest, selected by `?case=`: `manifest.json` for Rasuwa (`rasuwa-2026`, the default) and `tsho-rolpa-2026.json` for Tsho Rolpa. `landmet.json` is still shipped from the retired LANDMET case, but the case selector no longer offers it.
+Each case study has its own manifest, selected by `?case=`: `manifest.json` for Rasuwa (`rasuwa-2026`, the default) and `tsho-rolpa-2026.json` for Tsho Rolpa. The retired LANDMET case no longer ships; `processing/scripts/prepare_landmet.py` can rebuild it.
 
 ## Observation relationships
 

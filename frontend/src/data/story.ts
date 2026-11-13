@@ -216,26 +216,18 @@ function lakeStory(m: Manifest): StoryStep[] {
       ],
     })
   }
-  const sc = lake.scenario
-  const mid = sc?.scenarios.find((q) => q.breachM === 20) ?? sc?.scenarios[0]
-  if (sc && mid) {
-    const at = (k: number) => mid.arrival.find((q) => q[0] >= k)
-    const t = (q?: [number, number, number]) => (q ? `${q[1]} to ${q[2]} minutes` : 'unknown')
-    steps.push({
-      id: 'scenario', title: 'What if the dam failed?', bookmarkId: 'valley', layerId: 'context:hillshade', references: ['ref:lake-edge', 'ref:scenario-route', 'ref:scenario-extent'],
-      paragraphs: [
-        'Nobody can calculate whether or when a moraine dam will fail. What real numbers can do is work out what would follow if it did. This is a scenario, not a prediction, and not a warning.',
-        `If a ${mid.breachM} m deep breach opened, about ${Math.round(mid.volumeM3 / 1e6)} million m³ of water would escape: NISAR's lake area times the depth. Two published formulas put the peak flow at the dam between ${mid.peakRange[0].toLocaleString('en-GB')} and ${mid.peakRange[1].toLocaleString('en-GB')} m³/s.`,
-        `Cross-sections through the real terrain give the speed: the water would reach 10 km down the valley in ${t(at(10))}, and 30 km, where the route turns down the Tamakoshi, in ${t(at(30))}. Open "What if" at the top for the full table and the other breach sizes.`,
-      ],
-    })
-  }
+  // The dam-break scenario stays out of the guided story (audit, Category D): it rests on assumed breach depths and is
+  // offered only under Illustrations, as "What if", with its ranges and assumptions in view.
+  const scenarioNote = lake.scenario
+    ? ['A labelled what-if dam-break scenario, built on assumed breach depths, is under Illustrations: What if. It is not a prediction and not a warning.']
+    : []
   steps.push({
     id: 'why', title: 'Why it held steady, and what would change it', bookmarkId: 'valley', layerId: `${id}:rgb`, references: ['ref:lake-edge'],
     paragraphs: [
       'Why no change: the engineered channel at the dam lets extra monsoon water drain out instead of raising the lake. And lakes like this grow at the glacier end, as ice melts and breaks off into the water. That takes years: a change of a few percent would hide inside the radar’s 20 m pixels over five weeks.',
       'What would make it grow: warmer years melting the glacier faster, the glacier front retreating up the valley, or the moraine dam weakening as the ice buried inside it melts.',
       'What comes next: put these five weeks into decades of history with older satellite images, add NISAR dates after the monsoon, and check the outline against an optical image. The result we want to test: stable this season, but grown over decades.',
+      ...scenarioNote,
     ],
     sources: BACKGROUND,
   })

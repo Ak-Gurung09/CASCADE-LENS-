@@ -67,7 +67,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Time slider, day chart | Implemented and tested | Browser | Real, Tsho Rolpa GCOV dates | Any layer with saved time steps |
 | Terrain, UNOSAT, OSM, boundaries | Implemented and tested | Browser | Real | |
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
-| LANDMET test case | Retired from the app (team decision, 6 Nov) | Pipeline tests only, with the file present | Real, test only | Not in the case selector |
+| LANDMET test case | Retired from the app (team decision, 6 Nov); data no longer shipped (13 Nov) | Pipeline tests only, with the file present | Real, test only | `prepare_landmet.py` can rebuild it |
 | Offline operation | Implemented and tested | CSP-enforced browser test | Real | |
 | One-click package | Implemented and tested | Fresh unzip, via the `.bat` | Real | Needs Python 3 |
 | Accessibility | Implemented and tested | axe, keyboard | n/a | No serious findings |

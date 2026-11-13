@@ -31,6 +31,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 - Until the rebuild, the opening card and story step 3 ("Can the radar see it?") say the observability figures are withheld. Do not quote the old percentages. If asked, explain that the first method ignored the product's own quality mask and was withdrawn.
 - The before/after control figures are labelled as coming from an earlier script. Present them as consistent with surface change, not as proof of cause.
 - Rasuwa GCOV snapshots are not downloaded, so that tab shows *Download required*.
+- Keep the Illustrations group (What if, Simulate) out of the main script. They rest on assumed inputs: breach depths, an invented flow speed, a height-above-river rule. If a judge asks, open them as labelled illustrations, not results.
 - All NISAR products are Provisional.
 - Terrain stops at the search envelope.
 - Keep the browser window in front: browsers pause map drawing in hidden windows.

@@ -2,6 +2,12 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: illustrations out of the primary demonstration (Category D)
+
+- What if (dam-break scenario) and Simulate (flow replay, what-if flood, radar explainer) sit in their own "Illustrations" group in the top bar, apart from the evidence modes.
+- The Tsho Rolpa guided story no longer includes the dam-break arrival times; its last step points to What if as a labelled scenario.
+- The retired LANDMET case's data (about 28 MB of tiles, rasters and its manifest) no longer ships; `prepare_landmet.py` can rebuild it.
+
 ## 13 November 2026: engineering fixes (E3, E4, E6) and S10 to S12
 
 - Map errors stay visible while the failing layer is on the map. Before, any other layer loading or the map going idle cleared the warning within a moment, which also made a browser test flaky (E4).
