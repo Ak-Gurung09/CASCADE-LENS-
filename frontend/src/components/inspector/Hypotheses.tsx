@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Manifest } from '../../types/manifest'
-import { explain, gather, type Clues, type Hypothesis, type Standing } from '../../services/hypotheses'
+import { explain, gather, viewSummary, type Clues, type Hypothesis, type Standing } from '../../services/hypotheses'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 
 const List = ({ title, items, kind }: { title: string; items: string[]; kind: string }) =>
@@ -23,8 +23,11 @@ function Item({ h, open }: { h: Hypothesis; open: boolean }) {
 
 function measured(c: Clues) {
   const r: [string, string][] = []
-  if (c.coherence !== null) r.push(['Coherence', c.coherence.toFixed(2)])
-  if (c.offset !== null) r.push(['Shift beyond the usual', `${c.offset.toFixed(2)} m (usual spread ${c.offsetUsual!.toFixed(2)} m)`])
+  for (const v of c.views) {
+    const of = v.label ? `, ${v.label}` : ''
+    if (v.coherence !== null) r.push([`Coherence${of}`, v.coherence.toFixed(2)])
+    if (v.offset !== null) r.push([`Shift beyond the usual${of}`, `${v.offset.toFixed(2)} m (usual spread ${v.offsetUsual!.toFixed(2)} m)`])
+  }
   if (c.elevation !== null) r.push(['Elevation', `${Math.round(c.elevation)} m`])
   if (c.slopeDeg !== null) r.push(['Slope', `${Math.round(c.slopeDeg)}°`])
   return r
@@ -44,7 +47,8 @@ export function Hypotheses({ manifest, point }: { manifest: Manifest; point: [nu
       <h3>What could explain this? <EvidenceTag kind="hypothesis" compact /></h3>
       {!clues ? <p className="muted small">Weighing the evidence…</p> : (
         <>
-          <p className="muted small">Each explanation is checked against the radar values at this spot and independent mapping. The label counts which checks agree; it is not a probability. Context such as slope is listed but not counted.</p>
+          <p className="muted small">Each explanation is checked against the radar values at this spot and independent mapping. The label counts which checks agree; it is not a probability. Context such as slope is listed but not counted.{clues.views.length > 1 ? ' Each viewing direction is read from its own data, and its checks are labelled with its track.' : ''}</p>
+          {viewSummary(clues).length > 0 && <ul className="hyp-views small">{viewSummary(clues).map((t) => <li key={t}>{t}</li>)}</ul>}
           {explain(clues).map((h, i) => <Item key={h.id} h={h} open={i === 0} />)}
           {measured(clues).length > 0 && (
             <dl className="facts hyp-measured">{measured(clues).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>

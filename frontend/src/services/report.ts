@@ -3,7 +3,7 @@ import { acquisitionLabel, isUsable } from './manifest'
 import { samplePoint } from './sampler'
 import { evidenceOf, EVIDENCE } from './evidence'
 import { classify, classLabel, isObservability, obsViews, observabilityCurrent, reasons, STALE_NOTE, taskOf } from './observability'
-import { explain, gather, type Hypothesis } from './hypotheses'
+import { explain, gather, viewSummary, type Hypothesis } from './hypotheses'
 import { isTerrainScreen, nearestRoad, terrainClass, terrainFactors, terrainLayer } from './hazards'
 import { roadEvidence, type RoadEvidence } from './roadEvidence'
 
@@ -32,6 +32,8 @@ export interface Report {
   otherViews?: ObsAnswer[]
   readings: ReportRow[]
   explanations: Hypothesis[]
+  // what each viewing direction could read at the spot, when there is more than one
+  explanationViews?: string[]
   hazards?: { terrain: { class: string; factors: string[] } | null; road: RoadEvidence | null; maturity: string }
   notes: string[]
 }
@@ -78,6 +80,7 @@ export async function buildReport(m: Manifest, p: [number, number], now = new Da
       units: l.units, observation: acquisitionLabel(l), source: samples[i].granule ?? null,
     })),
     explanations: explain(clues),
+    ...(viewSummary(clues).length ? { explanationViews: viewSummary(clues) } : {}),
     hazards: m.hazards ? { terrain: tf === null ? null : { class: m.hazards.terrain.classes.find((c) => c.code === terrainClass(tf))?.label ?? '', factors: terrainFactors(tf) }, road: road ? roadEvidence(m, road) : null, maturity: 'Experimental screens, not forecasts' } : undefined,
     notes: [
       'Values are the nearest stored pixel, with no interpolation. A blank value means no valid observation, which is not the same as no change.',
@@ -136,6 +139,7 @@ ${v.current ? '' : `<p><b>${esc(STALE_NOTE)}</b></p>`}
 <table>${v.answers.map((a) => `<tr><th>${esc(a.question)}</th><td>${esc(a.answer)}</td></tr>`).join('')}</table>
 ${v.reasons.length ? `<ul>${li(v.reasons)}</ul>` : '<p>No problems found at this spot.</p>'}`).join('')}${r.otherViews?.length ? '<p class="muted">Each viewing direction is judged on its own flags.</p>' : ''}` : ''}
 <h2>What could explain this? <span class="tag">Hypothesis</span></h2>
+${r.explanationViews?.length ? `<ul>${li(r.explanationViews)}</ul>` : ''}
 ${r.explanations.map((h) => `<h3>${esc(h.title)} <span class="tag">${esc(h.standing)}</span></h3>
 ${h.for.length ? `<p><b>For</b></p><ul>${li(h.for)}</ul>` : ''}${h.against.length ? `<p><b>Against</b></p><ul>${li(h.against)}</ul>` : ''}
 ${h.context.length ? `<p><b>Context, not counted</b></p><ul>${li(h.context)}</ul>` : ''}

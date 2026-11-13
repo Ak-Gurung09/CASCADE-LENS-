@@ -2,6 +2,13 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: explanations from both viewing directions
+
+- "What could explain this?" now gathers its clues once per viewing direction (Track 48 and Track 98), each from its own observability flags, event pair, pixel offsets, pre-event pair and control series. Each radar check is labelled with its track. Mapping, slope and height are counted or listed once.
+- A direction that cannot see the spot adds nothing, and the panel says why. At the source, where Track 48's mask flags every pixel, the panel now reads Track 98 instead of refusing. It refuses only when no direction can see the spot.
+- **Rule correction.** A coherence drop on a side that terrain hides (layover or shadow) is no longer counted for "surface disturbed": the observability check cannot judge change there. It is listed under what would settle it. This applies to the single-direction case too. Where only one side is hidden, the other side counts against a viewing artefact.
+- The inspector lists each direction's coherence and offset, and the report carries the per-direction summary (`explanationViews`).
+
 ## 13 November 2026: the second viewing direction (Track 98)
 
 - **Pair B GUNW** (Track 98 ascending, frame 16, 19 to 31 August) is downloaded, passes the QA gates and is in the app: phase, coherence, components, ionosphere and the ionosphere-removed phase. Frame 15 covers 4% of the case area, so `pipeline.json` limits Pair B's GUNW to frame 16 (`framesByProduct`); a missing frame no longer holds back a whole layer.

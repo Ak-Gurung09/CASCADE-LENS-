@@ -23,7 +23,7 @@ Written 2026-11-10, after the master-prompt build. Revised 2026-11-13, after the
 | 15 | Is the product's mask read correctly? | No, until 13 Nov. The P05023 mask is a 32-bit field, and the decoder read the water and subswath digits from the whole value. Bit 24 (an interpolated ionosphere screen, set on 37 to 39% of pixels) turned valid subswaths invalid and hid water. On the event pair, 0.14 to 0.15% of pixels were wrongly kept. | Medium | **Fixed (13 Nov)**: the decoder reads the low byte and keeps the anomaly bits; a test uses values from the real masks |
 | 16 | Is the mudflow drop an artefact of a change in radar mode? | Track 48's pair before the event was acquired in mode 4000 and the event pair in 2000. Track 98's five pairs all use mode 4000, and the gap still opens across the event (0.09 before, 0.36 across). Its control ground also falls by early October, so the control area changes too. | Medium | **Checked (13 Nov)**: mode alone does not explain it; the pre-event pairs are still twice as long |
 
-**Still open:** a like-for-like pre-event control pair (Track 98 matches the radar mode, but both pre-event pairs are 24 days long); "What could explain this?" reading the Track 98 view too; rainfall and river-flow context (GPM IMERG, GloFAS); field validation (none exists).
+**Still open:** a like-for-like pre-event control pair (Track 98 matches the radar mode, but both pre-event pairs are 24 days long); rainfall and river-flow context (GPM IMERG, GloFAS); field validation (none exists).
 
 ## 2. Acceptance checks (prompt sections 32.1 and 32.2)
 
@@ -41,7 +41,7 @@ Written 2026-11-10, after the master-prompt build. Revised 2026-11-13, after the
 | Every "complete" claim has a test | `finding.test.ts` checks that each status entry's test files exist and that at least one calls the computation the claim is about |
 | No withdrawn claim comes back | `claims.test.ts` searches the app, README, demonstration script, limitations and product readme for the wording of every RED claim in `claims.json` |
 
-Test totals on 2026-11-10: Python 72 passed, 35 skipped (need raw files); unit 52 passed; browser 29 passed in Chromium. On 2026-11-12, with the P0.1 code: Python 92 passed, 35 skipped; unit 62 passed; browser 29 passed. On 2026-11-13, after the rebuild: Python 173 passed, 24 skipped (only NASA's samples and the LANDMET file are missing; the real-data Rasuwa tests now run); unit 86 passed; browser 30 passed. With the Track 98 view: Python 181 passed, 24 skipped; unit 92 passed; browser 31 passed. Passing tests check the code's behaviour; they do not validate a scientific result.
+Test totals on 2026-11-10: Python 72 passed, 35 skipped (need raw files); unit 52 passed; browser 29 passed in Chromium. On 2026-11-12, with the P0.1 code: Python 92 passed, 35 skipped; unit 62 passed; browser 29 passed. On 2026-11-13, after the rebuild: Python 173 passed, 24 skipped (only NASA's samples and the LANDMET file are missing; the real-data Rasuwa tests now run); unit 86 passed; browser 30 passed. With the Track 98 view: Python 181 passed, 24 skipped; unit 92 passed; browser 31 passed. With explanations from both directions: unit 98, browser 32. Passing tests check the code's behaviour; they do not validate a scientific result.
 
 ## 3. Scorecard
 
@@ -51,7 +51,7 @@ Test totals on 2026-11-10: Python 72 passed, 35 skipped (need raw files); unit 5
 | Scientific validity | 7 | Reasons kept separate, product masks honoured and decoded bit by bit, over-claims corrected, every shipped figure rebuilt reproducibly with intervals | The control comparison is not like for like; Provisional data, no field truth | A like-for-like control pair |
 | NISAR integration | 8 | GUNW, GOFF, GCOV read from HDF5 with metadata and QA gates | GCOV not loaded for Rasuwa | Rasuwa GCOV snapshots |
 | Originality | 7 | Task-specific observability (change vs movement) with reasons, tied to roads | Layover/shadow maps exist elsewhere; novelty is the per-task, per-reason framing | Show a case where it changes a decision |
-| Observability intelligence | 8 | Per pixel, per task, inspectable, tested; version 2 honours the product's mask, marks missing inputs as not assessed, combines frames 74 and 75, and adds the opposite viewing direction as its own view, compared but never merged | Passive shadow not modelled; explanations read one direction only | Feed both directions into the explanations |
+| Observability intelligence | 8 | Per pixel, per task, inspectable, tested; version 2 honours the product's mask, marks missing inputs as not assessed, combines frames 74 and 75, and adds the opposite viewing direction as its own view, compared but never merged | Passive shadow (from a distant ridge) not modelled | Model passive shadow from the DEM |
 | Temporal analysis | 6 | 5-pair zone series with intervals from two directions, one of them in a single radar mode; per-pixel coherence through time for both | Coherence only; pre-event pairs are 24 days | The later frame 75 pairs; a 12-day pre-event pair |
 | Hazard intelligence | 5 | Terrain screen and road exposure, honest labels | Terrain only; no rainfall; one-event check | Add IMERG rainfall for Model B |
 | Engineering | 7 | One manifest contract, shared services, 280+ tests | Static site; processing runs by hand | Scripted end-to-end rebuild |

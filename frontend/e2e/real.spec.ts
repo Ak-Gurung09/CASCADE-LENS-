@@ -100,6 +100,18 @@ test('Track 98 coherence reaches the source, and each viewing direction is judge
   await expect(page.locator('.obs-at')).toContainText('Each viewing direction is judged on its own')
 })
 
+test('the explanations read Track 98 where Track 48 cannot see, and label each check with its track', async ({ page }) => {
+  await open(page)
+  await page.getByRole('button', { name: 'Mountain source area' }).click()
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  const panel = page.locator('.hypotheses')
+  await expect(panel.locator('.hyp').first()).toBeVisible({ timeout: 20000 })
+  await expect(panel).not.toContainText('No NISAR explanation')
+  await expect(panel.locator('.hyp-views')).toContainText('Track 48 (descending): cannot judge this spot')
+  await expect(panel.locator('.hyp-views')).toContainText('Track 98 (ascending): coherence')
+  await expect(panel.locator('.hyp-measured')).toContainText('Coherence, Track 98 (ascending)')
+})
+
 test('completes the story with the outside world blocked', async ({ page }) => {
   const errors: string[] = []
   const external: string[] = []

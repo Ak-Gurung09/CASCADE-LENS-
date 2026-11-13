@@ -29,7 +29,6 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
 - **Parts of the study area lie outside both Track 48 frames**: 14% of the mapped mudflow, 18% of the Trishuli corridor and 19% of the whole case area. Track 98 frame 16 covers all of it, from the other side.
 - **Coherence through time** covers Track 48 frame 74 and Track 98 frame 16. The three later frame 75 pairs were not downloaded.
-- **"What could explain this?"** reads only the Track 48 view and coherence.
 - **Not built from the November master prompt** (need data or are out of scope): rainfall and river-flow context (IMERG, GloFAS), live processing, hosting. Slope screening and road exposure were built on 10 November as experimental screens. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
 - **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave up to 2 November, and in Chromium from 10 November. They have not run in Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
@@ -80,7 +79,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Radar Observability ("Can the radar see it?") | Method version 2 implemented, tested and rebuilt (13 Nov) | Python, frontend, browser | Real, derived | Applies the product's own mask. Rasuwa over frames 74 and 75, Tsho Rolpa over frame 74; see [RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md) |
 | Second viewing direction, Track 98 (13 Nov) | Implemented and tested | Python (comparison, merge, frames per product), unit, browser | Real: Pair B GUNW frame 16 and its pre-event pair | Its own observability view (`observabilityViews.t98`), compared cell by cell with Track 48 and never merged; the inspector and report answer per direction |
 | Pre-event control comparison | Implemented, tested and rebuilt (13 Nov) | Python, unit | Real, derived, with block-bootstrap 95% intervals; Track 48 and Track 98 | Rasuwa story step 2 chart. Wording: consistent with surface change, not proof of cause |
-| "What could explain this?" | Implemented and tested | Unit, browser | Real inputs, rule-based | Counts only radar values at the spot and independent mapping. Labels: Fits the checks, Partly fits, Little support; never probabilities |
+| "What could explain this?" | Implemented and tested | Unit, browser | Real inputs, rule-based | Reads each viewing direction (Track 48 and Track 98) from its own flags and pair, and labels each check with its track. Counts only radar values at the spot and independent mapping. Labels: Fits the checks, Partly fits, Little support; never probabilities |
 | Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | Unit, browser downloads | Real | Built in the browser |
 | Tsho Rolpa dam and glacier movement | Research output only (12 Nov) | Python | Not shown in the app | `prepare_lake.py --research-motion` writes to `data/qa` |
 | Tsho Rolpa coherence layer | Rebuilt (13 Nov) | Python | Real, event pair | `prepare_lake.py --coherence-only` rebuilds it without GCOV. The mask marks most of the lake as water, so the story quotes no lake median |
@@ -99,15 +98,17 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 
 ## Commands executed and results
 
-After the second viewing direction (Track 98) was added, on 2026-11-13, in a cloud copy, in Chromium:
+After the explanations were extended to both viewing directions, on 2026-11-13, in a cloud copy, in Chromium:
 
 ```text
 python -m pytest tests                       181 passed, 24 skipped (skips need NASA's samples or the LANDMET file)
 npx tsc --noEmit                             no errors
-npm test                                     92 passed
+npm test                                     98 passed
 npm run build                                OK
-npx playwright test                          31 passed
+npx playwright test                          32 passed
 ```
+
+When the second viewing direction (Track 98) was added, earlier the same day: Python 181 passed, 24 skipped; unit 92; browser 31.
 
 After the rebuild from the raw files, earlier the same day:
 
