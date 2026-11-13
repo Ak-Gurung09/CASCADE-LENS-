@@ -157,7 +157,7 @@ def main(argv: list[str]) -> None:
             feats.append({"type": "Feature", "geometry": mapping(stransform(to_ll, seg)), "properties": {
                 # Stable ID (E6): the OSM way and the stretch's place along it, so a report row can be traced back
                 "id": segment_id(props, f["geometry"], i), "osmId": props.get("id"), "name": props.get("name_en") or props.get("name"),
-                "bridge": props.get("bridge"), "road": kind, "exposure": level, "color": dict(EXPOSURE)[level], "reasons": reasons,
+                "bridge": props.get("bridge"), "osmStatus": props.get("status"), "road": kind, "exposure": level, "color": dict(EXPOSURE)[level], "reasons": reasons,
                 "steepSharePct": steep, "nearRiver": near_river, "mapped2026": mapped,
                 "radarWatch": watch, "radarUsablePct": usable, "radarHiddenPct": hidden, "radarUnseenPct": unseen,
                 "radarUnreliablePct": share(2), "radarNoValidPct": share(4), "radarOutsidePct": share(5), "radarNotAssessedPct": share(6),

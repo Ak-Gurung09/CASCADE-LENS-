@@ -5402,6 +5402,120 @@
     "OpenStreetMap roads exported after the event; some may have moved or closed.",
     "Click a road segment to see why it is rated as it is, and whether the radar can watch it."
    ]
+  },
+  {
+   "groupId": null,
+   "category": "reference",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "prepared",
+   "statusReason": null,
+   "sources": [],
+   "units": null,
+   "kind": "vector",
+   "measurementType": "reference",
+   "crs": "EPSG:4326",
+   "sourceGranules": [],
+   "page": "https://data.humdata.org/dataset/hot_flood_npl",
+   "id": "rasuwa-2026:road-states",
+   "name": "Road and bridge states (reported)",
+   "mission": "OpenStreetMap",
+   "instrument": "HOT export and HOT bridge damage assessment",
+   "productType": "Vector",
+   "measurementClass": "reference map",
+   "acquisition": {
+    "reference": "Post-event mapping, 2026",
+    "secondary": null
+   },
+   "vector": {
+    "url": "data/vectors/access-states-rasuwa-2026.geojson",
+    "type": "line",
+    "color": "#D9483B",
+    "opacity": 0.95,
+    "bounds": [
+     84.556508,
+     27.794728,
+     85.407896,
+     28.306441
+    ],
+    "colorProperty": "color",
+    "width": 3
+   },
+   "attribution": "\u00a9 OpenStreetMap contributors (ODbL), via HOT; bridge assessment by HOT volunteers",
+   "legend": {
+    "type": "categorical",
+    "stops": [
+     "#D9483B",
+     "#E8B04A",
+     "#7FB8A8"
+    ],
+    "keys": [
+     {
+      "color": "#D9483B",
+      "label": "Closed: mapped destroyed or reported washed out"
+     },
+     {
+      "color": "#E8B04A",
+      "label": "Uncertain: reported damaged"
+     },
+     {
+      "color": "#7FB8A8",
+      "label": "Open: reported intact"
+     }
+    ]
+   },
+   "limitations": [
+    "Reports and mapping, not field verified here. Unmapped damage is not shown: a road with no report is Unknown, not open.",
+    "Bridge reports are points, matched to the nearest OSM bridge within 60 m; unmatched reports are listed in the access block."
+   ],
+   "productMaturity": "Community-maintained"
+  },
+  {
+   "groupId": null,
+   "category": "reference",
+   "orbitDirection": null,
+   "track": null,
+   "frames": [],
+   "qualityLayerIds": [],
+   "status": "prepared",
+   "statusReason": null,
+   "sources": [],
+   "units": null,
+   "kind": "vector",
+   "measurementType": "reference",
+   "crs": "EPSG:4326",
+   "sourceGranules": [],
+   "page": "https://data.humdata.org/dataset/hot_flood_npl",
+   "id": "rasuwa-2026:facilities",
+   "name": "Health facilities and helipads (OSM)",
+   "mission": "OpenStreetMap",
+   "instrument": "HOT export",
+   "productType": "Vector",
+   "measurementClass": "reference map",
+   "acquisition": {
+    "reference": "HOT export, 2026",
+    "secondary": null
+   },
+   "vector": {
+    "url": "data/vectors/facilities-rasuwa-2026.geojson",
+    "type": "circle",
+    "color": "#74c0fc",
+    "opacity": 0.95,
+    "radius": 4,
+    "bounds": [
+     84.589744,
+     27.801697,
+     85.376986,
+     28.280729
+    ]
+   },
+   "attribution": "\u00a9 OpenStreetMap contributors (ODbL), via HOT",
+   "limitations": [
+    "Only facilities mapped in OSM; small health posts may be missing."
+   ],
+   "productMaturity": "Community-maintained"
   }
  ],
  "granules": [
@@ -6310,5 +6424,56 @@
     "A Nepal-calibrated rainfall threshold"
    ]
   }
+ },
+ "access": {
+  "url": "data/access/rasuwa-2026.json",
+  "maturity": "EXPERIMENTAL",
+  "states": {
+   "open": {
+    "ways": 10,
+    "km": 0.7
+   },
+   "closed": {
+    "ways": 260,
+    "km": 65.7
+   },
+   "uncertain": {
+    "ways": 3,
+    "km": 0.2
+   },
+   "unknown": {
+    "ways": 1233,
+    "km": 747.3
+   }
+  },
+  "summary": {
+   "before": {
+    "name": "Every mapped road open",
+    "placesWithHealthPath": 20,
+    "places": 26,
+    "pieces": 5
+   },
+   "reported": {
+    "name": "Reported damage closed",
+    "placesWithHealthPath": 10,
+    "places": 26,
+    "pieces": 18
+   },
+   "screen": {
+    "name": "Also close every stretch on ground mapped as hit",
+    "placesWithHealthPath": 5,
+    "places": 26,
+    "pieces": 34
+   }
+  },
+  "limitations": [
+   "A screen, not a statement about who can be reached: footpaths, river crossings, unmapped tracks and helicopters are outside this network.",
+   "The network stops at the study area. A detour that leaves it, for example through Kathmandu, is not found, so 'no road path in this network' can be a boundary effect.",
+   "Only facilities mapped in OSM inside the study area are destinations: three here. Others, including those just outside, are not counted.",
+   "'No path in either' means the mapped roads do not join even with every road open: a gap in the mapping or the network, not a closure.",
+   "OpenStreetMap is incomplete and was edited after the event; roads may be missing or out of date.",
+   "A road with no report is Unknown. The reported network leaves it open, which may be wrong either way.",
+   "No traffic, road condition, vehicle type or season is modelled; distances are along the mapped centre line."
+  ]
  }
 }

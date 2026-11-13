@@ -16,7 +16,7 @@ FILES = {"rasuwa-2026": "manifest.json"}
 def merge(fragment: dict, manifest: dict) -> dict:
     ids = {l["id"] for l in fragment["layers"]}
     manifest["layers"] = [l for l in manifest["layers"] if l["id"] not in ids] + fragment["layers"]
-    for key in ("observability", "hazards", "controlSeries"):
+    for key in ("observability", "hazards", "controlSeries", "access"):
         if key in fragment:
             manifest[key] = fragment[key]
     return manifest
@@ -24,7 +24,7 @@ def merge(fragment: dict, manifest: dict) -> dict:
 
 def main(frag_dir: str, man_dir: str) -> None:
     frags = pathlib.Path(frag_dir)
-    for f in sorted([*frags.glob("observability-*.json"), *frags.glob("hazards-*.json"), *frags.glob("control-*.json")]):
+    for f in sorted([*frags.glob("observability-*.json"), *frags.glob("hazards-*.json"), *frags.glob("control-*.json"), *frags.glob("access-*.json")]):
         frag = json.loads(f.read_text(encoding="utf-8"))
         path = pathlib.Path(man_dir) / FILES.get(frag["case"], f"{frag['case']}.json")
         raw = path.read_bytes()

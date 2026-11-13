@@ -43,5 +43,30 @@
     "url": "https://data.humdata.org/dataset/07db728a-4f0f-4e98-8eb0-8fa9df61f01c/resource/37775d96-2b6a-47b4-8465-2b3238368567/download/npl_admin_boundaries.gdb.zip",
     "page": "https://data.humdata.org/dataset/cod-ab-npl",
     "licence": "CC BY-IGO"
+  },
+  "osm_health": {
+    "url": "https://production-raw-data-api.s3.amazonaws.com/ISO3/NPL_FLOOD/health_facilities/hot_flood_npl_health_facilities_osm.geojson",
+    "page": "https://data.humdata.org/dataset/hot_flood_npl",
+    "licence": "ODbL"
+  },
+  "osm_education": {
+    "url": "https://production-raw-data-api.s3.amazonaws.com/ISO3/NPL_FLOOD/education_facilities/hot_flood_npl_education_facilities_osm.geojson",
+    "page": "https://data.humdata.org/dataset/hot_flood_npl",
+    "licence": "ODbL"
+  },
+  "osm_helipads": {
+    "url": "https://production-raw-data-api.s3.amazonaws.com/ISO3/NPL_FLOOD/helipads/hot_flood_npl_helipads_osm.geojson",
+    "page": "https://data.humdata.org/dataset/hot_flood_npl",
+    "licence": "ODbL"
+  },
+  "osm_destroyed": {
+    "url": "https://production-raw-data-api.s3.amazonaws.com/ISO3/NPL_FLOOD/destroyed_features/hot_flood_npl_destroyed_features_osm.geojson",
+    "page": "https://data.humdata.org/dataset/hot_flood_npl",
+    "licence": "ODbL"
+  },
+  "hot_bridge_damage": {
+    "url": "https://production-raw-data-api.s3.amazonaws.com/ISO3/NPL/combined/hot_flood_npl_bridge_damage.geojson",
+    "page": "https://data.humdata.org/dataset/hot_flood_npl",
+    "licence": "ODbL"
   }
 }

@@ -154,7 +154,7 @@ def osm():
     roads = gpd.read_file(f"zip://{RAW.as_posix()}/osm_roads/hot_flood_npl_roads_osm_gpkg.zip!/{name}")
     roads = roads[roads.intersects(aoi)].copy()
     # OSM way IDs and bridge/layer tags are kept (E6): road segments get stable IDs, and a road graph needs them (P0.4)
-    keep = [c for c in ("id", "highway", "name", "name_en", "bridge", "layer", "surface") if c in roads]
+    keep = [c for c in ("id", "highway", "name", "name_en", "bridge", "layer", "surface", "status") if c in roads]
     major = roads[roads["highway"].isin(["trunk", "primary", "secondary", "tertiary", "unclassified", "track"])] if "highway" in roads else roads
     water["label"] = water["name_en"].fillna(water["name"])
     places["label"] = places["name_en"].fillna(places["name"])
