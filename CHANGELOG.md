@@ -2,6 +2,12 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: readiness engine (P1)
+
+- `processing/src/cascade_lens/readiness.py` works out, from the files on disk, the state each flood and landslide capability (F0 to F5, L0 to L5) has earned. It checks presence, variables, units, space, time, resolution, CRS, missing values, quality flags, freshness, maturity and licence, and needs model, calibration and validation records before going further. Today two capabilities are context only and ten are not available, each with its next requirement.
+- Every dataset gets a `SOURCE.json` with time fields; `available_at` keeps future backtests free of leakage. `register_source.py` writes one, reading extent, CRS, resolution and dates from the files.
+- What is real? now lists flood and landslide outlooks at their earned state. See [docs/READINESS.md](docs/READINESS.md).
+
 ## 13 November 2026: road access screen (P0.4)
 
 - New screen, Hazard screens → Road access to health care: which named places keep a road path to a health facility once reported damage is closed (roads OSM maps as destroyed, bridges volunteers report washed out), the detour or loss for each, and the closures on each old route with their sources. Results say "no road path in this network", never "isolated", and state that the network stops at the study area. Method and limits in [docs/ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md).

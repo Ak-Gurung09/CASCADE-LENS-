@@ -82,6 +82,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Road-segment evidence inspector (P0.3) | Implemented and tested | Unit (panel and exports agree), browser (panel ID matches the downloaded JSON) | Real OSM + NISAR, derived | Stable stretch IDs, radar pair and source file, per-reason shares, what to verify |
 | Road access to health care (P0.4) | Experimental | 12 Python on synthetic networks, unit, browser | Real OSM + HOT bridge reports, derived | See [ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md); stops at the study area |
 | Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch; that rating rests on the version 1 flags until the rebuild |
+| Readiness engine (P1) | Implemented and tested | 18 Python, 3 unit, browser | Files on disk, with SOURCE.json | See [READINESS.md](docs/READINESS.md): 2 context only, 10 not available, each with its next requirement |
 | Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
 | First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |
 | Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names a test that calls its computation | n/a | Shown in the app as "What is real?" |

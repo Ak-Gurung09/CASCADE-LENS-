@@ -769,6 +769,11 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .m-experimental, .m-implemented, .m-partially { color: var(--amber); }
 .m-blocked { color: var(--coral); }
 .m-planned { color: var(--muted); }
+.status-panel h3 { font: 400 22px/1.1 var(--serif); margin: 22px 0 4px; }
+.readiness-state { justify-self: start; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; }
+.r-blocked { color: var(--coral); }
+.r-partial, .r-progress { color: var(--amber); }
+.r-context { color: var(--muted); }
 @media (max-width: 760px) {
   .status-btn { display: none; }
   .finding { top: 70px; max-height: calc(100% - 82px); padding: 18px 16px 16px; gap: 10px; border-radius: 26px; }
