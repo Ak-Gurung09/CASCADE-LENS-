@@ -4,7 +4,8 @@ import { samplePoint } from './sampler'
 import { evidenceOf, EVIDENCE } from './evidence'
 import { classify, classLabel, isObservability, observabilityCurrent, reasons, STALE_NOTE, taskOf } from './observability'
 import { explain, gather, type Hypothesis } from './hypotheses'
-import { isTerrainScreen, nearestRoad, terrainClass, terrainFactors, terrainLayer, type RoadSegment } from './hazards'
+import { isTerrainScreen, nearestRoad, terrainClass, terrainFactors, terrainLayer } from './hazards'
+import { roadEvidence, type RoadEvidence } from './roadEvidence'
 
 // One evidence report for one clicked spot: every value read there, where it came from, and what it can and cannot say.
 
@@ -27,7 +28,7 @@ export interface Report {
   observability: { pair: string; frame: string; methodVersion: number; current: boolean; answers: { question: string; answer: string }[]; reasons: string[] } | null
   readings: ReportRow[]
   explanations: Hypothesis[]
-  hazards?: { terrain: { class: string; factors: string[] } | null; road: RoadSegment | null; maturity: string }
+  hazards?: { terrain: { class: string; factors: string[] } | null; road: RoadEvidence | null; maturity: string }
   notes: string[]
 }
 
@@ -67,7 +68,7 @@ export async function buildReport(m: Manifest, p: [number, number], now = new Da
       units: l.units, observation: acquisitionLabel(l), source: samples[i].granule ?? null,
     })),
     explanations: explain(clues),
-    hazards: m.hazards ? { terrain: tf === null ? null : { class: m.hazards.terrain.classes.find((c) => c.code === terrainClass(tf))?.label ?? '', factors: terrainFactors(tf) }, road, maturity: 'Experimental screens, not forecasts' } : undefined,
+    hazards: m.hazards ? { terrain: tf === null ? null : { class: m.hazards.terrain.classes.find((c) => c.code === terrainClass(tf))?.label ?? '', factors: terrainFactors(tf) }, road: road ? roadEvidence(m, road) : null, maturity: 'Experimental screens, not forecasts' } : undefined,
     notes: [
       'Values are the nearest stored pixel, with no interpolation. A blank value means no valid observation, which is not the same as no change.',
       'Explanations are a rule-based screen: they count which checks agree, using radar values at this spot and independent mapping. Context such as slope is listed but not counted. They are hypotheses, not probabilities or verdicts.',
@@ -82,6 +83,10 @@ const cell = (v: unknown) => { const s = v === null || v === undefined ? '' : St
 export function toCsv(r: Report): string {
   const head = ['case', 'lng', 'lat', 'layer', 'layer_id', 'evidence', 'state', 'value', 'units', 'observation', 'source']
   const rows = r.readings.map((x) => [r.case.id, r.point.lng, r.point.lat, x.layer, x.layerId, x.evidence, x.state, x.value, x.units, x.observation, x.source])
+  const road = r.hazards?.road
+  // The nearest road stretch, as one row: its ID, its rating, and the share of it the event pair could use for change
+  if (road) rows.push([r.case.id, r.point.lng, r.point.lat, `Road stretch ${road.id ?? ''} (${road.road}, ${road.distanceM} m away)`.replace('  ', ' '), road.id, 'Derived',
+    `${road.exposure} exposure; ${road.radar.watch}`, road.radar.shares[0].pct, '% usable for change', road.radar.pair, road.radar.granule])
   return [head, ...rows].map((row) => row.map(cell).join(',')).join('\r\n') + '\r\n'
 }
 
@@ -92,6 +97,17 @@ export function toGeoJson(r: Report): string {
 }
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
+
+function roadHtml(ev: RoadEvidence, li: (xs: string[]) => string): string {
+  const row = (k: string, v: unknown) => (v === null || v === undefined || v === '' ? '' : `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`)
+  return `<h3>Road stretch ${esc(ev.id ?? '')}</h3><table>
+${row('Road', `${ev.road}${ev.bridge ? ', bridge' : ''}, ${ev.lengthM} m long, ${ev.distanceM} m from the spot`)}${row('Name', ev.name)}${row('OpenStreetMap', ev.osmWay)}
+${row('Rating', `${ev.exposure} exposure${ev.reasons.length ? `: ${ev.reasons.join('; ')}` : ': no factor found'}`)}
+${row('Radar pair', ev.radar.pair ? `${ev.radar.pair}${ev.radar.trackFrame ? `, ${ev.radar.trackFrame}` : ''}` : null)}${row('Before pair', ev.radar.baseline)}${row('Source file', ev.radar.granule)}
+${row('Observability', `Method version ${ev.radar.methodVersion}${ev.radar.current ? '' : ' (withdrawn; awaiting the rebuild)'}. ${ev.radar.watch}.`)}
+${ev.radar.shares.map((s) => row(s.label, s.pct === null ? 'not in this build' : `${s.pct}%`)).join('')}</table>
+<p><b>Context</b></p><ul>${li(ev.context)}</ul><p><b>What to verify</b></p><ul>${li(ev.verify)}</ul>`
+}
 
 export function toHtml(r: Report): string {
   const li = (xs: string[]) => xs.map((x) => `<li>${esc(x)}</li>`).join('')
@@ -114,7 +130,7 @@ ${h.context.length ? `<p><b>Context, not counted</b></p><ul>${li(h.context)}</ul
 ${h.missing.length ? `<p><b>Would settle it</b></p><ul>${li(h.missing)}</ul>` : ''}`).join('')}
 ${r.hazards ? `<h2>Hazard screens <span class="tag">Experimental</span></h2>
 ${r.hazards.terrain ? `<p><b>Landslide-prone terrain:</b> ${esc(r.hazards.terrain.class)}</p><ul>${li(r.hazards.terrain.factors)}</ul>` : ''}
-${r.hazards.road ? `<p><b>Road within ${r.hazards.road.distanceM} m (${esc(r.hazards.road.road)}):</b> ${esc(r.hazards.road.exposure)} exposure. ${esc(r.hazards.road.radarWatch)} (${r.hazards.road.radarUsablePct}% of the stretch usable for change).</p><ul>${li(r.hazards.road.reasons)}</ul>` : ''}
+${r.hazards.road ? roadHtml(r.hazards.road, li) : ''}
 <p class="muted">${esc(r.hazards.maturity)}. Terrain and position only: geology, soil and rainfall are not included.</p>` : ''}
 <h2>Every value at this spot</h2>
 <table><tr><th>Layer</th><th>Evidence</th><th>Value</th><th>Observation</th><th>Source file</th></tr>

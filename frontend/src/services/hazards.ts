@@ -27,9 +27,12 @@ export const isTerrainScreen = (l: Layer) => l.measurementType === 'terrain-scre
 export const terrainLayer = (m: Manifest) => m.layers.find((l) => isTerrainScreen(l) && isUsable(l))
 export const roadLayer = (m: Manifest) => m.layers.find((l) => l.measurementType === 'road-exposure' && isUsable(l))
 
+// One 250 m stretch from prepare_hazards.py. id, osmId, name, bridge and the per-class radar shares exist from 13 Nov builds on.
 export interface RoadSegment {
-  road: string; exposure: string; color: string; reasons: string[]; steepSharePct: number; nearRiver: boolean; mapped2026: boolean
+  road: string; exposure: string; color: string; reasons: string[]; steepSharePct: number | null; nearRiver: boolean; mapped2026: boolean
   radarWatch: string; radarUsablePct: number; radarHiddenPct: number; radarUnseenPct: number; lengthM: number; distanceM: number
+  id?: string; osmId?: string | null; name?: string | null; bridge?: string | null
+  radarUnreliablePct?: number; radarNoValidPct?: number; radarOutsidePct?: number; radarNotAssessedPct?: number
 }
 
 type Seg = { geometry: { coordinates: [number, number][] }; properties: Omit<RoadSegment, 'distanceM'> }

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import type { Manifest } from '../../types/manifest'
 import { samplePoint } from '../../services/sampler'
 import { nearestRoad, terrainClass, terrainFactors, terrainLayer, type RoadSegment } from '../../services/hazards'
+import { roadEvidence } from '../../services/roadEvidence'
+import { RoadEvidencePanel } from './RoadEvidencePanel'
 
 // Terrain screen and the nearest screened road, for the clicked spot. Both experimental, and labelled so.
 export function HazardAt({ manifest, point }: { manifest: Manifest; point: [number, number] }) {
@@ -35,6 +37,7 @@ export function HazardAt({ manifest, point }: { manifest: Manifest; point: [numb
             {road.reasons.length ? road.reasons.map((r) => <li key={r}>{r}</li>) : <li>No exposure factor found along this stretch.</li>}
             <li>{road.radarWatch}: the event pair could see a change on {road.radarUsablePct}% of this stretch{road.radarUnseenPct >= 50 ? ', and most of it lies beyond the frame checked' : road.radarHiddenPct >= 20 ? `, ${road.radarHiddenPct}% is hidden by terrain` : ''}.</li>
           </ul>
+          <RoadEvidencePanel ev={roadEvidence(manifest, road)} />
         </div>
       )}
       <p className="muted small">Screens of terrain and position only, not forecasts. They leave out geology, soil and rainfall.</p>

@@ -212,6 +212,16 @@ input:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Interpretation */
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.road-evidence { grid-column: 1 / -1; margin-top: 10px; border-top: 1px solid var(--line-strong); padding-top: 8px; }
+.road-evidence summary { cursor: pointer; font-weight: 600; font-size: 12.5px; min-height: 32px; display: flex; align-items: center; }
+.ev-facts { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 4px 12px; margin: 8px 0; font-size: 12px; }
+.ev-facts dt { color: var(--label); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding-top: 2px; }
+.ev-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.road-evidence .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+.road-evidence table.shares { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.road-evidence table.shares caption { text-align: left; color: var(--label); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding-bottom: 4px; }
+.road-evidence table.shares th { text-align: left; font-weight: 500; padding: 2px 0; }
+.road-evidence table.shares td { text-align: right; padding: 2px 0; font-variant-numeric: tabular-nums; }
 .facts > div { border: 1px solid var(--line-strong); border-radius: 16px; padding: 10px 13px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .facts > div.wide { grid-column: 1 / -1; }
 .facts dt { color: var(--label); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }

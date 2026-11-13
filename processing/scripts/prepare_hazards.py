@@ -132,6 +132,7 @@ def main(argv: list[str]) -> None:
             usable = round(100 * float((sc == 1).mean()), 1)
             hidden = round(100 * float((sc == 3).mean()), 1)
             unseen = round(100 * float(np.isin(sc, (4, 5, 6)).mean()), 1)
+            share = lambda k: round(100 * float((sc == k).mean()), 1)  # noqa: E731  one figure per observability class, for the road inspector
             near_river = bool(seg.distance(rivers) <= RIVER_M) if not rivers.is_empty else False
             mapped = bool(seg.intersects(flow)) or bool(seg.intersects(hit))
             reasons = []
@@ -159,6 +160,7 @@ def main(argv: list[str]) -> None:
                 "bridge": props.get("bridge"), "road": kind, "exposure": level, "color": dict(EXPOSURE)[level], "reasons": reasons,
                 "steepSharePct": steep, "nearRiver": near_river, "mapped2026": mapped,
                 "radarWatch": watch, "radarUsablePct": usable, "radarHiddenPct": hidden, "radarUnseenPct": unseen,
+                "radarUnreliablePct": share(2), "radarNoValidPct": share(4), "radarOutsidePct": share(5), "radarNotAssessedPct": share(6),
                 "lengthM": round(seg.length)}})
     road_path = out / f"vectors/road-exposure-{case}.geojson"
     road_path.parent.mkdir(parents=True, exist_ok=True)

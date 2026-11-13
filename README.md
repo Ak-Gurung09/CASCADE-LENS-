@@ -40,7 +40,7 @@ This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](
 - An evidence class on every layer, panel and report: Observed, Derived, Forecast, Hypothesis, Reference, Scenario or Unknown.
 - Radar observability (“Can the radar see it?”): for each spot, whether a surface change could be judged and whether movement could be measured, with the reasons kept separate. The figures are withheld until the rebuild, as described above.
 - “What could explain this?”, a rule-based panel that lists the checks for and against each explanation and never gives a probability, and an evidence report as a printable page, CSV, GeoJSON or JSON.
-- Experimental hazard screens: landslide-prone terrain and road exposure along the Rasuwa corridor.
+- Experimental hazard screens: landslide-prone terrain and road exposure along the Rasuwa corridor. Each 250 m road stretch has a stable ID, and its evidence panel shows the rating, what the radar saw there, from which file, and what to verify next. Every report format carries the same record.
 - Layer statuses generated from the files on disk. A NISAR layer cannot be selected until it has been downloaded, inspected and passed QA.
 - A list of what is real (“What is real?”), read from `frontend/public/data/status.json`, which gives each capability its maturity. Each headline claim is listed in `frontend/public/data/claims.json` with its basis and status, and a test keeps withdrawn claims out of the app and the main docs.
 - A Python pipeline for GUNW, GOFF and GCOV, with QA gates and provenance.

@@ -1,4 +1,4 @@
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import AxeBuilder from '@axe-core/playwright'
@@ -297,4 +297,14 @@ test('hazard screens explain a road stretch and say whether the radar could watc
   await expect(hz).toContainText('exposure', { timeout: 20000 })
   await expect(hz).toContainText(/Radar (can|cannot) watch|Partly watchable/)
   await expect(page.locator('.legend')).toContainText('High exposure')
+  // P0.3: the stretch's own evidence, and the exported report carries the same stretch
+  await hz.getByText('Evidence for this stretch').click()
+  const ev = hz.locator('.road-evidence')
+  await expect(ev).toContainText(/way\/\d+:\d+/)
+  await expect(ev).toContainText('NISAR_L2_PR_GUNW_028_048_D_074')
+  await expect(ev).toContainText('What to verify')
+  const id = (await ev.locator('dd.mono').first().textContent())!.trim()
+  const [json] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'JSON', exact: true }).click()])
+  const saved = JSON.parse(readFileSync((await json.path())!, 'utf8'))
+  expect(saved.hazards.road.id).toBe(id)
 })

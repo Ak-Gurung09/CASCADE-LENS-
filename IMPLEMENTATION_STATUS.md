@@ -79,6 +79,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | Unit, browser downloads | Real | Built in the browser |
 | Tsho Rolpa dam and glacier movement | Research output only (12 Nov) | Python | Not shown in the app | `prepare_lake.py --research-motion` writes to `data/qa` |
 | Landslide-prone terrain screen (Model A) | Experimental | 5 Python, 2 unit, browser | Real DEM, derived | Rasuwa only; a one-event consistency check (AUC 0.66), not a validation |
+| Road-segment evidence inspector (P0.3) | Implemented and tested | Unit (panel and exports agree), browser (panel ID matches the downloaded JSON) | Real OSM + NISAR, derived | Stable stretch IDs, radar pair and source file, per-reason shares, what to verify |
 | Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch; that rating rests on the version 1 flags until the rebuild |
 | Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
 | First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |

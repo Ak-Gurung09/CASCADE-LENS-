@@ -2,6 +2,12 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: road-segment evidence inspector (P0.3)
+
+- Clicking near a screened road opens "Evidence for this stretch": its stable ID and OSM way, the rating and its reasons, the radar pair, the before pair, the source file, the observability method version, the share of the stretch in each observability class, the context, and what to verify next.
+- The printable report, CSV, GeoJSON and JSON carry the same record. A unit test checks the exports against the panel's values, and a browser test checks that the ID on screen matches the downloaded report.
+- Each stretch now records the share in every observability class (usable, not reliable, hidden by terrain, no valid data, outside the frame, not assessed), and they add up to the whole stretch.
+
 ## 13 November 2026: illustrations out of the primary demonstration (Category D)
 
 - What if (dam-break scenario) and Simulate (flow replay, what-if flood, radar explainer) sit in their own "Illustrations" group in the top bar, apart from the evidence modes.
