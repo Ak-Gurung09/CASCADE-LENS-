@@ -108,7 +108,9 @@ def check_dataset(need: dict, meta: dict | None, areas: dict, windows: dict, now
         out.append(c("fresh", age is not None and age <= need["freshDays"], f"Available {age} days ago, needs {need['freshDays']} or fewer" if age is not None else "No available_at recorded"))
     if need.get("maturity"):
         out.append(c("maturity", meta.get("maturity") in need["maturity"], f"Maturity {meta.get('maturity')!r}, needs one of {need['maturity']}"))
-    out.append(c("licence", bool(meta.get("licence")), f"Licence {meta.get('licence') or 'not recorded'}"))
+    lic = str(meta.get("licence") or "")
+    known = bool(lic) and not any(w in lic.lower() for w in ("not stated", "unknown", "unclear", "not specified"))
+    out.append(c("licence", known, f"Licence {lic}" if known else f"Licence not established ({lic or 'not recorded'}): confirm the terms before use"))
     return out
 
 

@@ -4,7 +4,7 @@
 
 1. Writes a SOURCE.json for each dataset the repository already ships (group A), under data/metadata/sources, read from
    the files themselves: extent, CRS, resolution, dates.
-2. Reads every SOURCE.json under data/metadata/sources and data/raw, and every model, calibration, validation or
+2. Reads every SOURCE.json under data/metadata/sources, data/reference and data/raw, and every model, calibration, validation or
    operational record under data/metadata/evidence.
 3. Writes frontend/public/data/readiness.json: each capability's earned state, the check behind it and the next requirement.
 Downloads nothing. A dataset counts only when its SOURCE.json is on disk.
@@ -83,7 +83,7 @@ def main(argv: list[str]) -> None:
     now = datetime.fromisoformat(argv[argv.index("--now") + 1].replace("Z", "+00:00")) if "--now" in argv else datetime.now(timezone.utc)
     shipped_sources()
     catalogue = json.loads((ROOT / "processing/configs/readiness.json").read_text(encoding="utf-8"))
-    sources = rd.load_sources(SOURCES, ROOT / "data/raw")
+    sources = rd.load_sources(SOURCES, ROOT / "data/reference", ROOT / "data/raw")
     for meta in (m for ms in sources.values() for m in ms):
         meta["_path"] = str(pathlib.Path(meta["_path"]).relative_to(ROOT).as_posix()) if meta["_path"].startswith(str(ROOT)) else meta["_path"]
     evidence = {}

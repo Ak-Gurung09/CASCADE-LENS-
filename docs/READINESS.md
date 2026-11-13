@@ -48,11 +48,11 @@ Every check is recorded with its reason. A copy of a dataset that fails a check 
 | F4 Inundation forecast | Not available (ceiling: validation required) | B7: cross-sections |
 | F5 Infrastructure impact | Not available | B2: DHM discharge |
 | L0 Terrain and geology | Context only | C2: geological map |
-| L1 Susceptibility | Not available | C1: dated landslide inventory |
-| L2 Rainfall-trigger monitoring | Not available | C1 |
-| L3 24-hour threshold forecast | Not available | C1 |
+| L1 Susceptibility | Not available | C2: geological map (the NASA catalogue is present as C1 but ends in 2016) |
+| L2 Rainfall-trigger monitoring | Not available | C5: IMERG and DHM gauge rainfall |
+| L3 24-hour threshold forecast | Not available | C5 |
 | L4 InSAR movement | Not available (ceiling: validation required) | C7: NISAR GUNW series |
-| L5 Infrastructure impact | Not available | C1 |
+| L5 Infrastructure impact | Not available | E1: field reports for named places |
 
 `frontend/public/data/readiness.json` holds every check behind these.
 
@@ -74,7 +74,7 @@ Every check is recorded with its reason. A copy of a dataset that fails a check 
 
 `available_at` is when the provider published the data. A backtest for issue time *t* may read only records with `available_at` no later than *t*, which keeps hindcasts free of leakage.
 
-The datasets the repository already ships (group A: NISAR, the DEM clip, UNOSAT, OpenStreetMap and HOT) are registered by `prepare_readiness.py` itself, in `data/metadata/sources`.
+The datasets the repository already ships (group A: NISAR, the DEM clip, UNOSAT, OpenStreetMap and HOT) are registered by `prepare_readiness.py` itself, in `data/metadata/sources`. Reference data kept in the repository, such as the Nepal subset of NASA's Global Landslide Catalog, sits under `data/reference` with its own `SOURCE.json`. The model code that would use these is described in [MODELS.md](MODELS.md).
 
 ## Model evidence
 

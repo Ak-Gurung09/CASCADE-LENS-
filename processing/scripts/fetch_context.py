@@ -15,7 +15,9 @@ for key, src in json.loads((ROOT / "processing/configs/context_sources.json").re
         print(key, "cached")
         continue
     req = urllib.request.Request(src["url"], headers={"User-Agent": "cascade-lens/0.1"})
-    with urllib.request.urlopen(req, timeout=280) as r, open(target, "wb") as out:
+    part = target.with_name(target.name + ".part")  # a dropped connection must not leave a file that later looks cached
+    with urllib.request.urlopen(req, timeout=280) as r, open(part, "wb") as out:
         while chunk := r.read(1 << 20):
             out.write(chunk)
+    part.replace(target)
     print(key, target.stat().st_size, "bytes")

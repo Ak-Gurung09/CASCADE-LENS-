@@ -51,6 +51,7 @@ def test_wrong_units_mean_the_data_needs_processing_and_say_why():
     ({"resolution_m": 25000}, "RAIN.resolution"),
     ({"crs": None}, "RAIN.crs"),
     ({"licence": None}, "RAIN.licence"),
+    ({"licence": "Not stated on the portal"}, "RAIN.licence"),
     ({"variables": ["temperature"]}, "RAIN.variables"),
 ])
 def test_each_condition_can_fail_on_its_own(override, check):

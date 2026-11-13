@@ -72,6 +72,16 @@ Source issues found and how they are handled:
 | Licence | ODbL, © OpenStreetMap contributors |
 | Limitations | Volunteer reports and mapping, not field verified here. The bridge assessment gives points with a status (washed out, damaged, intact) and no link to OSM, so CascadeLens matches each to the nearest OSM bridge within 60 m and leaves the rest unused |
 
+## NASA Global Landslide Catalog, Nepal subset
+
+| | |
+|---|---|
+| Provider | NASA Goddard Space Flight Center, [Global Landslide Catalog Export](https://data.nasa.gov/dataset/global-landslide-catalog-export) |
+| Used as | Readiness dataset C1 (dated landslide inventory); no model is fitted to it |
+| Content | 481 Nepal events, 2007-03-21 to 2016-10-13, in `data/reference/hazard/nasa-glc/glc_nepal.csv` |
+| Licence | Not stated on data.nasa.gov; NASA-produced. The readiness engine marks the licence as not established |
+| Limitations | Compiled from media and reports, so unrecorded places are not confirmed negatives. Only 29 locations are exact or within 1 km; most are within 5 to 50 km |
+
 ## Sentinel-1 damage proxy map
 
 | | |

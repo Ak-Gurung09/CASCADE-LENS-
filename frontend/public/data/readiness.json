@@ -495,8 +495,38 @@
    "checks": [
     {
      "id": "C1.present",
+     "ok": true,
+     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+    },
+    {
+     "id": "C1.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C1.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C1.space",
+     "ok": true,
+     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+    },
+    {
+     "id": "C1.time",
      "ok": false,
-     "reason": "C1 (Dated landslide inventory with completeness notes) is not on disk"
+     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+    },
+    {
+     "id": "C1.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "C1.licence",
+     "ok": false,
+     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
     },
     {
      "id": "C2.present",
@@ -568,7 +598,7 @@
     "C3: Land cover",
     "C4: Soil properties"
    ],
-   "next_requirement": "C1: Dated landslide inventory with completeness notes",
+   "next_requirement": "C2: Geological map: lithology, formations, faults",
    "decision": "Start after data supply",
    "ceiling": null
   },
@@ -580,8 +610,38 @@
    "checks": [
     {
      "id": "C1.present",
+     "ok": true,
+     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+    },
+    {
+     "id": "C1.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C1.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C1.space",
+     "ok": true,
+     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+    },
+    {
+     "id": "C1.time",
      "ok": false,
-     "reason": "C1 (Dated landslide inventory with completeness notes) is not on disk"
+     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+    },
+    {
+     "id": "C1.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "C1.licence",
+     "ok": false,
+     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
     },
     {
      "id": "C5.present",
@@ -617,7 +677,7 @@
    "partial": [
     "C6: Soil moisture, SMAP L4"
    ],
-   "next_requirement": "C1: Dated landslide inventory with completeness notes",
+   "next_requirement": "C5: Rainfall for thresholds: IMERG plus DHM daily gauges",
    "decision": "Start after data supply, then after validation",
    "ceiling": null
   },
@@ -629,8 +689,38 @@
    "checks": [
     {
      "id": "C1.present",
+     "ok": true,
+     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+    },
+    {
+     "id": "C1.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C1.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C1.space",
+     "ok": true,
+     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+    },
+    {
+     "id": "C1.time",
      "ok": false,
-     "reason": "C1 (Dated landslide inventory with completeness notes) is not on disk"
+     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+    },
+    {
+     "id": "C1.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "C1.licence",
+     "ok": false,
+     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
     },
     {
      "id": "C5.present",
@@ -664,7 +754,7 @@
     }
    ],
    "partial": [],
-   "next_requirement": "C1: Dated landslide inventory with completeness notes",
+   "next_requirement": "C5: Rainfall for thresholds: IMERG plus DHM daily gauges",
    "decision": "Start after data supply, then after validation",
    "ceiling": null
   },
@@ -743,8 +833,38 @@
     },
     {
      "id": "C1.present",
+     "ok": true,
+     "reason": "Found at data/reference/hazard/nasa-glc/SOURCE.json"
+    },
+    {
+     "id": "C1.variables",
+     "ok": true,
+     "reason": "All needed variables present"
+    },
+    {
+     "id": "C1.units",
+     "ok": true,
+     "reason": "Units as needed"
+    },
+    {
+     "id": "C1.space",
+     "ok": true,
+     "reason": "Extent [80.3109, 26.4596, 88.125, 30.1818] against area R1 [84.3976, 27.732, 85.5508, 28.35]"
+    },
+    {
+     "id": "C1.time",
      "ok": false,
-     "reason": "C1 (Dated landslide inventory with completeness notes) is not on disk"
+     "reason": "Time ['2007-03-21', '2016-10-13'] against window W3 ['2016-06-01', '2024-10-31']"
+    },
+    {
+     "id": "C1.crs",
+     "ok": true,
+     "reason": "CRS EPSG:4326"
+    },
+    {
+     "id": "C1.licence",
+     "ok": false,
+     "reason": "Licence not established (Not stated on data.nasa.gov; NASA-produced data): confirm the terms before use"
     },
     {
      "id": "E1.present",
@@ -773,7 +893,7 @@
     }
    ],
    "partial": [],
-   "next_requirement": "C1: Dated landslide inventory with completeness notes",
+   "next_requirement": "E1: Field reports or photos for named places",
    "decision": "Only after a validated landslide output exists",
    "ceiling": null
   }
@@ -845,7 +965,7 @@
    "name": "Dated landslide inventory with completeness notes",
    "group": "C",
    "source": "BIPAD; NASA GLC/COOLR; NSIDC HMA v2; published inventories",
-   "onDisk": false
+   "onDisk": true
   },
   "C2": {
    "name": "Geological map: lithology, formations, faults",

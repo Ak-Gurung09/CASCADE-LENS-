@@ -2,6 +2,14 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: first model code and verification (P2)
+
+- `cascade_lens/verify.py`: POD, FAR, CSI and bias, event matching, chronological splits, the `available_at` leakage guard, spatial-block folds, AUC and NSE.
+- `cascade_lens/models`: rainfall intensity-duration thresholds (L2/L3), logistic-regression susceptibility with spatial block cross-validation (L1), and GR4J with a snow routine (F3). All are tested on synthetic data only; none has been run on real data, because the inputs are not available.
+- The Nepal subset of NASA's Global Landslide Catalog (481 events, 2007 to October 2016) is registered as dataset C1. The readiness engine finds it present but not fit: it ends before the 2016-2024 window, most locations are coarse, and its licence is not stated. An unstated licence now fails the licence check.
+- Context downloads are written to a temporary file and renamed when complete, so a dropped connection cannot leave a file that looks cached.
+- See [docs/MODELS.md](docs/MODELS.md).
+
 ## 13 November 2026: readiness engine (P1)
 
 - `processing/src/cascade_lens/readiness.py` works out, from the files on disk, the state each flood and landslide capability (F0 to F5, L0 to L5) has earned. It checks presence, variables, units, space, time, resolution, CRS, missing values, quality flags, freshness, maturity and licence, and needs model, calibration and validation records before going further. Today two capabilities are context only and ten are not available, each with its next requirement.

@@ -68,5 +68,10 @@
     "url": "https://production-raw-data-api.s3.amazonaws.com/ISO3/NPL/combined/hot_flood_npl_bridge_damage.geojson",
     "page": "https://data.humdata.org/dataset/hot_flood_npl",
     "licence": "ODbL"
+  },
+  "nasa_glc": {
+    "url": "https://data.nasa.gov/docs/legacy/Global_Landslide_Catalog_Export/Global_Landslide_Catalog_Export_rows.csv",
+    "page": "https://data.nasa.gov/dataset/global-landslide-catalog-export",
+    "licence": "Not stated on data.nasa.gov; NASA-produced data"
   }
 }
