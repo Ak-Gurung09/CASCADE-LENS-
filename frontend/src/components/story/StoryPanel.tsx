@@ -116,7 +116,7 @@ export function StoryPanel({ steps, index, manifest, onGo, onExit }: Props) {
         </ol>
         <footer>
           {last ? <button className="primary" onClick={onExit}>Explore the map</button>
-            : <button className="primary" onClick={() => onGo(index + 1)}>Next: {steps[index + 1].title.replace(/^The /, 'the ')}</button>}
+            : <button className="primary" onClick={() => onGo(index + 1)}><span className="next-label">Next: {steps[index + 1].title.replace(/^The /, 'the ')}</span></button>}
           <button onClick={() => onGo(index - 1)} disabled={index === 0}>Back</button>
           <span className="grow" />
           <button className="ghost" onClick={onExit}>Exit story</button>

@@ -41,6 +41,21 @@ class MapBoundary extends Component<{ children: ReactNode }, { error: string | n
   }
 }
 
+// One fault in one panel used to leave a blank page with no way back. This keeps a message on screen and offers a restart.
+class AppBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
+  state = { error: null as string | null }
+  static getDerivedStateFromError(e: Error) { return { error: e.message } }
+  render() {
+    return this.state.error ? (
+      <main className="splash" role="alert">
+        <h1>GAIA CascadeLens hit a problem</h1>
+        <p>{this.state.error}</p>
+        <p><button className="primary" onClick={() => window.location.reload()}>Start again</button></p>
+      </main>
+    ) : this.props.children
+  }
+}
+
 export function App() {
   const [manifest, setManifest] = useState<Manifest | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
@@ -56,7 +71,7 @@ export function App() {
   const onMapReady = useCallback(() => setMapReady(true), [])
   const screen = failure ? <main className="splash"><h1>GAIA CascadeLens could not start</h1><p>{failure}</p><p>Run the processing scripts to generate the data manifest, then reload.</p></main>
     : !manifest ? <main className="splash"><p>Initializing…</p></main>
-    : <Explorer manifest={manifest} onMapReady={onMapReady} />
+    : <AppBoundary><Explorer manifest={manifest} onMapReady={onMapReady} /></AppBoundary>
   return <>{screen}{intro && <Intro progress={failure || mapReady ? 1 : manifest ? 0.6 : 0.15} onDone={endIntro} />}</>
 }
 
@@ -77,6 +92,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   const [focus, setFocus] = useState<{ bounds: Bookmark['bounds']; nonce: number } | null>(null)
   const [point, setPoint] = useState<[number, number] | null>(null)
   const [statusOpen, setStatusOpen] = useState(false)
+  const [exploring, setExploring] = useState(false) // The reader has started using the map, so the opening card is done
   const [storyStep, setStoryStep] = useState<number | null>(null)
   const [simOn, setSimOn] = useState(false)
   const [compareOn, setCompareOn] = useState(false)
@@ -130,7 +146,8 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   const selectView = (v: EvidenceView) => {
     setView(v)
     if (!group) return
-    const target = (v === 'gcov') !== (group.kind === 'snapshot') ? m.groups.find((g) => g.kind === (v === 'gcov' ? 'snapshot' : 'pair'))! : group
+    const target = (v === 'gcov') !== (group.kind === 'snapshot') ? m.groups.find((g) => g.kind === (v === 'gcov' ? 'snapshot' : 'pair')) : group
+    if (!target) return // A case with no snapshots (or no pairs) keeps its current observation
     setGroupId(target.id)
     const next = m.layers.find((l) => l.groupId === target.id && (l.category === v || l.previewOf === v) && isUsable(l))
     selectLayer(next?.id ?? TERRAIN)
@@ -238,7 +255,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
       <aside className="left" aria-label="Controls">
         <div className="sheet-handle" aria-hidden="true" />
         <LeftPanel manifest={m} group={group} view={view} activeId={activeId} step={step} onStep={setStep} hasStory={story.length > 0} storySteps={story.length} layerVisible={layerVisible} bookmarkId={bookmarkId} opacity={opacity} showTerrain={showTerrain} showMask={showMask} overlayId={overlayId}
-          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} canSimulate={canSimulate} onSimulate={startSim} canCompare={Boolean(m.lake)} compareActive={compareOn} onCompare={startCompare} can3d={Boolean(m.lake?.terrain)} on3d={start3d} onBookmark={goToBookmark} onGroup={selectGroup} onView={selectView} onLayer={selectLayer} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
+          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} canSimulate={canSimulate} onSimulate={startSim} canCompare={Boolean(m.lake)} compareActive={compareOn} onCompare={startCompare} can3d={Boolean(m.lake?.terrain)} on3d={start3d} canScenario={Boolean(m.lake?.scenario)} scenarioActive={scenarioOn && storyStep === null} onScenario={startScenario} onStatus={() => { setPanel(null); setStatusOpen(true) }} onBookmark={(b) => { setExploring(true); goToBookmark(b) }} onGroup={(id) => { setExploring(true); selectGroup(id) }} onView={(v) => { setExploring(true); selectView(v) }} onLayer={(id) => { setExploring(true); selectLayer(id) }} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
           onMask={setShowMask} onOverlay={setOverlayId} onReference={(id, on) => setReferenceIds((r) => (on ? [...r, id] : r.filter((x) => x !== id)))} onAbout={showAbout} onStory={() => goStory(0)} />
       </aside>
 
@@ -246,7 +263,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
         <MapBoundary>
           <Suspense fallback={null}>
             <MapView envelope={m.caseStudy.searchEnvelope} terrain={terrain} showTerrain={showTerrain} active={shownLayer} overlay={overlay} showMask={showMask} opacity={opacity} references={references}
-              footprints={simOn ? NO_FOOTPRINTS : footprints} point={point} focus={focus} sim={sim} onPoint={(p) => { setPoint(p); setTab('inspect'); setAboutId(null); edges.showRight() }} onStatus={setMapStatus} onCoverage={setCovered} />
+              footprints={simOn ? NO_FOOTPRINTS : footprints} point={point} focus={focus} sim={sim} onPoint={(p) => { setExploring(true); setPoint(p); setTab('inspect'); setAboutId(null); edges.showRight() }} onStatus={setMapStatus} onCoverage={setCovered} />
           </Suspense>
         </MapBoundary>
         {threeOn && m.lake?.terrain && (
@@ -254,7 +271,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
             <Terrain3D lake={m.lake} onExit={() => setThreeOn(false)} />
           </Suspense>
         )}
-        {storyStep === null && !simOn && panel === null && <FindingCard manifest={m} onStory={() => goStory(0)} onStatus={() => setStatusOpen(true)} />}
+        {storyStep === null && !simOn && panel === null && <FindingCard manifest={m} exploring={exploring} onStory={() => goStory(0)} onStatus={() => setStatusOpen(true)} />}
         {statusOpen && <StatusPanel onClose={() => setStatusOpen(false)} />}
         {bookmark && <p className="place-chip">{bookmark.name}</p>}
         {mapStatus.state === 'error' && <p className="map-alert" role="alert">{mapStatus.message}</p>}

@@ -20,6 +20,16 @@ export async function loadSimulation(path: string): Promise<SimData> {
   return res.json()
 }
 
+// Time since the last animation frame, never negative. A frame's timestamp is when the browser began that frame, and on a busy computer
+// that can be earlier than a moment already recorded with performance.now(). Unclamped, the first step of an animation then runs backwards.
+export const elapsedMs = (now: number, before: number) => Math.max(0, now - before)
+
+// Where the flow replay stands after one frame, in kilometres along the path. It never leaves the path: a position below zero has no
+// point to draw, and looking one up used to take the whole app down.
+export function replayStep(pos: number, now: number, before: number, last: number, seconds: number): number {
+  return Math.min(last, Math.max(0, pos + (elapsedMs(now, before) / 1000) * (last / seconds)))
+}
+
 export interface SimCount { buildings: number; roadKm: number; places: string[] }
 
 // A feature counts once the flow has passed its kilometre. Without a rise, that is everything mapped so far.
