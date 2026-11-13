@@ -41,6 +41,21 @@ class MapBoundary extends Component<{ children: ReactNode }, { error: string | n
   }
 }
 
+// One fault in one panel used to leave a blank page with no way back. This keeps a message on screen and offers a restart.
+class AppBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
+  state = { error: null as string | null }
+  static getDerivedStateFromError(e: Error) { return { error: e.message } }
+  render() {
+    return this.state.error ? (
+      <main className="splash" role="alert">
+        <h1>GAIA CascadeLens hit a problem</h1>
+        <p>{this.state.error}</p>
+        <p><button className="primary" onClick={() => window.location.reload()}>Start again</button></p>
+      </main>
+    ) : this.props.children
+  }
+}
+
 export function App() {
   const [manifest, setManifest] = useState<Manifest | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
@@ -56,7 +71,7 @@ export function App() {
   const onMapReady = useCallback(() => setMapReady(true), [])
   const screen = failure ? <main className="splash"><h1>GAIA CascadeLens could not start</h1><p>{failure}</p><p>Run the processing scripts to generate the data manifest, then reload.</p></main>
     : !manifest ? <main className="splash"><p>Initializing…</p></main>
-    : <Explorer manifest={manifest} onMapReady={onMapReady} />
+    : <AppBoundary><Explorer manifest={manifest} onMapReady={onMapReady} /></AppBoundary>
   return <>{screen}{intro && <Intro progress={failure || mapReady ? 1 : manifest ? 0.6 : 0.15} onDone={endIntro} />}</>
 }
 

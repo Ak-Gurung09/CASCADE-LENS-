@@ -89,7 +89,7 @@ Re-run on 2026-11-13 in a cloud copy (Chromium, not Edge or Brave), after the re
 ```text
 python -m pytest tests                       72 passed, 35 skipped (skips need the raw NISAR files)
 npx tsc --noEmit                             no errors
-npm test                                     55 passed
+npm test                                     57 passed
 npx playwright test                          30 passed: 20 on the real build, 10 on the synthetic fixture
 python processing/scripts/build_product.py   8,116 files, 222 MB
 ```
@@ -104,6 +104,7 @@ These now also run on every pull request, see `.github/workflows/ci.yml`.
 | On a phone, the story's sheet covered the place its text describes | The detachment zone sat under the sheet | The map frames each place in the strip above the sheet; the sheet is shorter with one row of buttons; browser test added |
 | On a phone, the story's map could be left undrawn | Headless Chromium treated the solid scrolling sheet as hiding the whole map | The sheet's background stops just short of solid. Seen only in headless Chromium, and not checked on a physical phone |
 | On a phone, the case menu, "What is real?" and the dam-failure scenario could not be reached | The top bar hides them at that width | The Layers sheet now carries them |
+| Pressing Play in the flow replay could blank the whole app on a busy computer | The first animation frame can be stamped earlier than the moment Play was pressed, which made the position negative | Elapsed time is never negative, in every animation; a fault anywhere now shows a message with a restart button instead of a blank page. Found by the first CI run |
 | The chosen tab's label vanished under the pointer | White text on the white pill, straight after the click | Hover rule corrected; browser test added |
 | The opening finding card stayed over the map while the reader explored | It hid the map behind the inspector's readings | It steps aside once a place, layer or spot is picked |
 | `scipy` was missing from `processing/requirements.txt` | A fresh install failed one hazard test | Added |

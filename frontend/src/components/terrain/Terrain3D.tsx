@@ -6,6 +6,7 @@ import { assetUrl, formatDate } from '../../services/manifest'
 import { COLOUR_KEY, LakeChart } from '../compare/ComparePanel'
 import { CountUp } from '../motion/CountUp'
 import { buildRadarPass, buildRoute, makeGrid, type Frame } from './sims3d'
+import { elapsedMs } from '../../services/simulation'
 
 // A block model of the lake valley: Copernicus DEM heights, with a NISAR radar image draped on top and layered earth on the sides.
 // Units in the scene are kilometres. North is towards the back at the start.
@@ -191,7 +192,7 @@ export function Terrain3D({ lake, onExit }: { lake: LakeSeries; onExit: () => vo
     const panelShift = () => (window.innerWidth <= 980 || app?.classList.contains('hide-right') ? 0 : 190)
     let last = performance.now()
     let frame = requestAnimationFrame(function loop(now) {
-      const dt = Math.min(0.1, (now - last) / 1000)
+      const dt = Math.min(0.1, elapsedMs(now, last) / 1000)
       last = now
       const want = panelShift()
       const next = shift < 0 ? want : Math.abs(want - shift) < 0.5 ? want : shift + (want - shift) * Math.min(1, dt * 7)
@@ -290,7 +291,7 @@ export function Terrain3D({ lake, onExit }: { lake: LakeSeries; onExit: () => vo
     }
     let before = performance.now()
     let frame = requestAnimationFrame(function tick(now) {
-      const dt = (now - before) / 1000
+      const dt = elapsedMs(now, before) / 1000
       before = now
       setProgress((p) => { const n = Math.min(1, p + dt / (tab === 'route' ? 8 : 10)); if (n >= 1) setPlaying(false); return n })
       frame = requestAnimationFrame(tick)

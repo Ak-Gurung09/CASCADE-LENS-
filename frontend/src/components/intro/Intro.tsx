@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { elapsedMs } from '../../services/simulation'
 
 // The opening screen: the mark, a counter that follows the real loading, then "Ready" and a fade into the map.
 // It never holds the reader back: a click or a key skips it, it is shown once per browser tab, and it stays away
@@ -40,7 +41,7 @@ export function Intro({ progress, onDone }: { progress: number; onDone: () => vo
     const start = performance.now()
     let value = 0
     let frame = requestAnimationFrame(function tick(now) {
-      const t = now - start
+      const t = elapsedMs(now, start)
       const target = t >= MAX_MS ? 100 : Math.min(real.current, t / MIN_MS) * 100
       value = Math.min(100, value + Math.max(0.4, (target - value) * 0.12))
       if (value > target) value = target
