@@ -6,7 +6,10 @@
 |---|---|---|---|---|
 | Pair A, 16→28 Aug 2026 | GUNW | 48 descending | 74, 75 | Downloaded, inspected, QA passed, prepared |
 | Pair A | GOFF | 48 descending | 74, 75 | Downloaded, inspected, QA passed, prepared |
-| Pair B, 19→31 Aug 2026 | GOFF | 98 ascending | 15, 16 | Downloaded, inspected, QA passed, prepared |
+| Pair B, 19→31 Aug 2026 | GUNW | 98 ascending | 16 | Downloaded, inspected, QA passed, prepared (13 Nov). Frame 15 covers 4% of the case area and is not used |
+| Pair B | GOFF | 98 ascending | 15, 16 | Downloaded, inspected, QA passed, prepared |
+| Track 98 series, 26 Jul → 6 Oct 2026 | GUNW | 98 ascending | 16 | Four more pairs (one before the event, three after), QA passed, coherence prepared |
+| Track 48 series, 23 Jul → 3 Oct 2026 | GUNW | 48 descending | 74 (and 75 for the pair before) | Four more pairs, QA passed, coherence prepared |
 | Snapshots, 28 and 31 Aug | GCOV | 48 and 98 | 74, 75, 15, 16 | Catalogued only. 31 GB needed |
 
 All granules are PROVISIONAL, CRID P05023. `tests/integration/test_rasuwa_data.py` checks them.
@@ -34,8 +37,11 @@ All granules are PROVISIONAL, CRID P05023. `tests/integration/test_rasuwa_data.p
 |---|---|---|
 | 74 | 0.19 | 0.46 |
 | 75 | 0.16 | 0.52 |
+| Track 98, frame 16 (Pair B) | 0.13 | 0.46 |
 
-Two independent frames agree, and they agree with independent UNOSAT mapping. Low coherence has other causes, and river channels may be low anyway.
+Valid shares inside the extent: 36.5% (frame 74), 44.0% (frame 75) and 81.2% (Track 98). In Track 98 the rest is masked as water (the river).
+
+Two frames and two viewing directions agree, and they agree with independent UNOSAT mapping. Low coherence has other causes, and river channels may be low anyway.
 
 ### Before and after, against ground nearby
 
@@ -51,23 +57,36 @@ Track 48, frame 74. "Inside" is the UNOSAT mudflow extent. "Control" is ground 3
 
 The gap opens only inside the mapped area, then narrows. A seasonal change would be expected to lower both areas, so the pattern is **consistent with surface change in the mapped area. It does not establish the cause.** The comparison is indicative, not like for like: the pair before spans twice as many days and was acquired in a different radar mode, and either difference changes coherence by itself.
 
+**From the opposite side.** Track 98, frame 16, the same zone and method. Every Track 98 pair was acquired in the same radar mode (4000), so mode cannot explain the difference here; the pair before is still twice as long. Valid inside is 77% in every pair: only the river is masked, and the water mask is the same in all five.
+
+| Pair | Days | Mode in file name | Inside | Control |
+|---|---|---|---|---|
+| 26 Jul → 19 Aug (before) | 24 | 4000 | 0.31 (0.28–0.33) | 0.40 (0.39–0.40) |
+| 19 → 31 Aug (across the event) | 12 | 4000 | 0.13 (0.12–0.14) | 0.49 (0.48–0.50) |
+| 31 Aug → 12 Sep | 12 | 4000 | 0.27 (0.25–0.29) | 0.50 (0.49–0.51) |
+| 12 → 24 Sep | 12 | 4000 | 0.37 (0.34–0.40) | 0.43 (0.42–0.45) |
+| 24 Sep → 6 Oct | 12 | 4000 | 0.29 (0.26–0.31) | 0.31 (0.30–0.32) |
+
+From this side the mapped area was already a little lower before the event (the intervals do not overlap), and the gap widens from 0.09 to 0.36 across it, then narrows. Both directions show the same pattern, with different modes and geometry. Coherence on the control ground also falls in the last two pairs, to 0.43 and then 0.31, so something affected both areas by late September and October. That is a reminder that the control ground changes too.
+
 These figures replace medians from an earlier script that was never in the repository (0.41 and 0.42 before, 0.28 and 0.52 across the event). That script did not apply the mask, and its intervals treated neighbouring pixels as independent. The across-event median inside now matches the pair analysis above (0.19).
 
 ### Phase: mostly unusable inside the extent
 
 Only 15.2% and 19.0% of phase pixels inside the extent are valid. 40.5% and 45.3% are masked, mostly because they could not be reliably unwrapped.
 
-### The source: nothing usable in Pair A, strong signal in Pair B
+### The source: nothing usable in Pair A, very low coherence in Pair B
 
 Pair A's own mask flags every frame-74 pixel of the detachment zone (307 product pixels), and no valid coherence, phase or GOFF value exists anywhere in it. The raw mask settles why. Every one of those pixels has the value 10: water flag 0, reference subswath 1, secondary subswath 0. So the 28 August acquisition has no valid subswath over the source: it is a gap in that acquisition's coverage, not water. The same holds for the barrier lakes. An earlier version of these documents called it a swath gap without checking, which turns out to be right in substance. A later one said a change was visible on 66% of it, from an observability check that ignored the mask, which was wrong. Pair B frame 16 covers the source.
 
 | Pair B, frame 16 | Detachment zone | Nearby channel terrain |
 |---|---|---|
+| Median coherence (GUNW, valid share) | 0.09 (100%) | 0.46 (99.9%) |
 | Median correlation peak | 0.18 | 0.63 |
 | Median SNR | 3.3 | 9.8 |
 | Range offsets flagged or masked | 60% | 0.6% |
 
-Image matching largely fails at the source, which is what a heavily changed surface can look like. Steep terrain, layover and snow can also reduce matching. Pair B has no GUNW here yet, so no coherence is available at the source, though the catalogue lists one.
+Coherence is very low and image matching largely fails at the source, which is what a heavily changed surface can look like. Steep terrain, layover and snow can also reduce both. From this side, 28% of the zone is hidden by layover, and 37% was already incoherent in the pair before the event. Pair B's mask flags none of the zone, but its phase there was not reliably unwrapped (component 0 everywhere), so it gives no movement value.
 
 ### Pixel offsets: no large coherent shift detected
 
@@ -85,6 +104,7 @@ Typical size means the median distance from the scene median. The differences ar
 |---|---|---|---|---|
 | 74 | 0.84 | 8.87 rad | 4.79 rad | 15.5 rad |
 | 75 | 0.95 | 6.41 rad | 1.98 rad | 12.56 rad |
+| Track 98, frame 16 | 0.82 | 1.74 rad | 1.06 rad | 2.70 rad |
 
 This supports the derived ionosphere-removed layer. It also shows why raw phase should never be read as ground motion here.
 
@@ -182,7 +202,6 @@ The ATBD gives the magnitude, φ = (4π/λ)·δr, and the file gives `centerFreq
 **Worth doing next:**
 
 - A like-for-like pre-event control pair, with the same length and radar mode as the event pair, if the catalogue holds one.
-- The Track 98 GUNW for 19→31 August, for coherence at the source.
 - Why every granule fails NISAR's `identification` QA check.
 
 **In the reference data:**

@@ -246,7 +246,11 @@ export interface Manifest {
   granules: GranuleRecord[]
   lake?: LakeSeries
   controlSeries?: ControlSeries
+  // the same comparison from another viewing direction, keyed by view id such as 't98'
+  controlSeriesViews?: Record<string, ControlSeries & { label?: string }>
   observability?: Observability
+  // further viewing directions (another track) beside the main block, keyed by view id such as 't98'; never merged into it
+  observabilityViews?: Record<string, ObservabilityView>
   hazards?: Hazards
   access?: AccessSummary
 }
@@ -288,6 +292,17 @@ export interface Observability {
   zones: Record<string, Record<string, ObservabilityZone>>
 }
 
+export interface ObservabilityComparison { name: string; pixels: number; onlyThis?: number; onlyOther?: number; both?: number; either?: number; neither?: number }
+
+// One more viewing direction, written by prepare_observability.py --view. comparedWith holds, per zone and task, the share usable
+// from this view only, the main view only, both, either and neither (same analysis grid; only "Usable" counts).
+export interface ObservabilityView extends Observability {
+  view: string
+  label: string
+  layerIds: string[]
+  comparedWith?: { flags: string; note: string; zones: Record<string, Record<string, ObservabilityComparison>> }
+}
+
 // Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair.
 // Version 2 is written by processing/scripts/prepare_control_series.py; earlier versions came from a script that is not in the repository.
 export interface ControlPair {
@@ -312,6 +327,6 @@ export interface ControlSeries {
 export interface Hazards {
   terrain: { layerId: string; flags: Record<string, number>; classes: { code: number; label: string; color: string; meaning: string }[]; maturity: string
     validation: { kind?: string; caveats?: string[]; detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
-  roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number }>; rules: Record<string, string>; maturity: string }
+  roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number; unwatchedEitherKm?: number }>; rules: Record<string, string>; maturity: string }
   dynamicTrigger: { maturity: string; needs: string[] }
 }

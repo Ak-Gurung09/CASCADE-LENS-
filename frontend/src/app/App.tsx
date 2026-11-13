@@ -195,7 +195,8 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   useEffect(() => { if (m.lake && story.length) goStory(0) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const caseSimulation = currentCase().simulation
-  const timeLayer = m.layers.find((l) => (l.timeSteps?.length ?? 0) > 1 && isUsable(l))
+  const timeLayers = m.layers.filter((l) => (l.timeSteps?.length ?? 0) > 1 && isUsable(l))
+  const timeLayer = timeLayers[0]
   const canSimulate = Boolean(caseSimulation)
   const showTimeLayer = () => { if (!active?.timeSteps && timeLayer) selectLayer(timeLayer.id) }
 
@@ -282,7 +283,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
 
       {simOn && (
         <div className="sim-dock">
-          <SimPanel manifest={m} simulation={caseSimulation} layer={active} step={step} canTime={Boolean(timeLayer)} onStep={setStep} onTimeTab={showTimeLayer} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
+          <SimPanel manifest={m} simulation={caseSimulation} layer={active} step={step} canTime={Boolean(timeLayer)} timeLayers={timeLayers} onTimeLayer={selectLayer} onStep={setStep} onTimeTab={showTimeLayer} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
         </div>
       )}
 

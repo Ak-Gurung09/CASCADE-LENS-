@@ -33,6 +33,8 @@ export interface RoadSegment {
   radarWatch: string; radarUsablePct: number; radarHiddenPct: number; radarUnseenPct: number; lengthM: number; distanceM: number
   id?: string; osmId?: string | null; name?: string | null; bridge?: string | null; osmStatus?: string | null
   radarUnreliablePct?: number; radarNoValidPct?: number; radarOutsidePct?: number; radarNotAssessedPct?: number
+  // a second viewing direction (prepare_hazards.py --other-view): its own usable share, and the share usable from either view
+  radarOtherView?: string; radarOtherUsablePct?: number; radarEitherUsablePct?: number; radarWatchEither?: string
 }
 
 type Seg = { geometry: { coordinates: [number, number][] }; properties: Omit<RoadSegment, 'distanceM'> }

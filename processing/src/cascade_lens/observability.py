@@ -153,6 +153,21 @@ def summary(classes: np.ndarray, mask: np.ndarray, task: str) -> dict:
     return {"pixels": n, "percent": pct, "verdict": verdict, "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."}
 
 
+def compare_usable(classes_this: np.ndarray, classes_other: np.ndarray, mask: np.ndarray) -> dict:
+    """Share of a zone usable from this viewing direction only, the other only, both, either, or neither (same grid, same task).
+
+    Only class 1 counts as usable. Everything else, including outside the frame and not assessed, counts as not usable, so
+    'only this view' is ground the other view could not judge. The views are compared, never merged into one reason."""
+    if classes_this.shape != classes_other.shape:
+        raise ValueError("views are not on one analysis grid")
+    n = int(mask.sum())
+    if not n:
+        return {"pixels": 0}
+    a, b = (classes_this == 1) & mask, (classes_other == 1) & mask
+    pct = lambda x: round(100 * float(x.sum()) / n, 1)  # noqa: E731
+    return {"pixels": n, "onlyThis": pct(a & ~b), "onlyOther": pct(b & ~a), "both": pct(a & b), "either": pct(a | b), "neither": pct(mask & ~(a | b))}
+
+
 def _on_grid(h5, ds_path: str, gxc: np.ndarray, gyc: np.ndarray) -> tuple[np.ndarray, nisar.Grid]:
     """Nearest product pixel for every analysis-cell centre, as float64 (exact for the uint8/uint16 masks and labels).
     Cells beyond the product grid are NaN."""

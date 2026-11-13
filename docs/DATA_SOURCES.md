@@ -12,7 +12,7 @@ Every source keeps its own identity in the app. Only NISAR layers are NISAR resu
 | Dates | See [DATA_ACQUISITION.md](DATA_ACQUISITION.md) |
 | Maturity | PROVISIONAL (CRID P05023), calibrated and partly validated, per ASF |
 | Limitations | NASA's general maturity definition says Provisional products are not intended for scientific research. [ASF known issues](https://nisar-docs.asf.alaska.edu/provisional-known-issues/) |
-| Status here | Pair A GUNW and GOFF, Pair B GOFF: real measurements. GCOV: catalogue records only |
+| Status here | Pair A GUNW and GOFF, Pair B GUNW and GOFF, and five-pair GUNW series on Track 48 and Track 98: real measurements. GCOV: Tsho Rolpa only; Rasuwa catalogue records only |
 | Attribution | NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC |
 
 ## UNOSAT event layers

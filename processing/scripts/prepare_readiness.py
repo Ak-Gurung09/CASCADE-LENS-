@@ -77,21 +77,25 @@ def shipped_sources() -> None:
                     variables=["roads", "rivers", "places", "health_facilities", "helipads", "road_states"], units={}, crs="EPSG:4326",
                     resolution_m=None, missing_fraction=None, quality_flags=False, maturity="Community-maintained",
                     notes="Post-event mapping; incomplete")
-    # C7: the repeat GUNW series, as shipped: one coherence step per frame 74 pair, plus the frames observability assessed
-    tl = next((l for l in m["layers"] if l["id"] == "rasuwa-2026:coherence-timeline"), None)
-    if tl and tl.get("timeSteps"):
-        pairs = [s["label"].split("/") for s in tl["timeSteps"]]
-        srcs = [s for st in tl["timeSteps"] for s in st["sources"]]
+    # C7: the repeat GUNW series, as shipped: one coherence step per pair, for every track with a series (Track 48 frame 74,
+    # Track 98 frame 16), plus the frames observability assessed
+    series = [l for l in m["layers"] if l["id"].startswith(f"{m['caseStudy']['id']}:coherence-timeline") and l.get("timeSteps")]
+    if series:
+        steps = [st for l in series for st in l["timeSteps"]]
+        pairs = [s["label"].split("/") for s in steps]
+        srcs = [s for st in steps for s in st["sources"]]
         b = [s["bounds"] for s in srcs]
-        frames = sorted({f["frame"] for f in (m.get("observability") or {}).get("frames", [])} | {s["frame"] for s in srcs})
-        rd.write_source(SOURCES / "C7", dataset="C7", provider="NASA/JPL, ISRO via ASF DAAC", product="NISAR L2 GUNW repeat series, Track 48 descending",
+        views = [m.get("observability") or {}, *(m.get("observabilityViews") or {}).values()]
+        frames = sorted({f"{v['track']}/{f['frame']}" for v in views if v for f in v.get("frames") or [{"frame": v.get("frame")}]})
+        tracks = ", ".join(f"Track {l['track']} {str(l.get('orbitDirection', '')).lower()} frame {l['frames'][0]} ({len(l['timeSteps'])} pairs)" for l in series)
+        rd.write_source(SOURCES / "C7", dataset="C7", provider="NASA/JPL, ISRO via ASF DAAC", product=f"NISAR L2 GUNW repeat series: {tracks}",
                         version=", ".join(sorted({s["granule"].split("_")[-5] for s in srcs})), url_or_request_ref="data/metadata/catalogue.json",
                         licence="NASA open data (attribution required)", retrieved_at=None, available_at=None,
                         spatial_extent=[round(min(x[0] for x in b), 4), round(min(x[1] for x in b), 4), round(max(x[2] for x in b), 4), round(max(x[3] for x in b), 4)],
                         time_extent=[min(p[0] for p in pairs), max(p[1] for p in pairs)], variables=["coherence"], units={"coherence": "1"},
                         crs="EPSG:32645", resolution_m=80, missing_fraction=None, quality_flags=True, maturity="Provisional",
-                        notes=f"{len(pairs)} consecutive frame 74 pairs as coherence through time; frames assessed for observability: "
-                              f"{', '.join(map(str, frames))}. Phase is not converted to displacement")
+                        notes=f"{len(pairs)} pairs as coherence through time; track/frame assessed for observability: "
+                              f"{', '.join(frames)}. Phase is not converted to displacement")
 
 
 def main(argv: list[str]) -> None:

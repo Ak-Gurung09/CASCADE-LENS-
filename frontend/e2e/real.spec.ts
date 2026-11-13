@@ -85,6 +85,21 @@ test('Pair B reaches the source that Pair A cannot', async ({ page }) => {
   await expect(inspector(page)).toContainText('ascending, Track 98, frame 16')
 })
 
+test('Track 98 coherence reaches the source, and each viewing direction is judged on its own', async ({ page }) => {
+  await open(page)
+  await page.getByRole('radio', { name: /19–31 August 2026/ }).check()
+  await page.getByRole('radio', { name: /Coherence magnitude/ }).check()
+  await inspect(page, 'Mountain source area')
+  await expect(inspector(page)).toHaveAttribute('data-state', 'valid')
+  await expect(inspector(page)).toContainText('Track 98')
+  const views = page.locator('.obs-at .obs-view')
+  await expect(views).toHaveCount(2)
+  await expect(views.nth(0).locator('h4')).toHaveText('Track 48, descending, frames 74 and 75')
+  await expect(views.nth(1).locator('h4')).toHaveText('Track 98, ascending, frame 16')
+  for (const v of [views.nth(0), views.nth(1)]) await expect(v.locator('.obs-tasks li')).toHaveCount(2)
+  await expect(page.locator('.obs-at')).toContainText('Each viewing direction is judged on its own')
+})
+
 test('completes the story with the outside world blocked', async ({ page }) => {
   const errors: string[] = []
   const external: string[] = []

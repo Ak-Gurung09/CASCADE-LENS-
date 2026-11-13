@@ -10,11 +10,11 @@ All outputs were rebuilt from the raw files on 13 November 2026, with the produc
 
 ## Coverage gaps
 
-Pair A holds no usable measurement at the detachment zone. The product's own mask marks every pixel there as having no valid subswath in the 28 August acquisition (mask value 10), a gap in that acquisition's coverage; it is not water. Pair B reaches the source with pixel offsets only. Frame 75 covers the lower mudflow and the Trishuli corridor; 14% of the mudflow and 18% of the Trishuli corridor lie outside both frames.
+Pair A holds no usable measurement at the detachment zone. The product's own mask marks every pixel there as having no valid subswath in the 28 August acquisition (mask value 10), a gap in that acquisition's coverage; it is not water. Pair B, from the opposite side (Track 98), reaches the source with valid data: a change could be judged on 35% of it, the rest being hidden by layover or already incoherent before the event, and movement on none of it. Frame 75 covers the lower mudflow and the Trishuli corridor; 14% of the mudflow and 18% of the Trishuli corridor lie outside both frames.
 
 ## Coherence is not a damage map
 
-Coherence inside the mapped extent is much lower than nearby, and channels may be low anyway. One pre-event pair has been compared, reproducibly. Inside the mapped mudflow, median coherence fell from 0.38 to 0.19 across the event while the ground around it rose from 0.40 to 0.50. That is consistent with surface change there, but it does not establish the cause. The comparison is indicative only: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes.
+Coherence inside the mapped extent is much lower than nearby, and channels may be low anyway. One pre-event pair has been compared, reproducibly. Inside the mapped mudflow, median coherence fell from 0.38 to 0.19 across the event while the ground around it rose from 0.40 to 0.50. That is consistent with surface change there, but it does not establish the cause. The comparison is indicative only: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes. From the opposite side (Track 98) every pair has the same mode, and the gap also opens (0.31 against 0.40 before, 0.13 against 0.49 across), but that pair before is also 24 days long. In Track 98 the control ground itself drops to 0.31 by early October, so the control area changes too.
 
 ## Derived phase
 
@@ -26,7 +26,7 @@ A pair shows that something changed between two dates, at most. The 12-day inter
 
 ## Orbit geometry
 
-Ascending and descending passes view slopes from opposite sides. Pair A and Pair B are not a time series, and the 28 and 31 August GCOV snapshots are not a before and after. CascadeLens does not subtract them.
+Ascending and descending passes view slopes from opposite sides. Pair A and Pair B are not a time series, and the 28 and 31 August GCOV snapshots are not a before and after. CascadeLens does not subtract them. Observability is judged for each direction on its own; "either track" figures only count where at least one direction could judge, and never mix reasons from the two.
 
 ## InSAR decorrelation
 

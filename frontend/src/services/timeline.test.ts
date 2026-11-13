@@ -34,3 +34,21 @@ describe('coherence through time (shipped Rasuwa layer)', () => {
     }
   })
 })
+
+describe('coherence through time from the opposite side (shipped Track 98 layer)', () => {
+  const t98 = shipped.layers.find((l) => l.id === 'rasuwa-2026:coherence-timeline-t98')
+  it('holds the five frame 16 pairs, 26 Jul to 6 Oct 2026, beside the Track 48 series, never replacing it', () => {
+    expect(t98?.track).toBe(98)
+    expect(t98?.orbitDirection).toBe('ASCENDING')
+    expect(t98?.frames).toEqual([16])
+    expect(t98?.timeSteps?.map((s) => s.label)).toEqual([
+      '2026-07-26/2026-08-19', '2026-08-19/2026-08-31', '2026-08-31/2026-09-12', '2026-09-12/2026-09-24', '2026-09-24/2026-10-06',
+    ])
+    expect(layer?.track).toBe(48)
+    for (const step of t98?.timeSteps ?? []) {
+      const [ref, sec] = step.label.split('/').map(compact)
+      expect(step.sources[0].granule).toMatch(new RegExp(`_098_A_016_.*_${ref}T\\d{6}_${ref}T\\d{6}_${sec}T\\d{6}_${sec}T\\d{6}_`))
+      for (const f of [step.sources[0].sampling, step.sources[0].validity]) expect(existsSync(resolve(data, String(f).replace(/^data\//, ''))), String(f)).toBe(true)
+    }
+  })
+})

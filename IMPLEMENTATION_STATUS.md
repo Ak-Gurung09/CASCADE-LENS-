@@ -5,6 +5,8 @@
 Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12 November (P0.1) and the rebuild from the raw files. Two main cases now ship: Rasuwa (flagship, opens first) and Tsho Rolpa glacial lake.
 
 > **Rebuilt on 13 November 2026.** Both cases were rebuilt from the raw NISAR files with the P0.1 code: observability method 2 over frames 74 and 75, the control series with bootstrap intervals, the hazard screens on the new flags, and coherence through time. The rebuild found and fixed one more error, in reading the product's mask (S13). The raw files are not in the repository; the steps are in [docs/RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md).
+>
+> **Second viewing direction (13 November).** Track 98 (ascending, frame 16) is loaded as Pair B GUNW, with four more pairs: observability as its own view beside Track 48, the before/after series in one radar mode, coherence through time, and road stretches watched from either direction.
 
 ## Minimum completion threshold (brief, section 25.4)
 
@@ -25,8 +27,9 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 - **Rasuwa GCOV snapshots** are not downloaded. They need 31 GB, and the tab says so. The Tsho Rolpa case does use GCOV.
 - **GSLC** is deferred: no justified use yet.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
-- **Parts of the study area lie outside both frames**: 14% of the mapped mudflow, 18% of the Trishuli corridor and 19% of the whole case area. No product covering them has been processed.
-- **Coherence through time covers frame 74 only.** The three later frame 75 pairs were not downloaded.
+- **Parts of the study area lie outside both Track 48 frames**: 14% of the mapped mudflow, 18% of the Trishuli corridor and 19% of the whole case area. Track 98 frame 16 covers all of it, from the other side.
+- **Coherence through time** covers Track 48 frame 74 and Track 98 frame 16. The three later frame 75 pairs were not downloaded.
+- **"What could explain this?"** reads only the Track 48 view and coherence.
 - **Not built from the November master prompt** (need data or are out of scope): rainfall and river-flow context (IMERG, GloFAS), live processing, hosting. Slope screening and road exposure were built on 10 November as experimental screens. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
 - **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave up to 2 November, and in Chromium from 10 November. They have not run in Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
@@ -65,7 +68,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Snapshot view | Implemented and tested | Browser, fixture | Unavailable dependency | Shows *Download required* for Rasuwa |
 | Simulate mode (flow replay, what-if flood, radar explainer) | Implemented and tested | Unit, data and browser tests | Illustrations built on real geography | Not a forecast, see [LIMITATIONS.md](docs/LIMITATIONS.md) |
 | Time slider, day chart | Implemented and tested | Unit (labels), browser | Real: Tsho Rolpa GCOV dates, Rasuwa coherence pairs | Any layer with saved time steps; labels show dates or pair dates |
-| Coherence through time (P0.5) | Implemented and tested (13 Nov) | Python, unit | Real: five frame 74 pairs, 23 Jul to 3 Oct 2026 | One layer, `rasuwa-2026:coherence-timeline`, built by `prepare_timeline.py`; the inspector chart shows a clicked spot pair by pair |
+| Coherence through time (P0.5) | Implemented and tested (13 Nov) | Python, unit, browser | Real: five Track 48 frame 74 pairs (23 Jul to 3 Oct 2026) and five Track 98 frame 16 pairs (26 Jul to 6 Oct) | Two layers, `rasuwa-2026:coherence-timeline` and `-t98`, built by `prepare_timeline.py`; Time replay picks the series; the inspector chart shows a clicked spot pair by pair |
 | Terrain, UNOSAT, OSM, boundaries | Implemented and tested | Browser | Real | |
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
 | LANDMET test case | Retired from the app (team decision, 6 Nov); data no longer shipped (13 Nov) | Pipeline tests only, with the file present | Real, test only | `prepare_landmet.py` can rebuild it |
@@ -75,7 +78,8 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Responsive layout | Implemented and tested | 375 px emulation | n/a | Not on a physical phone |
 | Evidence classes on every layer | Implemented and tested | Unit, browser | Real | Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown |
 | Radar Observability ("Can the radar see it?") | Method version 2 implemented, tested and rebuilt (13 Nov) | Python, frontend, browser | Real, derived | Applies the product's own mask. Rasuwa over frames 74 and 75, Tsho Rolpa over frame 74; see [RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md) |
-| Pre-event control comparison | Implemented, tested and rebuilt (13 Nov) | Python, unit | Real, derived, with block-bootstrap 95% intervals | Rasuwa story step 2 chart. Wording: consistent with surface change, not proof of cause |
+| Second viewing direction, Track 98 (13 Nov) | Implemented and tested | Python (comparison, merge, frames per product), unit, browser | Real: Pair B GUNW frame 16 and its pre-event pair | Its own observability view (`observabilityViews.t98`), compared cell by cell with Track 48 and never merged; the inspector and report answer per direction |
+| Pre-event control comparison | Implemented, tested and rebuilt (13 Nov) | Python, unit | Real, derived, with block-bootstrap 95% intervals; Track 48 and Track 98 | Rasuwa story step 2 chart. Wording: consistent with surface change, not proof of cause |
 | "What could explain this?" | Implemented and tested | Unit, browser | Real inputs, rule-based | Counts only radar values at the spot and independent mapping. Labels: Fits the checks, Partly fits, Little support; never probabilities |
 | Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | Unit, browser downloads | Real | Built in the browser |
 | Tsho Rolpa dam and glacier movement | Research output only (12 Nov) | Python | Not shown in the app | `prepare_lake.py --research-motion` writes to `data/qa` |
@@ -83,19 +87,29 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Landslide-prone terrain screen (Model A) | Experimental | 5 Python, 2 unit, browser | Real DEM, derived | Rasuwa only; a one-event consistency check (AUC 0.66), not a validation |
 | Road-segment evidence inspector (P0.3) | Implemented and tested | Unit (panel and exports agree), browser (panel ID matches the downloaded JSON) | Real OSM + NISAR, derived | Stable stretch IDs, radar pair and source file, per-reason shares, what to verify |
 | Road access to health care (P0.4) | Experimental | 12 Python on synthetic networks, unit, browser | Real OSM + HOT bridge reports, derived | See [ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md); stops at the study area |
-| Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch, from the version 2 flags |
+| Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch, from the version 2 flags, and the share watched from Track 98 and from either direction |
 | Readiness engine (P1) | Implemented and tested | 18 Python, 3 unit, browser | Files on disk, with SOURCE.json | See [READINESS.md](docs/READINESS.md): 2 context only, 1 data available but processing required (L4, the NISAR series), 9 not available, each with its next requirement |
 | First models and verification harness (P2) | Code tested on synthetic data; not run on real data | 17 Python | Blocked: rainfall, discharge, geology, a current inventory | See [MODELS.md](docs/MODELS.md) |
 | Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
 | First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |
 | Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names a test that calls its computation | n/a | Shown in the app as "What is real?" |
-| Claim register (`frontend/public/data/claims.json`) | Implemented and tested | Unit test keeps the wording of RED claims off every live surface | n/a | 26 claims: 25 from the Stage 0 audit and one added at the rebuild, with basis and status |
+| Claim register (`frontend/public/data/claims.json`) | Implemented and tested | Unit test keeps the wording of RED claims off every live surface | n/a | 28 claims: 25 from the Stage 0 audit, one added at the rebuild and two with the Track 98 view, with basis and status |
 | Image swipe comparison | Implemented | No automated test | Real, Tsho Rolpa GCOV dates | Tsho Rolpa compare mode |
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 
 ## Commands executed and results
 
-After the rebuild from the raw files, on 2026-11-13, in a cloud copy, in Chromium:
+After the second viewing direction (Track 98) was added, on 2026-11-13, in a cloud copy, in Chromium:
+
+```text
+python -m pytest tests                       181 passed, 24 skipped (skips need NASA's samples or the LANDMET file)
+npx tsc --noEmit                             no errors
+npm test                                     92 passed
+npm run build                                OK
+npx playwright test                          31 passed
+```
+
+After the rebuild from the raw files, earlier the same day:
 
 ```text
 python -m pytest tests                       173 passed, 24 skipped (skips need NASA's samples or the LANDMET file;
@@ -163,10 +177,12 @@ These are medians of 3 localhost runs, not hosted or low-bandwidth measurements.
 |---|---|---|---|
 | Pair A, 16→28 Aug, Track 48 descending | GUNW | 74, 75 | Validated by the QA gates |
 | Pair A | GOFF | 74, 75 | Validated by the QA gates |
-| Pair B, 19→31 Aug, Track 98 ascending | GOFF | 15, 16 | Validated by the QA gates |
+| Pair B, 19→31 Aug, Track 98 ascending | GUNW | 16 | Validated by the QA gates (13 Nov) |
+| Pair B | GOFF | 15, 16 | Validated by the QA gates |
+| Series, before and after the event | GUNW | Track 48: 74 (and 75 before); Track 98: 16 | Validated by the QA gates (13 Nov) |
 | Snapshots 28 and 31 Aug | GCOV | 74, 75, 15, 16 | Not downloaded |
 
-"Validated" means these gates passed. The products themselves remain NASA Provisional. Pair B frame 15 does not reach the mapped extent.
+"Validated" means these gates passed. The products themselves remain NASA Provisional. Pair B frame 15 does not reach the mapped extent, so its GUNW is not used.
 
 ## Findings
 
@@ -176,7 +192,9 @@ See [SCIENTIFIC_VALIDATION.md](docs/SCIENTIFIC_VALIDATION.md).
 - Pair A holds no usable measurement at the detachment zone. The product's own mask gives every frame-74 pixel there the value 10: no valid subswath in the 28 August acquisition, a gap in that acquisition's coverage, not water. Two earlier statements went too far. The first called it a swath gap without checking the mask. The 6 November correction said a change was visible on 66% of it, which came from an observability check that ignored the mask.
 - Against a pre-event pair (23 Jul to 16 Aug), median coherence in the mapped mudflow went from 0.38 to 0.19 while nearby ground went from 0.40 to 0.50; across the event the two 95% intervals do not overlap. The gap narrowed over the three later pairs (0.315 against 0.550, then 0.434 against 0.545, then 0.456 against 0.537). That is consistent with surface change in the mapped area, not proof of cause. The pairs differ in length (24 and 12 days) and radar mode.
 - Where the radar could judge: in the whole Rasuwa case area, a change was judgeable on 44.0% and movement on 48.1%; on the Bhote Koshi corridor, 64.0% and 72.5%.
-- Pair B reaches the source, and matching largely fails: correlation peak 0.18 against 0.63.
+- Pair B (Track 98, the opposite side) reaches the source: coherence 0.09 against 0.46 nearby, and matching largely fails (correlation peak 0.18 against 0.63). A change could be judged on 35% of the detachment zone from that side, movement on none of it. Across the whole case area, a change is judgeable from at least one direction on 78.8%.
+- From Track 98, every pair has the same radar mode, and the mudflow's coherence gap also opens across the event: 0.31 against 0.40 before, 0.13 against 0.49 across.
+- Road stretches the radar could not watch, counting either direction: 4.8 km (2.7 km of them High exposure), against 28.2 km from Track 48 alone.
 - Raw phase is dominated by the ionosphere.
 - Pixel offsets show no large coherent shift.
 
@@ -188,4 +206,4 @@ GOFF units check, ignored GOFF mask, unreliable phase shown as valid, GCOV mask 
 
 ## Remaining actions
 
-See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). The rebuild is done. The most valuable next steps need new downloads: the frame 98/16 GUNW pairs (a second viewing direction, which reaches the source), the later frame 75 pairs (coherence through time downstream), and rainfall and river data for the models. The download list is kept with the project files.
+See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). The rebuild and the second viewing direction are done. The most valuable next steps need new downloads: the later frame 75 pairs (coherence through time downstream), and rainfall and river data for the models. The download list is kept with the project files.

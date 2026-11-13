@@ -52,6 +52,23 @@ export function classify(flags: number, task: Task): number {
 }
 
 export const isObservability = (l: Layer) => l.measurementType.startsWith('observability-')
+
+// One viewing direction: the observability layers that share one reason-flag raster. Flags from one view must never be read
+// through another view's layers. Views keep manifest order, so the main view (Track 48) comes first.
+export interface ObsView { key: string; label: string; layers: Layer[] }
+
+export function obsViews(layers: Layer[]): ObsView[] {
+  const by = new Map<string, Layer[]>()
+  for (const l of layers.filter(isObservability)) {
+    const key = l.sources[0]?.sampling ?? l.id
+    by.set(key, [...(by.get(key) ?? []), l])
+  }
+  return [...by.entries()].map(([key, ls]) => {
+    const l = ls[0]
+    const pass = l.orbitDirection ? `, ${l.orbitDirection.toLowerCase()}` : ''
+    return { key, layers: ls, label: `Track ${l.track ?? '?'}${pass}, frame${l.frames.length > 1 ? 's' : ''} ${l.frames.join(' and ')}` }
+  })
+}
 export const taskOf = (l: Layer) => l.measurementType.replace('observability-', '') as Task
 
 // The class label as the layer's legend gives it, falling back to the shared labels for codes an older legend lacks.

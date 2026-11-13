@@ -38,6 +38,9 @@ describe('road-segment evidence', () => {
     expect(ev.radar.granule).toBe(shipped.observability!.granule)
     expect(ev.radar.methodVersion).toBe(2)
     expect(ev.radar.current).toBe(true)
+    expect(ev.radar.otherView?.label).toBe('Track 98, ascending')
+    expect(ev.radar.otherView?.pair).toBe('19 Aug 2026 to 31 Aug 2026')
+    expect(ev.radar.otherView!.eitherPct).toBeGreaterThanOrEqual(Math.max(ev.radar.otherView!.usablePct, ev.radar.shares[0].pct ?? 0) - 0.1)
     expect(ev.verify.join(' ')).not.toContain('withdrawn first observability method')
   })
 
@@ -51,8 +54,11 @@ describe('road-segment evidence', () => {
   it('turns each factor into something a reviewer can check, and never calls a Low stretch safe', () => {
     const bridge = roadEvidence(shipped, find((s) => Boolean(s.bridge)))
     expect(bridge.verify.join(' ')).toContain('bridge is standing and passable')
-    const unseen = roadEvidence(shipped, find((s) => s.radarUsablePct < 20))
-    expect(unseen.verify.join(' ')).toContain('neither confirm nor rule out')
+    const unseen = roadEvidence(shipped, find((s) => (s.radarEitherUsablePct ?? s.radarUsablePct) < 20))
+    expect(unseen.verify.join(' ')).toContain('Neither viewing direction could watch most of this stretch, so radar can neither confirm nor rule out')
+    const rescued = roadEvidence(shipped, find((s) => s.radarUsablePct < 20 && (s.radarEitherUsablePct ?? 0) >= 50))
+    expect(rescued.verify.join(' ')).toContain('with the opposite side (Track 98, ascending)')
+    expect(rescued.radar.shares[0].pct).toBeLessThan(20) // the main pair's own share is never replaced by the other view's
     const low = roadEvidence(shipped, find((s) => s.exposure === 'Low'))
     expect(low.verify.join(' ')).toContain('does not mean the road is safe')
     const mapped = roadEvidence(shipped, find((s) => s.mapped2026))

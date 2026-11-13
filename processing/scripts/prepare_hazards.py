@@ -1,6 +1,9 @@
 """Terrain landslide screening and road-corridor exposure for one case, on the Radar Observability grid.
 
-    python prepare_hazards.py <manifest.json> <dem.tif> <observability-flags.tif> <vectors dir> <out dir>
+    python prepare_hazards.py <manifest.json> <dem.tif> <observability-flags.tif> <vectors dir> <out dir> [--other-view ID FLAGS.tif]
+
+--other-view adds a second viewing direction's flags (prepare_observability.py --view, same grid). Each stretch then also
+records the share usable from that view and from either view. The main rating (radarWatch) stays the main view's own.
 
 Writes into <out dir> (laid out like frontend/public): the factor-flag raster for the inspector, map tiles, a road
 segment GeoJSON, and hazards-<case>.json, a fragment that merge_observability.py folds into the manifest.
@@ -46,6 +49,12 @@ def read_fc(p: pathlib.Path):
 
 
 def main(argv: list[str]) -> None:
+    argv = list(argv)
+    other_id = other_path = None
+    if "--other-view" in argv:
+        i = argv.index("--other-view")
+        other_id, other_path = argv[i + 1], pathlib.Path(argv[i + 2])
+        del argv[i:i + 3]
     man, dem, flags_path, vectors, out = (pathlib.Path(a) for a in argv[:5])
     m = json.loads(man.read_text(encoding="utf-8"))
     case = m["caseStudy"]["id"]
@@ -103,6 +112,16 @@ def main(argv: list[str]) -> None:
     # Whether the radar could watch a stretch needs the disturbance task, which exists only with a pre-event baseline pair
     has_baseline = bool((m.get("observability") or {}).get("baselinePair"))
     disturb = ob.classify(obs_flags, "disturbance") if has_baseline else np.full(obs_flags.shape, 6, np.uint8)
+    other = None
+    if other_path:
+        view = (m.get("observabilityViews") or {}).get(other_id) or {}
+        if not view.get("baselinePair"):
+            raise SystemExit(f"view {other_id} has no pre-event pair in the manifest, so it cannot judge change; merge its fragment first")
+        with rasterio.open(other_path) as d:
+            if d.shape != shp or tuple(d.transform)[:6] != tuple(tr)[:6] or d.crs.to_epsg() != epsg:
+                raise SystemExit(f"{other_path.name} is not on the main view's grid")
+            other = ob.classify(d.read(1), "disturbance")
+    rate = lambda u: "Radar can watch" if u >= 50 else "Partly watchable" if u >= 20 else "Radar cannot watch"  # noqa: E731
     feats, tally = [], {}
     inv = ~tr
     for f in read_fc(vectors / "osm_roads.geojson"):
@@ -127,6 +146,7 @@ def main(argv: list[str]) -> None:
             if not inside.any():
                 continue
             cl, sc = cls[r0:r1, c0:c1][inside], disturb[r0:r1, c0:c1][inside]
+            oc = other[r0:r1, c0:c1][inside] if other is not None else None
             steep = hz.steep_share(cl)  # class 0 (no valid elevation) is left out, never counted as gentle
             steep_n = steep or 0.0
             usable = round(100 * float((sc == 1).mean()), 1)
@@ -147,20 +167,26 @@ def main(argv: list[str]) -> None:
             if near_river:
                 reasons.append(f"Within {RIVER_M} m of a mapped river (OpenStreetMap)")
             level = "High" if mapped or steep_n >= 30 else "Moderate" if steep_n >= 10 or near_river else "Low"
-            watch = ("Not assessed" if not has_baseline else
-                     "Radar can watch" if usable >= 50 else "Partly watchable" if usable >= 20 else "Radar cannot watch")
+            watch = "Not assessed" if not has_baseline else rate(usable)
             km = seg.length / 1000
-            t = tally.setdefault(level, {"km": 0.0, "unwatchedKm": 0.0})
+            t = tally.setdefault(level, {"km": 0.0, "unwatchedKm": 0.0, **({"unwatchedEitherKm": 0.0} if oc is not None else {})})
             t["km"] += km
             if watch == "Radar cannot watch":
                 t["unwatchedKm"] += km
+            views = {}
+            if oc is not None:
+                o_usable = round(100 * float((oc == 1).mean()), 1)
+                either = round(100 * float(((sc == 1) | (oc == 1)).mean()), 1)
+                views = {"radarOtherView": other_id, "radarOtherUsablePct": o_usable, "radarEitherUsablePct": either, "radarWatchEither": rate(either)}
+                if rate(either) == "Radar cannot watch":
+                    t["unwatchedEitherKm"] += km
             feats.append({"type": "Feature", "geometry": mapping(stransform(to_ll, seg)), "properties": {
                 # Stable ID (E6): the OSM way and the stretch's place along it, so a report row can be traced back
                 "id": segment_id(props, f["geometry"], i), "osmId": props.get("id"), "name": props.get("name_en") or props.get("name"),
                 "bridge": props.get("bridge"), "osmStatus": props.get("status"), "road": kind, "exposure": level, "color": dict(EXPOSURE)[level], "reasons": reasons,
                 "steepSharePct": steep, "nearRiver": near_river, "mapped2026": mapped,
                 "radarWatch": watch, "radarUsablePct": usable, "radarHiddenPct": hidden, "radarUnseenPct": unseen,
-                "radarUnreliablePct": share(2), "radarNoValidPct": share(4), "radarOutsidePct": share(5), "radarNotAssessedPct": share(6),
+                "radarUnreliablePct": share(2), "radarNoValidPct": share(4), "radarOutsidePct": share(5), "radarNotAssessedPct": share(6), **views,
                 "lengthM": round(seg.length)}})
     road_path = out / f"vectors/road-exposure-{case}.geojson"
     road_path.parent.mkdir(parents=True, exist_ok=True)
@@ -168,7 +194,8 @@ def main(argv: list[str]) -> None:
     xs = [c for f in feats for c in f["geometry"]["coordinates"]]
     road_bounds = [round(min(c[0] for c in xs), 6), round(min(c[1] for c in xs), 6), round(max(c[0] for c in xs), 6), round(max(c[1] for c in xs), 6)]
     for t in tally.values():
-        t["km"], t["unwatchedKm"] = round(t["km"], 1), round(t["unwatchedKm"], 1)
+        for k in t:
+            t[k] = round(t[k], 1)
 
     base = {"groupId": None, "mission": "Copernicus DEM", "instrument": "TanDEM-X (via Copernicus DEM GLO-30)", "orbitDirection": None, "track": None, "frames": [],
             "qualityLayerIds": [], "status": "sampleable", "statusReason": None, "sourceGranules": [], "productMaturity": "Experimental screen"}
@@ -200,7 +227,8 @@ def main(argv: list[str]) -> None:
         "roads": {"layerId": layers[1]["id"], "segmentM": SEG_M, "bufferM": BUFFER_M, "riverM": RIVER_M, "roadTypes": sorted(ROAD_TYPES), "kmByExposure": tally,
                   "rules": {"High": "Crosses ground mapped as hit in 2026, or 30% or more of the ground within 150 m screens High or Very high",
                             "Moderate": "10% or more screens High or Very high, or within 100 m of a mapped river (OpenStreetMap)", "Low": "Otherwise",
-                            "radarWatch": "Share of the 150 m corridor where the event pair could see a surface change: 50% or more = can watch, 20 to 50% = partly, under 20% = cannot"},
+                            "radarWatch": "Share of the 150 m corridor where the event pair could see a surface change: 50% or more = can watch, 20 to 50% = partly, under 20% = cannot",
+                            **({"radarWatchEither": f"The same rule on the share usable from either the main view or view {other_id}; the two views are never merged into one reason"} if other is not None else {})},
                   "maturity": "EXPERIMENTAL"},
         "dynamicTrigger": {"maturity": "BLOCKED BY DATA", "needs": ["GPM IMERG daily rainfall for Aug 2026", "SMAP soil moisture", "A Nepal-calibrated rainfall threshold"]}}}
     (out / f"hazards-{case}.json").write_text(json.dumps(frag, indent=1), encoding="utf-8")

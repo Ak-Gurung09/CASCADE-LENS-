@@ -38,6 +38,9 @@ All of these exist as PROVISIONAL records. A catalogue record does not prove the
 |---|---|---|---|---|---|---|
 | Pair A | GUNW, GOFF | 2026-08-16 → 08-28 | Descending | 48 | 74, 75 | 7.0 GB |
 | Pair B | GOFF | 2026-08-19 → 08-31 | Ascending | 98 | 15, 16 | 2.2 GB |
+| Pair B | GUNW | 2026-08-19 → 08-31 | Ascending | 98 | 16 | 2.3 GB |
+| Track 48 series | GUNW | 2026-07-23 → 10-03: the pair before (frames 74 and 75) and three after (frame 74) | Descending | 48 | 74, 75 | 11.9 GB |
+| Track 98 series | GUNW | 2026-07-26 → 10-06: the pair before and three after | Ascending | 98 | 16 | 9.4 GB |
 | Snapshot | GCOV | 2026-08-28 | Descending | 48 | 74, 75 | 16.9 GB |
 | Snapshot | GCOV | 2026-08-31 | Ascending | 98 | 15, 16 | 14.2 GB |
 
@@ -52,13 +55,13 @@ Footprint coverage of each bookmark, from catalogue polygons. This describes fra
 
 Other findings:
 
-- GUNW also exists for the Track 98 pair, though the brief only lists GOFF there.
+- GUNW also exists for the Track 98 pair, though the brief only lists GOFF there. It was added on 13 November (frame 16 only: frame 15 covers 4% of the case area). `pipeline.json` limits Pair B's GUNW to frame 16 with `framesByProduct`.
 - Tracks 26 and 149 have further pairs around the event, as a fallback if a primary pair fails QA.
 - Track 98 frame 16 has two releases, `P05023` and `X05026`. The pipeline uses `P05023` only, so releases are never mixed.
 
 ## What has been downloaded
 
-Pair A GUNW and GOFF, and Pair B GOFF, all at their catalogue sizes. For the Tsho Rolpa case, the four Track 48 frame 74 GCOV dates (16 Aug to 21 Sep) were downloaded and clipped to the lake; the raw files stay on the team's machine. The Rasuwa GCOV snapshots listed above are not downloaded: they need 31 GB. The other frame 74 GUNW pairs behind the control series (23 Jul to 3 Oct) were also used on the team's machine and are not in this repository.
+Pair A GUNW and GOFF, Pair B GOFF and GUNW, and the Track 48 and Track 98 series, all at their catalogue sizes. Downloads resume with a range request, which the server must answer with 206. For the Tsho Rolpa case, the four Track 48 frame 74 GCOV dates (16 Aug to 21 Sep) were downloaded and clipped to the lake; the raw files stay on the team's machine. The Rasuwa GCOV snapshots listed above are not downloaded: they need 31 GB. The other frame 74 GUNW pairs behind the control series (23 Jul to 3 Oct) were also used on the team's machine and are not in this repository.
 
 ## Download procedure
 

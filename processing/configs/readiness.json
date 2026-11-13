@@ -115,7 +115,7 @@
    "source": "NSIDC (Earthdata login)"
   },
   "C7": {
-   "name": "NISAR GUNW repeat series, frames 74 and 75",
+   "name": "NISAR GUNW repeat series (Track 48 frames 74 and 75, Track 98 frame 16)",
    "group": "C",
    "source": "ASF (Earthdata login)"
   },

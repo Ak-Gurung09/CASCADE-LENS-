@@ -12,6 +12,7 @@ Added November 2026. These three tools answer, for any spot on the map: *could N
 |---|---|---|---|---|
 | Rasuwa | 16 to 28 Aug 2026 | 23 Jul to 16 Aug 2026 | 48 descending / 74 | 32.3 to 38.2° |
 | Rasuwa | 16 to 28 Aug 2026 | 23 Jul to 16 Aug 2026 | 48 descending / 75 | 32.1 to 38.2° |
+| Rasuwa, second view | 19 to 31 Aug 2026 | 26 Jul to 19 Aug 2026 | 98 ascending / 16 | 39.5 to 44.8° |
 | Tsho Rolpa | 16 to 28 Aug 2026 | 23 Jul to 16 Aug 2026 | 48 descending / 74 | 43.3 to 43.9° |
 
 For Rasuwa, frame 74 is assessed first. A cell outside frame 74 takes frame 75's flags when frame 75 covers it (`combine_frames`). Of the 5,043,504 cells in the case area, frame 74 assesses 2,485,353 and frame 75 adds 1,584,616. The manifest lists each frame's pair, granules, incidence and sensitivity under `observability.frames`.
@@ -71,6 +72,27 @@ Movement usable at coherence thresholds 0.2, 0.3 and 0.4: 61.2%, 57.1% and 49.3%
 
 **Version 1 for comparison** (withdrawn, computed without the product's mask, frame 74 only): detachment zone 66% and 0%; mapped mudflow 34% and 9%, 52% outside; Bhote Koshi 70% and 76%; Trishuli 3% and 4%, 95% outside; Tsho Rolpa lake bookmark 70% and 65%. Sensitivity was 95%, 82% and 67%.
 
+### 1b. A second viewing direction: Track 98, ascending
+
+Track 98 passes on the ascending orbit and looks at the slopes from the other side (look vector toward the sensor about 0.65 east and 0.17 north, against 0.55 west for Track 48). Frame 16 covers the whole Rasuwa case area; frame 15 covers 4% of it and is not used. The same method (version 2) runs on its own pairs and writes its own flags, layers and block (`observabilityViews.t98`). The two directions are compared cell by cell on the same 40 m grid and never merged into one reason. The app answers for each direction separately.
+
+```bash
+python processing/scripts/prepare_observability.py frontend/public/data/manifests/manifest.json <event GUNW t98 f016 .h5> <baseline GUNW t98 f016 .h5> frontend/public/data/sampling/context/copdem_glo30.tif frontend/public/data/vectors data/interim/obs-t98/data unosat_detachment_zone.geojson unosat_mudflow_extent.geojson --view t98 --compare frontend/public/data/sampling/rasuwa-2026/observability-flags.tif
+```
+
+| Zone | Change: Track 98 | Change: either track | Movement: Track 98 | Movement: either track |
+|---|---|---|---|---|
+| Detachment zone (UNOSAT) | 35.4% | 35.4% | 0% | 0% |
+| Mountain source area | 54.8% | 59.3% | 44.2% | 47.7% |
+| Mapped mudflow (UNOSAT) | 43.3% | 54.7% | 13.6% | 21.7% |
+| Bhote Koshi corridor | 79.3% | 93.8% | 85.2% | 93.9% |
+| Trishuli corridor | 66.7% | 77.5% | 77.7% | 84.3% |
+| Whole case area | 70.1% | 78.8% | 80.6% | 85.5% |
+
+"Either track" counts a cell once if at least one direction could use it. Movement usable from Track 98 at coherence thresholds 0.2, 0.3 and 0.4: 86.8%, 80.6% and 69.9%.
+
+At the detachment zone, Track 98 holds valid data everywhere, unlike Track 48. A change could be judged on 35% of it. The rest is hidden by layover (28%) or was already incoherent before the event (37%). Movement cannot be measured anywhere there from either side: event-pair coherence is low across the zone (median 0.09), and the phase was not reliably unwrapped. Inside the mapped mudflow, Track 98's mask flags 18% as water (the river).
+
 **Limits.** Passive shadow (cast by a distant ridge) is not modelled. Features smaller than the 40 m grid are smoothed. Coherence also falls for wet snow, vegetation or a long time gap, so "change visible" means a change *could* be seen, not that one happened. The products are Provisional.
 
 ## 2. "What could explain this?"
@@ -101,6 +123,6 @@ Every layer, panel and report carries one class (`frontend/src/services/evidence
 
 **Landslide-prone terrain (Model A, terrain only).** Slope bands (15, 25, 35°), converging hollows (negative plan curvature) and a topographic wetness index (D8 flow accumulation) give Low, Moderate, High or Very high. Each pixel keeps its factor bits for the inspector. A one-event consistency check, not a validation: 56% of the UNOSAT 2026 detachment zone screens High or Very high, against 32% of the whole area (AUC 0.66). The AUC treats every unmapped pixel as a confirmed negative and counts neighbouring pixels as independent, so it shows only that the screen is not inconsistent with this one event. Pixels with no valid elevation are left out. The mudflow runout screens mostly Low (58%), as expected for valley floors where debris settles. No geology, soil, land cover or rainfall, and no calibration: it is a screen, not a susceptibility model or forecast.
 
-**Road exposure.** Trunk, primary, secondary and tertiary OpenStreetMap roads cut into 250 m stretches. High: crosses the 2026 mapped mudflow or UNOSAT affected roads, or 30% of the ground within 150 m screens High or Very high. Moderate: 10% or more, or within 100 m of a mapped river (OpenStreetMap). Being near a river is a reason to look, not evidence of bank erosion or flooding. Ground with no valid elevation is left out of the steep share. Each stretch also says whether the event pair could watch it (share of its corridor usable for change). Of 153 km screened, 73 km rate High; 109 km lie mostly beyond the frame checked, so the radar could not watch them for this event.
+**Road exposure.** Trunk, primary, secondary and tertiary OpenStreetMap roads cut into 250 m stretches. High: crosses the 2026 mapped mudflow or UNOSAT affected roads, or 30% of the ground within 150 m screens High or Very high. Moderate: 10% or more, or within 100 m of a mapped river (OpenStreetMap). Being near a river is a reason to look, not evidence of bank erosion or flooding. Ground with no valid elevation is left out of the steep share. Each stretch also says whether the event pair could watch it (share of its corridor usable for change), and, with `--other-view t98`, the share usable from Track 98 and from either direction. The Track 48 rating is never replaced by the other view. Of 153.4 km screened, 73.3 km rate High. Track 48 could not watch 28.2 km (13.1 km of them High); counting either direction, 4.8 km (2.7 km High). Before frame 75 was assessed, 109 km lay beyond the frame checked.
 
 **Model B (rainfall triggering)** is blocked by data: it needs GPM IMERG rainfall, soil moisture and a Nepal-calibrated threshold.

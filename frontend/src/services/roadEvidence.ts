@@ -25,6 +25,8 @@ export interface RoadEvidence {
     current: boolean
     watch: string
     shares: { label: string; pct: number | null }[]
+    // the opposite viewing direction, judged on its own flags; never merged into the shares above
+    otherView: { label: string; pair: string | null; usablePct: number; eitherPct: number; watch: string } | null
   }
   context: string[]
   verify: string[]
@@ -32,6 +34,18 @@ export interface RoadEvidence {
 
 const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 const span = (p?: [string, string] | null) => (p ? `${day(p[0])} to ${day(p[1])}` : null)
+
+// What the radar coverage of a stretch means for checking it. With a second viewing direction, the share usable from either
+// direction decides whether radar can say anything; each direction still reports its own share.
+function watchAdvice(usable: number, other: RoadEvidence['radar']['otherView']): string[] {
+  const best = other ? other.eitherPct : usable
+  if (other && usable < 50 && best >= 50)
+    return [`This pair watched ${usable < 20 ? 'little' : 'only part'} of this stretch, but with the opposite side (${other.label}) ${best}% can be watched from at least one direction. Read that view before relying on either.`]
+  if (best < 20)
+    return [`${other ? 'Neither viewing direction could' : 'The event pair could not'} watch most of this stretch, so radar can neither confirm nor rule out a change here. Use optical images or field reports.`]
+  if (best < 50) return [`${other ? 'The two viewing directions together' : 'The event pair'} watched only part of this stretch. Check the rest by other means.`]
+  return []
+}
 
 export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
   const o = m.observability
@@ -46,6 +60,10 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
     { label: 'Outside the frame checked', pct: outside },
     { label: 'Not assessed', pct: s.radarNotAssessedPct ?? null },
   ]
+  const ov = s.radarOtherView ? m.observabilityViews?.[s.radarOtherView] : undefined
+  const otherView = ov && s.radarOtherUsablePct != null && s.radarEitherUsablePct != null
+    ? { label: ov.label, pair: span(ov.pair), usablePct: s.radarOtherUsablePct, eitherPct: s.radarEitherUsablePct, watch: s.radarWatchEither ?? '' }
+    : null
   const steep = s.steepSharePct
   const context = [
     steep === null || steep === undefined ? 'Terrain not assessed: no valid elevation along this stretch.' : `${steep}% of the ground within 150 m screens High or Very high for slope failure.`,
@@ -61,8 +79,7 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
     ...(s.nearRiver ? ['Check the river bank and the road edge on recent imagery for erosion or new deposits.'] : []),
     ...(s.bridge ? ['Confirm the bridge is standing and passable, with the road authority or a field report.'] : []),
     ...(s.osmStatus === 'Destroyed' ? ['Check with the road authority whether this stretch has been reopened or bypassed since it was mapped as destroyed.'] : []),
-    ...(usable < 20 ? ['The event pair could not watch most of this stretch, so radar can neither confirm nor rule out a change here. Use optical images or field reports.']
-      : usable < 50 ? ['The event pair watched only part of this stretch. Check the rest by other means.'] : []),
+    ...watchAdvice(usable, otherView),
     ...(outside !== null && outside >= 50 ? ['Most of this stretch lies beyond the radar frames checked, so this pair says nothing about it.'] : []),
     ...(!current ? ['These radar figures come from the withdrawn first observability method. Recheck them after the rebuild.'] : []),
     ...(s.exposure === 'Low' ? ['Low means no factor was found among those screened. It does not mean the road is safe.'] : []),
@@ -87,6 +104,7 @@ export function roadEvidence(m: Manifest, s: RoadSegment): RoadEvidence {
       current,
       watch: s.radarWatch,
       shares,
+      otherView,
     },
     context,
     verify,

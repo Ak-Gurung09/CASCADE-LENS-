@@ -10,7 +10,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 
 **0:00 The problem.** After a mountain disaster, evidence is scattered and radar data is hard to read. CascadeLens puts NISAR measurements in one place, with their quality and limits visible.
 
-**0:25 The source.** Start the guided story. Show the UNOSAT detachment zone. Point out the honest finding: Pair A holds no usable measurement here. The radar product's own quality mask marks the whole zone as having no valid subswath in the 28 August acquisition, a gap in that acquisition's coverage. The story then shows that Pair B, viewing from the other side, does reach it, and that image matching largely fails there.
+**0:25 The source.** Start the guided story. Show the UNOSAT detachment zone. Point out the honest finding: Pair A holds no usable measurement here. The radar product's own quality mask marks the whole zone as having no valid subswath in the 28 August acquisition, a gap in that acquisition's coverage. Then switch the pair to 19–31 August (Track 98, the opposite side): coherence there is very low, 0.09 against 0.46 nearby. Say that low coherence is what a heavily changed surface can look like, but steep slopes and snow lower it too. The story then shows that Pair B, viewing from the other side, does reach it, and that image matching largely fails there.
 
 **0:55 Interferometric evidence.** Choose *Bhote Koshi corridor* and Coherence. Show the dark ribbon along the river under the UNOSAT extent. Median coherence is 0.19 inside against 0.46 nearby, and frame 75 agrees. Say clearly that this agrees with independent mapping, but it is not proof.
 

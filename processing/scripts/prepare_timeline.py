@@ -1,7 +1,10 @@
 """Coherence through time for one frame (audit P0.5): every catalogued GUNW pair of a track and frame, as one map layer
 with a time step per pair, so the inspector can show a clicked spot's coherence pair by pair.
 
-    python prepare_timeline.py <manifest.json> <track> <frame> <out dir>/data [GUNW .h5 ...]
+    python prepare_timeline.py [--view ID] <manifest.json> <track> <frame> <out dir>/data [GUNW .h5 ...]
+
+--view ID makes a further series beside the main one (another track, such as t98): its layer id, groups and fragment get
+the suffix, so the main series is left alone.
 
 The out dir must end in a folder named data (asset paths are written relative to its parent, as in frontend/public).
 
@@ -33,6 +36,13 @@ def pair_of(path: pathlib.Path) -> tuple[int, int, str, str, str] | None:
 
 
 def main(argv: list[str]) -> None:
+    argv = list(argv)
+    view = None
+    if "--view" in argv:
+        i = argv.index("--view")
+        view = argv[i + 1]
+        del argv[i:i + 2]
+    sfx = f"-{view}" if view else ""
     man, track, frame, out = pathlib.Path(argv[0]), int(argv[1]), int(argv[2]), pathlib.Path(argv[3])
     files = sorted(pathlib.Path(p) for p in argv[4:])
     m = json.loads(man.read_text(encoding="utf-8"))
@@ -48,7 +58,7 @@ def main(argv: list[str]) -> None:
             continue
         _, _, mode, ref, sec = info
         g = next(r for r in recs if r["file_id"] == p.stem)
-        group = f"{case}-coherence-{ref.replace('-', '')}"
+        group = f"{case}-coherence{sfx}-{ref.replace('-', '')}"
         state, records = pipeline.process_granule({**g, "group": group}, p, cfg, ROOT / "data/processed/timeline", ROOT / "data/qa")
         if state["status"] == "invalid":
             raise SystemExit(f"{p.name} failed the QA gates: {state.get('reason')}")
@@ -63,9 +73,13 @@ def main(argv: list[str]) -> None:
     steps.sort(key=lambda s: s["label"])
     modes = sorted({s["mode"] for s in steps})
     lengths = sorted({s["days"] for s in steps})
-    base = next(l for l in m["layers"] if l["id"] == "pair-a:gunw-coherence")
+    # display settings from the event pair's coherence layer of the same track, so the pass direction is that track's own
+    base = next((l for l in m["layers"] if l["measurementType"] == "gunw-coherence" and l.get("groupId") and l.get("track") == track and l.get("status") == "sampleable"),
+                next(l for l in m["layers"] if l["id"] == "pair-a:gunw-coherence"))
+    if base.get("track") != track:
+        raise SystemExit(f"No processed event-pair coherence layer for track {track}; run process_nisar.py for it first")
     layer = {**{k: base[k] for k in ("mission", "instrument", "productType", "orbitDirection", "crs", "attribution", "productMaturity", "postingM", "units", "kind", "stats", "legend")},
-             "id": f"{case}:coherence-timeline", "groupId": None, "name": f"Coherence through time (Track {track}, frame {frame})",
+             "id": f"{case}:coherence-timeline{sfx}", "groupId": None, "name": f"Coherence through time (Track {track}, frame {frame})",
              "category": "gunw", "measurementClass": "measurement", "measurementType": "gunw-coherence", "track": track, "frames": [frame],
              "qualityLayerIds": [], "status": "sampleable", "statusReason": None, "sourceGranules": granules,
              "acquisition": {"reference": steps[0]["label"].split("/")[0], "secondary": steps[-1]["label"].split("/")[1]},
@@ -78,8 +92,8 @@ def main(argv: list[str]) -> None:
                              "One value per pair, nothing interpolated between pairs.", "Provisional data."]}
     frag = {"case": case, "layers": [layer]}
     out.mkdir(parents=True, exist_ok=True)
-    (out / f"timeline-{case}.json").write_text(json.dumps(frag, indent=1), encoding="utf-8")
-    print(f"{len(steps)} steps -> {out / f'timeline-{case}.json'}")
+    (out / f"timeline-{case}{sfx}.json").write_text(json.dumps(frag, indent=1), encoding="utf-8")
+    print(f"{len(steps)} steps -> {out / f'timeline-{case}{sfx}.json'}")
 
 
 if __name__ == "__main__":

@@ -22,13 +22,14 @@
     {
       "id": "pair-b",
       "label": "19\u201331 August 2026",
-      "role": "Secondary pixel-offset investigation",
+      "role": "Second viewing direction: interferometry and pixel offsets",
       "direction": "ASCENDING",
       "track": 98,
       "frames": [15, 16],
+      "framesByProduct": {"GUNW": [16]},
       "ref_date": "2026-08-19",
       "sec_date": "2026-08-31",
-      "products": ["GOFF"]
+      "products": ["GUNW", "GOFF"]
     }
   ],
   "snapshots": [

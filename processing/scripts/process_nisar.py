@@ -1,6 +1,8 @@
 """Process every downloaded, configured NISAR granule. Run generate_manifest.py afterwards to publish the results to the app.
 
-usage: python process_nisar.py   (safe to rerun; reads data/raw/nisar, never modifies it)
+usage: python process_nisar.py [--only GROUP[:PRODUCT]]   (safe to rerun; reads data/raw/nisar, never modifies it)
+
+--only pair-b:GUNW processes just that group and product, so adding one pair leaves the others' outputs untouched.
 """
 import collections
 import json
@@ -19,8 +21,11 @@ cfg = json.loads((ROOT / "processing/configs/pipeline.json").read_text())
 cat = json.loads((ROOT / "data/metadata/catalogue.json").read_text())
 raw, meta = ROOT / "data/raw", ROOT / "data/metadata"
 (meta / "granules").mkdir(parents=True, exist_ok=True)
+only = sys.argv[sys.argv.index("--only") + 1].split(":") if "--only" in sys.argv else None
 layers = collections.defaultdict(list)
 for g in pipeline.select_granules(cat, cfg):
+    if only and (g["group"] != only[0] or (len(only) > 1 and g["product"] != only[1])):
+        continue
     path = pipeline.granule_path(raw, g)
     if not path.exists():
         log.info("not downloaded: %s", g["file_id"])

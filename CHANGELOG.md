@@ -2,6 +2,18 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: the second viewing direction (Track 98)
+
+- **Pair B GUNW** (Track 98 ascending, frame 16, 19 to 31 August) is downloaded, passes the QA gates and is in the app: phase, coherence, components, ionosphere and the ionosphere-removed phase. Frame 15 covers 4% of the case area, so `pipeline.json` limits Pair B's GUNW to frame 16 (`framesByProduct`); a missing frame no longer holds back a whole layer.
+- **At the source,** where Track 48 has no valid subswath, Track 98 holds valid data: coherence 0.09 against 0.46 nearby. A change could be judged on 35% of the detachment zone from that side (28% is hidden by layover, 37% was already incoherent before the event), and movement on none of it.
+- **Observability as a second view** (`prepare_observability.py --view t98 --compare`), beside the Track 48 block and never merged into it: each zone also gives the share usable from either direction (whole area 78.8% for change, 85.5% for movement). The inspector and the report answer for each direction from its own flags. Before this, the app would have read every observability layer through the first layer's flags; that never shipped.
+- **Before and after from Track 98,** all five pairs in the same radar mode (4000): the mudflow 0.31 against 0.40 before, 0.13 against 0.49 across the event. A change of mode does not explain the drop. Valid inside is 77% in every pair, because only the river is masked.
+- **Coherence through time** for Track 98 (26 July to 6 October); Time replay can switch series.
+- **Road exposure** records each stretch's share watched from Track 98 and from either direction (`prepare_hazards.py --other-view`). Road the radar could not watch, counting either direction: 4.8 km (2.7 km High), against 28.2 km (13.1 km High) from Track 48 alone. The Track 48 rating is unchanged.
+- `process_nisar.py --only GROUP:PRODUCT` and `generate_manifest.py --keep-merged`, so one pair can be added without rerunning every analysis. The manifest keeps its line endings.
+- The readiness record C7 now covers both series (23 July to 6 October); L4 is still "data available, processing required".
+- PR #4 (Track 98 observability with the withdrawn first method) is superseded by this work; its design for separate views was kept.
+
 ## 13 November 2026: rebuilt from the raw NISAR files
 
 - **Scientific correction (S13).** The Provisional (P05023) mask is a 32-bit field: the low byte holds the water and subswath digits, bits 8 to 23 flag image anomalies, and bit 24 marks an interpolated ionosphere screen (set on 37 to 39% of pixels). The decoder read the digits from the whole number. It now reads the low byte and also masks flagged anomalies. On the event pair, 0.14 to 0.15% of pixels had been wrongly kept; no headline figure moves.
