@@ -22,6 +22,7 @@ from rasterio.warp import transform_bounds, transform_geom
 from scipy import ndimage
 
 from . import export, motion, nisar, quality
+from .manifest import maturity as product_maturity
 
 POSTING = 20.0
 FILTER = 3
@@ -301,7 +302,8 @@ def prepare(cfg: dict, files: list[pathlib.Path], public: pathlib.Path, work: pa
     qa_dir.mkdir(parents=True, exist_ok=True)
     (qa_dir / f"{case}-report.json").write_text(json.dumps(qa, indent=1), encoding="utf-8")
 
-    maturity = nisar_maturity(qa["files"][0]["identification"])
+    ident = qa["files"][0]["identification"]
+    maturity = product_maturity(ident, ident.get("compositeReleaseId") or "release not recorded")
     gcov_limits = ["Provisional data: calibrated and partly validated, not for final scientific conclusions.",
                    "Dates alternate between dual-pol 10 m and quad-pol 20 m acquisitions. All are shown on a shared 20 m grid.",
                    "Radar shadow behind steep slopes also looks dark. Shadows do not change between dates on this track, so they do not move."]

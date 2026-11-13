@@ -300,7 +300,7 @@ export interface ControlSeries {
 // Terrain screen and road exposure, written by processing/scripts/prepare_hazards.py
 export interface Hazards {
   terrain: { layerId: string; flags: Record<string, number>; classes: { code: number; label: string; color: string; meaning: string }[]; maturity: string
-    validation: { detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
+    validation: { kind?: string; caveats?: string[]; detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
   roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number }>; rules: Record<string, string>; maturity: string }
   dynamicTrigger: { maturity: string; needs: string[] }
 }

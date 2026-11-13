@@ -62,6 +62,9 @@ def main(argv: list[str]) -> None:
     valid = (cls > 0) & seen
     score = cls.astype(float)
     validation = {
+        "kind": "One-event consistency check, not a validation",
+        "caveats": ["One event only: the UNOSAT 2026 detachment zone.", "Every unmapped pixel is treated as a confirmed negative, which it is not.",
+                    "Neighbouring pixels are not independent, so the AUC has no meaningful sample size.", "Pixels with no valid elevation (class 0) are left out."],
         "detachmentZone": {"pixels": int((in_det & valid).sum()),
                            "percentByClass": {c[1]: round(100 * float(((cls == c[0]) & in_det & valid).sum()) / max(1, (in_det & valid).sum()), 1) for c in hz.CLASSES},
                            "aucVsRestOfArea": hz.auc(score, in_det & valid, valid & ~in_det & ~in_flow)},
@@ -113,7 +116,8 @@ def main(argv: list[str]) -> None:
             if not inside.any():
                 continue
             cl, sc = cls[r0:r1, c0:c1][inside], disturb[r0:r1, c0:c1][inside]
-            steep = round(100 * float(((cl >= 3)).mean()), 1)
+            steep = hz.steep_share(cl)  # class 0 (no valid elevation) is left out, never counted as gentle
+            steep_n = steep or 0.0
             usable = round(100 * float((sc == 1).mean()), 1)
             hidden = round(100 * float((sc == 3).mean()), 1)
             unseen = round(100 * float(np.isin(sc, (4, 5, 6)).mean()), 1)
@@ -122,13 +126,15 @@ def main(argv: list[str]) -> None:
             reasons = []
             if mapped:
                 reasons.append("Crosses ground UNOSAT mapped as hit by the 2026 mudflow")
-            if steep >= 30:
+            if steep is None:
+                reasons.append(f"Terrain not assessed: no valid elevation within {BUFFER_M} m")
+            elif steep >= 30:
                 reasons.append(f"{steep:.0f}% of the ground within {BUFFER_M} m screens High or Very high for slope failure")
             elif steep >= 10:
                 reasons.append(f"{steep:.0f}% of nearby ground screens High or Very high")
             if near_river:
-                reasons.append(f"Within {RIVER_M} m of a river: bank erosion and flood exposure")
-            level = "High" if mapped or steep >= 30 else "Moderate" if steep >= 10 or near_river else "Low"
+                reasons.append(f"Within {RIVER_M} m of a mapped river (OpenStreetMap)")
+            level = "High" if mapped or steep_n >= 30 else "Moderate" if steep_n >= 10 or near_river else "Low"
             watch = ("Not assessed" if not has_baseline else
                      "Radar can watch" if usable >= 50 else "Partly watchable" if usable >= 20 else "Radar cannot watch")
             km = seg.length / 1000
@@ -178,7 +184,7 @@ def main(argv: list[str]) -> None:
                     "wetIndexCut": round(r["wetCut"], 2), "validation": validation, "limitations": hz.LIMITS, "maturity": "EXPERIMENTAL"},
         "roads": {"layerId": layers[1]["id"], "segmentM": SEG_M, "bufferM": BUFFER_M, "riverM": RIVER_M, "roadTypes": sorted(ROAD_TYPES), "kmByExposure": tally,
                   "rules": {"High": "Crosses ground mapped as hit in 2026, or 30% or more of the ground within 150 m screens High or Very high",
-                            "Moderate": "10% or more screens High or Very high, or within 100 m of a river", "Low": "Otherwise",
+                            "Moderate": "10% or more screens High or Very high, or within 100 m of a mapped river (OpenStreetMap)", "Low": "Otherwise",
                             "radarWatch": "Share of the 150 m corridor where the event pair could see a surface change: 50% or more = can watch, 20 to 50% = partly, under 20% = cannot"},
                   "maturity": "EXPERIMENTAL"},
         "dynamicTrigger": {"maturity": "BLOCKED BY DATA", "needs": ["GPM IMERG daily rainfall for Aug 2026", "SMAP soil moisture", "A Nepal-calibrated rainfall threshold"]}}}

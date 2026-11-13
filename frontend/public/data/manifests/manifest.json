@@ -5330,7 +5330,7 @@
    },
    "limitations": [
     "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
-    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is a one-event consistency check against the UNOSAT 2026 detachment zone. It is not a validation: every unmapped pixel counts as a negative, and neighbouring pixels are not independent.",
     "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
     "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed."
    ]
@@ -6227,6 +6227,13 @@
    },
    "wetIndexCut": 6.4,
    "validation": {
+    "kind": "One-event consistency check, not a validation",
+    "caveats": [
+     "One event only: the UNOSAT 2026 detachment zone.",
+     "Every unmapped pixel is treated as a confirmed negative, which it is not.",
+     "Neighbouring pixels are not independent, so the AUC has no meaningful sample size.",
+     "Pixels with no valid elevation (class 0) are left out."
+    ],
     "detachmentZone": {
      "pixels": 1219,
      "percentByClass": {
@@ -6256,7 +6263,7 @@
    },
    "limitations": [
     "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
-    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is a one-event consistency check against the UNOSAT 2026 detachment zone. It is not a validation: every unmapped pixel counts as a negative, and neighbouring pixels are not independent.",
     "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
     "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed."
    ],
@@ -6289,7 +6296,7 @@
    },
    "rules": {
     "High": "Crosses ground mapped as hit in 2026, or 30% or more of the ground within 150 m screens High or Very high",
-    "Moderate": "10% or more screens High or Very high, or within 100 m of a river",
+    "Moderate": "10% or more screens High or Very high, or within 100 m of a mapped river (OpenStreetMap)",
     "Low": "Otherwise",
     "radarWatch": "Share of the 150 m corridor where the event pair could see a surface change: 50% or more = can watch, 20 to 50% = partly, under 20% = cannot"
    },

@@ -33,3 +33,10 @@ def test_auc():
     pos = np.array([False, False, True, True])
     assert hz.auc(s, pos, ~pos) == 1.0
     assert hz.auc(np.ones(4), pos, ~pos) == 0.5
+
+
+def test_road_steep_share_leaves_out_cells_with_no_valid_elevation():
+    """S10: class 0 means no valid elevation. It must not dilute the steep share as if it were gentle ground."""
+    assert hz.steep_share(np.array([3, 4, 1, 0, 0, 0])) == round(100 * 2 / 3, 1)
+    assert hz.steep_share(np.array([1, 2, 0])) == 0.0
+    assert hz.steep_share(np.array([0, 0])) is None

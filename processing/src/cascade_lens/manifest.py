@@ -44,7 +44,7 @@ def maturity(ident: dict, crid: str) -> str:
         return f"Provisional per catalogue ({crid}); confirm from file"
     doi = str(ident.get("productDoi") or "")
     name = {"B": "Beta", "P": "Provisional", "V": "Validated"}.get(doi.rsplit("-", 1)[-1][:1], "Unknown")
-    return f"{name} ({ident.get('compositeReleaseId')})"
+    return f"{name} ({ident.get('compositeReleaseId') or 'release not recorded'})"
 
 
 def _status(granules: list[dict], states: dict, raw: pathlib.Path) -> tuple[str, str | None]:
