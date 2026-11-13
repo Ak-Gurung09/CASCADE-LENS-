@@ -103,13 +103,17 @@ export function buildStory(m: Manifest): StoryStep[] {
   const offset = has(m, 'pair-a:goff-range')
   const clean = has(m, 'pair-a:gunw-phase-iono')
   const coherenceText = contrast(m, 'gunw-coherence', 2)
+  const validText = frames(m).flatMap(([name, f]) => {
+    const v = f.zones['gunw-coherence']?.[EXTENT]?.validPct
+    return v == null ? [] : [`${Math.round(v)}% of the mapped extent in frame ${Number(name.slice(1))}`]
+  }).join(' and ')
   const offsetText = contrast(m, 'goff-range |x - scene median|', 2)
   const iono = ionosphereNote(m)
   const pairB = sourceFromPairB(m)
   const control = controlText(m)
   const radar = coherence
     ? ['The map shows coherence from the descending Track 48 pair of 16 and 28 August 2026: how consistent the radar signal stayed between the two passes.',
-       ...(coherenceText ? [`Along the channel that UNOSAT mapped, coherence is much lower than on the terrain beside it. The median is ${coherenceText}, comparing inside the mapped extent with the area within 1 km of it.`] : []),
+       ...(coherenceText ? [`Along the channel that UNOSAT mapped, coherence is much lower than on the terrain beside it. The median is ${coherenceText}, comparing inside the mapped extent with the area within 1 km of it.${validText ? ` Only pixels the product marks valid count: ${validText}.` : ''}`] : []),
        ...(control ? [control] : []),
        'This agrees with independent mapping, but it does not prove what happened. Low coherence has other causes too, and river channels are often low anyway.']
     : ['The descending Track 48 pair of 16 and 28 August 2026 brackets the event, and the catalogue footprints show both frames reach this corridor.',
@@ -142,7 +146,7 @@ export function buildStory(m: Manifest): StoryStep[] {
       paragraphs: [
         'Phase and pixel offsets are different kinds of radar evidence. Phase is sensitive to small changes but fails where the surface is disrupted. Offsets are coarser but can survive larger change. They measure different things and are not combined here.',
         ...(iono ? [iono] : []),
-        ...(offsetText ? [`Pixel offsets add little here: the typical offset size inside the mapped extent is close to the terrain beside it, at ${offsetText}, in metres. Most phase inside the extent could not be reliably unwrapped.`] : []),
+        ...(offsetText ? [`Pixel offsets add little here: the typical offset size inside the mapped extent is close to the terrain beside it, at ${offsetText}, in metres. These offsets come from the product layer with the smallest search window, which could miss a very large shift. Most phase inside the extent could not be reliably unwrapped.`] : []),
         coherence || offset
           ? 'No displacement is calculated. The phase sign convention is not documented, so phase stays in radians.'
           : 'In this build, no NISAR measurement is loaded, so this story establishes where to look and which observations exist. It does not establish any radar-measured change.',
@@ -154,7 +158,7 @@ export function buildStory(m: Manifest): StoryStep[] {
 
 
 const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-const BACKGROUND = 'Background facts: ICIMOD (2011), Glacial Lakes and Glacial Lake Outburst Floods in Nepal, and the Department of Hydrology and Meteorology, Nepal.'
+const BACKGROUND = 'Background facts: ICIMOD (2011), Glacial Lakes and Glacial Lake Outburst Floods in Nepal; Peppa et al. (2020), ISPRS Annals V-3-2020, 633–640; the Department of Hydrology and Meteorology, Nepal, 2022 bathymetric survey, as reported by Dialogue Earth.'
 
 // Compare only dates taken in the same radar mode, so a change of mode cannot pose as a change of lake
 export function sameMode(s: NonNullable<Manifest['lake']>['series'], noise: number) {
@@ -196,8 +200,8 @@ function lakeStory(m: Manifest): StoryStep[] {
     {
       id: 'verdict', title: 'The lake did not change size', bookmarkId: 'lake', layerId: `${id}:hh`, references: ['ref:lake-edge'], chart: 'lake',
       paragraphs: [
-        `On every date the lake measured between ${lo.toFixed(2)} and ${hi.toFixed(2)} km². That spread is smaller than the method's own uncertainty, about ±${lake.methodHalfRangeKm2.toFixed(2)} km², so the radar sees no change in these ${Math.round((Date.parse(s[s.length - 1].date) - Date.parse(s[0].date)) / 86400000)} days.`,
-        'Our number matches published surveys, which give about 1.5 to 1.6 km² in recent years. That agreement is a check that the method works.',
+        `On every date the lake measured between ${lo.toFixed(2)} and ${hi.toFixed(2)} km². That spread is smaller than the method's own range, about ±${lake.methodHalfRangeKm2.toFixed(2)} km² (half the largest change in area when the water threshold moves between −8 and −6 dB; a method range, not a formal error), so the radar sees no change in these ${Math.round((Date.parse(s[s.length - 1].date) - Date.parse(s[0].date)) / 86400000)} days.`,
+        'Our number falls inside the range of published figures: about 1.55 km² in a 2008 survey, 1.61 km² from satellite images (Peppa et al., 2020) and 1.65 km² in a 2022 bathymetric survey for the Department of Hydrology and Meteorology. That agreement is a check on the method, not proof of an exact area.',
         sameMode(s, lake.methodHalfRangeKm2),
       ],
     },

@@ -82,7 +82,8 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch; that rating rests on the version 1 flags until the rebuild |
 | Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
 | First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |
-| Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names an existing test | n/a | Shown in the app as "What is real?" |
+| Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names a test that calls its computation | n/a | Shown in the app as "What is real?" |
+| Claim register (`frontend/public/data/claims.json`) | Implemented and tested | Unit test keeps the wording of RED claims off every live surface | n/a | 25 claims from the Stage 0 audit, with basis and status |
 | Image swipe comparison | Implemented | No automated test | Real, Tsho Rolpa GCOV dates | Tsho Rolpa compare mode |
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 

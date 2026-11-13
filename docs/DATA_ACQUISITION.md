@@ -58,7 +58,7 @@ Other findings:
 
 ## What has been downloaded
 
-Pair A GUNW and GOFF, and Pair B GOFF, all at their catalogue sizes. GCOV is not downloaded: it needs 31 GB.
+Pair A GUNW and GOFF, and Pair B GOFF, all at their catalogue sizes. For the Tsho Rolpa case, the four Track 48 frame 74 GCOV dates (16 Aug to 21 Sep) were downloaded and clipped to the lake; the raw files stay on the team's machine. The Rasuwa GCOV snapshots listed above are not downloaded: they need 31 GB. The other frame 74 GUNW pairs behind the control series (23 Jul to 3 Oct) were also used on the team's machine and are not in this repository.
 
 ## Download procedure
 

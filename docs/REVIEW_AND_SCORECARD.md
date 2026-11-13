@@ -36,7 +36,8 @@ Written 2026-11-10, after the master-prompt build. Revised 2026-11-13, after the
 | Inspect observability limits | Observability unit tests (Python and TypeScript), story step 3 |
 | Generate a traceable report | Report unit tests and a browser download test |
 | Missing coverage is never "safe" | Hypotheses refuse to explain unseen spots; evidence class "Unknown"; tests for both |
-| Every "complete" claim has a test | `finding.test.ts` checks each status entry's test files exist |
+| Every "complete" claim has a test | `finding.test.ts` checks that each status entry's test files exist and that at least one calls the computation the claim is about |
+| No withdrawn claim comes back | `claims.test.ts` searches the app, README, demonstration script, limitations and product readme for the wording of every RED claim in `claims.json` |
 
 Test totals on 2026-11-10: Python 72 passed, 35 skipped (need raw files); unit 52 passed; browser 29 passed in Chromium. On 2026-11-12, with the P0.1 code: Python 92 passed, 35 skipped; unit 62 passed; browser 29 passed. Passing tests check the code's behaviour; they do not validate a scientific result.
 

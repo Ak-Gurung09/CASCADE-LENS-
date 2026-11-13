@@ -1,6 +1,6 @@
 # GAIA CascadeLens
 
-**Following Earth's movement, one radar observation at a time.**
+**Following change on Earth's surface, one radar observation at a time.**
 
 GAIA: Seeing Earth Dance. A Team GAIA project for NASA Space Apps Challenge 2026, Dancing with the SARs.
 
@@ -20,11 +20,11 @@ Do not open `index.html` directly. Browsers block a page opened that way from lo
 
 ## What the radar shows
 
-- **Coherence** is much lower along the UNOSAT-mapped channel than on the terrain beside it: 0.19 against 0.46, and 0.16 against 0.52.
+- **Coherence** is much lower along the UNOSAT-mapped channel than on the terrain beside it: 0.19 against 0.46 in frame 74, and 0.16 against 0.52 in frame 75. Only pixels the product marks valid count, which is 37% and 44% of the mapped extent.
 - **At the source**, Pair A holds no usable measurement: the product’s own quality mask flags every pixel of the detachment zone in frame 74, as water or an invalid subswath. Which of the two has not been read from the raw mask yet. Pair B reaches the source, and image matching largely fails there: correlation peak 0.18 against 0.63.
 - **Before and after.** In the pair before the event, the mapped mudflow and the ground around it had similar coherence. Across the event, coherence fell inside the mapped area while the ground around it rose. That is consistent with surface change there, but it does not establish the cause. The pairs are not like for like, either: the pair before spans 24 days and the event pair 12, and they were acquired in different radar modes (4000 and 2000 in the file names).
 - **Raw phase** is dominated by the ionosphere. Removing the product's own estimate cuts scatter by about half to two-thirds.
-- **Pixel offsets** show no large coherent shift.
+- **Pixel offsets** show no large coherent shift. They come from the product layer with the smallest search window, which could miss a very large shift.
 
 This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](docs/SCIENTIFIC_VALIDATION.md).
 
@@ -42,7 +42,7 @@ This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](
 - “What could explain this?”, a rule-based panel that lists the checks for and against each explanation and never gives a probability, and an evidence report as a printable page, CSV, GeoJSON or JSON.
 - Experimental hazard screens: landslide-prone terrain and road exposure along the Rasuwa corridor.
 - Layer statuses generated from the files on disk. A NISAR layer cannot be selected until it has been downloaded, inspected and passed QA.
-- A list of what is real (“What is real?”), read from `frontend/public/data/status.json`, which gives each capability its maturity.
+- A list of what is real (“What is real?”), read from `frontend/public/data/status.json`, which gives each capability its maturity. Each headline claim is listed in `frontend/public/data/claims.json` with its basis and status, and a test keeps withdrawn claims out of the app and the main docs.
 - A Python pipeline for GUNW, GOFF and GCOV, with QA gates and provenance.
 - A pre-download QA check, and a clearly labelled browse-preview fallback.
 - Automated tests at every level, including real browser tests with offline and accessibility checks.
