@@ -156,6 +156,10 @@ test('all three simulations run and stay labelled as illustrations', async ({ pa
   await panel.getByRole('tab', { name: 'What-if flood' }).click()
   await expect(panel).toContainText('not a forecast')
   await expect(panel).toContainText('Places below the water')
+  await page.waitForTimeout(1500) // The tab's content fades in: wait so the picture shows it
+  // The pointer is still on the tab it just clicked, and the tab's label must stay readable there
+  const tab = panel.getByRole('tab', { name: 'What-if flood' })
+  expect(await tab.evaluate((e) => { const s = getComputedStyle(e); return s.color !== s.backgroundColor })).toBe(true)
   await page.screenshot({ path: `${SHOTS}/simulate-whatif.png` })
   await panel.getByRole('tab', { name: 'Radar explainer' }).click()
   await expect(panel).toContainText('This model')
@@ -230,6 +234,8 @@ test('every control can be reached and used from the keyboard', async ({ page })
 test('switching case moves between Tsho Rolpa and Rasuwa', async ({ page }) => {
   await open(page, TSHO)
   await expect(page.getByRole('heading', { name: /Tsho Rolpa/ }).first()).toBeVisible()
+  await page.waitForTimeout(1500)
+  await page.screenshot({ path: `${SHOTS}/tsho-rolpa.png` })
   await page.getByLabel('Case study').selectOption('rasuwa-2026')
   await expect(page.getByRole('heading', { name: 'Rasuwa–Bhote Koshi–Trishuli, Nepal' })).toBeVisible()
 })
@@ -243,11 +249,19 @@ test.describe('phone', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.getByRole('button', { name: 'Layers' }).click()
     await expect(page.locator('.left')).toBeVisible()
+    // The top bar's case menu and status button do not fit on a phone, so the sheet carries them
+    await expect(page.getByLabel('Change case')).toBeVisible()
+    await expect(page.locator('.left').getByRole('button', { name: 'What is real here?' })).toBeVisible()
     await page.getByRole('button', { name: 'Start the guided story' }).click()
     await expect(page.locator('.left')).toBeHidden()
     await expect(page.locator('.story')).toBeVisible()
     await expect(page.locator('.story')).toContainText('The source')
     await page.waitForTimeout(1500)
+    // The step describes the detachment zone, so its marker must sit in the strip of map the sheet leaves free.
+    const marker = await page.locator('.point-marker').boundingBox()
+    const sheet = await page.locator('.story').boundingBox()
+    expect(marker!.y + marker!.height).toBeLessThan(sheet!.y)
+    expect(marker!.y).toBeGreaterThan(64)
     await page.screenshot({ path: `${SHOTS}/phone-story.png` })
     for (const b of await page.locator('.top-actions button, .story button').all()) {
       if (!(await b.isVisible())) continue // hidden at phone width, so not a tap target
@@ -282,8 +296,10 @@ test('records performance', async ({ page }) => {
   const report = { mapReadyMs: mapReady, firstSampleMs: firstSample, nextSampleMs: nextSample, ...metrics }
   console.log(JSON.stringify(report))
   writeFileSync('e2e/performance.json', JSON.stringify(report, null, 2))
-  expect(mapReady).toBeLessThan(8000)
-  expect(firstSample).toBeLessThan(5000)
+  // A shared CI machine draws the map in software on borrowed cores: CL_PERF_SLACK widens the limits there without loosening them here.
+  const slack = Number(process.env.CL_PERF_SLACK ?? 1)
+  expect(mapReady).toBeLessThan(8000 * slack)
+  expect(firstSample).toBeLessThan(5000 * slack)
 })
 
 test('a clicked spot gets ranked explanations and a downloadable evidence report', async ({ page }) => {
@@ -295,6 +311,21 @@ test('a clicked spot gets ranked explanations and a downloadable evidence report
   await expect(panel).toContainText('it is not a probability')
   const [csv] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'CSV', exact: true }).click()])
   expect(csv.suggestedFilename()).toMatch(/^cascadelens-rasuwa-2026-.*\.csv$/)
+})
+
+test('the printable report prints under the offline policy', async ({ page, context }) => {
+  await open(page)
+  await page.getByRole('button', { name: 'Bhote Koshi corridor' }).click()
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  const [report] = await Promise.all([context.waitForEvent('page'), page.getByRole('button', { name: 'Printable / PDF' }).click()])
+  const refused: string[] = []
+  report.on('console', (m) => { if (/Content Security Policy/.test(m.text())) refused.push(m.text()) })
+  await expect(report.getByRole('heading', { level: 1 })).toContainText('CascadeLens evidence report', { timeout: 20000 })
+  // The new window inherits the policy that blocks a script written into the page, so the button must be wired from the app.
+  await report.evaluate(() => { window.print = () => { document.title = 'printed' } })
+  await report.getByRole('button', { name: 'Print or save as PDF' }).click()
+  await expect(report).toHaveTitle('printed')
+  expect(refused).toEqual([])
 })
 
 test('the first minute leads with the finding and an honest status list', async ({ page }) => {

@@ -36,4 +36,13 @@ describe('evidence report', () => {
     expect(h).toContain('method version 1')
     expect(h).toContain('withheld until the corrected run')
   })
+  it('carries no script unless it is the saved file, so the print button survives the offline policy', () => {
+    expect(toHtml(r)).not.toMatch(/onclick|<script/i)
+    expect(toHtml(r)).toContain('<button id="print">')
+    expect(toHtml(r, true)).toContain('onclick="print()"')
+  })
+  it('names the hemisphere from the sign of the coordinates', () => {
+    expect(toHtml(r)).toContain('28.10000°N, 85.30000°E')
+    expect(toHtml({ ...r, point: { lng: -70.5, lat: -33.4 } })).toContain('33.40000°S, 70.50000°W')
+  })
 })

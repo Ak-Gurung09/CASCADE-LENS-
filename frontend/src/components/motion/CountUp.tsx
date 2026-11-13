@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { elapsedMs } from '../../services/simulation'
 
 // A number that counts up to its value when it first appears, and glides when the value changes.
 // Shows the final value at once when the reader has asked the system for less motion.
@@ -13,7 +14,7 @@ export function CountUp({ value, format, ms = 900 }: { value: number; format: (v
     const start = performance.now()
     const a = from.current
     let frame = requestAnimationFrame(function tick(now) {
-      const k = Math.min(1, (now - start) / ms)
+      const k = Math.min(1, elapsedMs(now, start) / ms)
       const e = 1 - Math.pow(1 - k, 3)
       const v = a + (value - a) * e
       setShown(v)

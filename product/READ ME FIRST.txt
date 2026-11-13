@@ -13,7 +13,7 @@ it. It is usually http://localhost:8765
 Do NOT open app\index.html directly. Browsers block a page opened that way from
 loading its scripts and data, so it cannot start.
 
-On macOS or Linux, run:  python3 serve.py
+On macOS or Linux, open a terminal in this folder and run:  sh start.sh
 
 It needs Python 3, and nothing else. It needs no internet connection, no login,
 and no installing.
@@ -33,10 +33,13 @@ WHAT IS INSIDE
 
 
 HOW TO USE IT
-  - Pick a place under "Go to", or click the map.
+  - Pick a place under "Jump to", or click the map.
   - Open the Inspector tab to read the stored value at that point.
   - Open the Interpretation tab to see what a layer means and what it cannot show.
   - Start the guided story for a walk through the evidence of each case.
+  - Open "What is real?" for an honest status of every capability.
+  - On a phone, the Layers button opens the controls, the case menu and the
+    status list.
 
 
 IMPORTANT LIMITS
@@ -50,6 +53,7 @@ IMPORTANT LIMITS
 
 WHAT IS IN THIS FOLDER
   Start CascadeLens.bat   Starts the app on Windows
+  start.sh                Starts the app on macOS or Linux
   serve.py                The small local server it runs
   app\                    The finished app and its prepared data
   source\                 Code, tests and documentation

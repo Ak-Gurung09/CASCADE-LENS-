@@ -74,15 +74,15 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
 | LANDMET test case | Retired from the app (team decision, 6 Nov); data no longer shipped (13 Nov) | Pipeline tests only, with the file present | Real, test only | `prepare_landmet.py` can rebuild it |
 | Offline operation | Implemented and tested | CSP-enforced browser test | Real | |
-| One-click package | Implemented and tested | Fresh unzip, via the `.bat` | Real | Needs Python 3 |
+| One-click package | Implemented and tested | Fresh unzip, via the `.bat`; `start.sh` run on Linux only | Real | Needs Python 3 |
 | Accessibility | Implemented and tested | axe, keyboard | n/a | No serious findings |
-| Responsive layout | Implemented and tested | 375 px emulation | n/a | Not on a physical phone |
+| Responsive layout | Implemented and tested | 375 px emulation, with the story's place checked to be in view | n/a | Not on a physical phone |
 | Evidence classes on every layer | Implemented and tested | Unit, browser | Real | Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown |
 | Radar Observability ("Can the radar see it?") | Method version 2 implemented, tested and rebuilt (13 Nov) | Python, frontend, browser | Real, derived | Applies the product's own mask. Rasuwa over frames 74 and 75, Tsho Rolpa over frame 74; see [RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md) |
 | Second viewing direction, Track 98 (13 Nov) | Implemented and tested | Python (comparison, merge, frames per product), unit, browser | Real: Pair B GUNW frame 16 and its pre-event pair | Its own observability view (`observabilityViews.t98`), compared cell by cell with Track 48 and never merged; the inspector and report answer per direction |
 | Pre-event control comparison | Implemented, tested and rebuilt (13 Nov) | Python, unit | Real, derived, with block-bootstrap 95% intervals; Track 48 and Track 98 | Rasuwa story step 2 chart. Wording: consistent with surface change, not proof of cause |
 | "What could explain this?" | Implemented and tested | Unit, browser | Real inputs, rule-based | Reads each viewing direction (Track 48 and Track 98) from its own flags and pair, and labels each check with its track. Counts only radar values at the spot and independent mapping. Labels: Fits the checks, Partly fits, Little support; never probabilities |
-| Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | Unit, browser downloads | Real | Built in the browser |
+| Evidence report (PDF, CSV, GeoJSON, JSON) | Implemented and tested | Unit, browser downloads and print | Real | Built in the browser |
 | Tsho Rolpa dam and glacier movement | Research output only (12 Nov) | Python | Not shown in the app | `prepare_lake.py --research-motion` writes to `data/qa` |
 | Tsho Rolpa coherence layer | Rebuilt (13 Nov) | Python | Real, event pair | `prepare_lake.py --coherence-only` rebuilds it without GCOV. The mask marks most of the lake as water, so the story quotes no lake median |
 | Landslide-prone terrain screen (Model A) | Experimental | 5 Python, 2 unit, browser | Real DEM, derived | Rasuwa only; a one-event consistency check (AUC 0.66), not a validation |
@@ -99,6 +99,21 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 
 ## Commands executed and results
+
+### Review fixes merged from main (13 Nov)
+
+A separate review of `main` on 13 November found the problems below. Its fixes are merged into this branch, and they now run on every pull request, see `.github/workflows/ci.yml`.
+
+| Problem | Effect | Fix |
+|---|---|---|
+| The report's "Print or save as PDF" button did nothing in the packaged app | The offline policy blocks a script written into the report window | The app wires the button from outside; browser test added |
+| On a phone, the story's sheet covered the place its text describes | The detachment zone sat under the sheet | The map frames each place in the strip above the sheet; the sheet is shorter with one row of buttons; browser test added |
+| On a phone, the story's map could be left undrawn | Headless Chromium treated the solid scrolling sheet as hiding the whole map | The sheet's background stops just short of solid. Seen only in headless Chromium, and not checked on a physical phone |
+| On a phone, the case menu, "What is real?" and the dam-failure scenario could not be reached | The top bar hides them at that width | The Layers sheet now carries them |
+| On `main`, pressing Play in the flow replay could blank the whole app on a busy computer | The first animation frame can be stamped earlier than the moment Play was pressed, which made the position negative | This branch had already fixed the replay (`replayAdvance`). The merge adds the same guard to the four other animations, and a fault anywhere now shows a message with a restart button instead of a blank page |
+| The chosen tab's label vanished under the pointer | White text on the white pill, straight after the click | Hover rule corrected; browser test added |
+| The opening finding card stayed over the map while the reader explored | It hid the map behind the inspector's readings | It steps aside once a place, layer or spot is picked |
+| A package built on Linux shipped a Windows launcher with Unix line endings | `.bat` files can misread their labels that way | `.gitattributes` fixes the endings; `start.sh` added for macOS and Linux |
 
 After the rainfall-threshold run, on 2026-11-13, in a fresh cloud copy without the raw NISAR files, in Chromium:
 

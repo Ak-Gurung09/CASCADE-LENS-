@@ -14,7 +14,7 @@ CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwaâ€
 
 ## Quick start
 
-Use the finished package, `CascadeLens.zip`. Unzip it to a short path and double-click **Start CascadeLens.bat**. It needs Python 3 and no internet connection. To use Brave or another browser, paste the address from the black window.
+Use the finished package, `CascadeLens.zip`. Unzip it to a short path and double-click **Start CascadeLens.bat**. On macOS or Linux, open a terminal in the unzipped folder and run `sh start.sh` instead. It needs Python 3 and no internet connection. To use Brave or another browser, paste the address from the black window.
 
 Do not open `index.html` directly. Browsers block a page opened that way from loading its scripts and data, so it cannot start.
 
@@ -142,6 +142,8 @@ python processing/scripts/generate_manifest.py
 ```
 
 ## Test
+
+Every pull request runs the type check, the unit tests, the Python tests and the browser tests, see [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 To include the real-format tests, first fetch NASA's public samples (about 540 MB, no login):
 

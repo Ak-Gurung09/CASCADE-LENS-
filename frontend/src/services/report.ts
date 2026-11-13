@@ -1,5 +1,5 @@
 import type { Manifest } from '../types/manifest'
-import { acquisitionLabel, isUsable } from './manifest'
+import { acquisitionLabel, coordinates, isUsable } from './manifest'
 import { samplePoint } from './sampler'
 import { evidenceOf, EVIDENCE } from './evidence'
 import { classify, classLabel, isObservability, obsViews, observabilityCurrent, reasons, STALE_NOTE, taskOf } from './observability'
@@ -123,16 +123,19 @@ ${ev.radar.otherView ? row('Opposite direction', `${ev.radar.otherView.label}${e
 <p><b>Context</b></p><ul>${li(ev.context)}</ul><p><b>What to verify</b></p><ul>${li(ev.verify)}</ul>`
 }
 
-export function toHtml(r: Report): string {
+// The app's offline policy forbids scripts written into a page, and a window the app opens inherits that policy.
+// So the print button carries no script by default: the app wires it up from outside (see ReportButtons).
+// `selfPrinting` is for the saved-file fallback, which opens from disk under no policy and has nobody to wire it.
+export function toHtml(r: Report, selfPrinting = false): string {
   const li = (xs: string[]) => xs.map((x) => `<li>${esc(x)}</li>`).join('')
   const num = (v: number | null) => (v === null ? '' : Math.abs(v) >= 1000 ? v.toFixed(1) : v.toPrecision(5))
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(r.title)}</title><style>
 body{font:14px/1.45 system-ui,sans-serif;color:#111;max-width:820px;margin:24px auto;padding:0 16px}h1{font-size:20px}h2{font-size:15px;margin-top:22px;border-bottom:1px solid #ccc}
 table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #ddd;padding:4px 6px;text-align:left;vertical-align:top}.muted{color:#555}.tag{font-size:11px;border:1px solid #999;border-radius:8px;padding:0 6px}
 @media print{button{display:none}}</style></head><body>
-<button onclick="print()">Print or save as PDF</button>
+<button id="print"${selfPrinting ? ' onclick="print()"' : ''}>Print or save as PDF</button>
 <h1>${esc(r.title)}</h1>
-<p class="muted">Spot ${r.point.lat.toFixed(5)}° N, ${r.point.lng.toFixed(5)}° E · event ${esc(r.case.eventDate)} · generated ${esc(r.generatedAt.slice(0, 16).replace('T', ' '))} UTC</p>
+<p class="muted">Spot ${coordinates(r.point.lng, r.point.lat)} · event ${esc(r.case.eventDate)} · generated ${esc(r.generatedAt.slice(0, 16).replace('T', ' '))} UTC</p>
 ${r.observability ? `<h2>Can the radar see here? <span class="tag">Derived</span></h2>
 ${[r.observability, ...(r.otherViews ?? [])].map((v) => `<p class="muted">Pair ${esc(v.pair)}, ${esc(v.frame)}, method version ${v.methodVersion}</p>
 ${v.current ? '' : `<p><b>${esc(STALE_NOTE)}</b></p>`}

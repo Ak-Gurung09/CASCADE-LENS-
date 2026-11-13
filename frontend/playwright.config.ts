@@ -7,12 +7,16 @@ import { defineConfig, devices } from '@playwright/test'
 const executablePath = process.env.CL_BROWSER_PATH
 const browser = { ...devices['Desktop Edge'], ...(executablePath ? { launchOptions: { executablePath } } : { channel: 'msedge' as const }), viewport: { width: 1440, height: 900 } }
 const packaged = process.env.CL_BASE_URL
+// A shared CI machine draws the map in software on borrowed cores, and its first "Map ready" can take longer than the usual 5 seconds.
+// CL_PERF_SLACK widens every wait there. Without it the limits stay as strict as they were.
+const slack = Number(process.env.CL_PERF_SLACK ?? 1)
 
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: false,
   workers: 1,
-  timeout: 45_000,
+  timeout: 45_000 * slack,
+  expect: { timeout: 5_000 * slack },
   reporter: 'list',
   use: { trace: 'off' },
   projects: [

@@ -20,6 +20,10 @@ export async function loadSimulation(path: string): Promise<SimData> {
   return res.json()
 }
 
+// Time since the last animation frame, never negative. A frame's timestamp is when the browser began that frame, and on a busy computer
+// that can be earlier than a moment already recorded with performance.now(). Unclamped, the first step of an animation then runs backwards.
+export const elapsedMs = (now: number, before: number) => Math.max(0, now - before)
+
 export interface SimCount { buildings: number; roadKm: number; places: string[] }
 
 // A feature counts once the flow has passed its kilometre. Without a rise, that is everything mapped so far.
