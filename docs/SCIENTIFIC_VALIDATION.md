@@ -9,7 +9,7 @@
 | Pair B, 19→31 Aug 2026 | GUNW | 98 ascending | 16 | Downloaded, inspected, QA passed, prepared (13 Nov). Frame 15 covers 4% of the case area and is not used |
 | Pair B | GOFF | 98 ascending | 15, 16 | Downloaded, inspected, QA passed, prepared |
 | Track 98 series, 26 Jul → 6 Oct 2026 | GUNW | 98 ascending | 16 | Four more pairs (one before the event, three after), QA passed, coherence prepared |
-| Track 48 series, 23 Jul → 3 Oct 2026 | GUNW | 48 descending | 74 (and 75 for the pair before) | Four more pairs, QA passed, coherence prepared |
+| Track 48 series, 23 Jul → 3 Oct 2026 | GUNW | 48 descending | 74, 75 | Four more pairs in each frame, QA passed, coherence prepared |
 | Snapshots, 28 and 31 Aug | GCOV | 48 and 98 | 74, 75, 15, 16 | Catalogued only. 31 GB needed |
 
 All granules are PROVISIONAL, CRID P05023. `tests/integration/test_rasuwa_data.py` checks them.
@@ -56,6 +56,18 @@ Track 48, frame 74. "Inside" is the UNOSAT mudflow extent. "Control" is ground 3
 | 21 Sep → 3 Oct | 12 | 2000 | 0.46 (0.44–0.47) | 0.54 (0.52–0.55) | 38% |
 
 The gap opens only inside the mapped area, then narrows. A seasonal change would be expected to lower both areas, so the pattern is **consistent with surface change in the mapped area. It does not establish the cause.** The comparison is indicative, not like for like: the pair before spans twice as many days and was acquired in a different radar mode, and either difference changes coherence by itself.
+
+**Frame 75, the lower mudflow.** The same method on the frame 75 pairs, a cross-check that is documented here and not shown in the app. Only the part of the mapped mudflow inside frame 75 counts; 36 to 39% of it is valid in each pair. Reproduce with `prepare_control_series.py` on the five frame 75 files.
+
+| Pair | Days | Mode in file name | Inside | Control |
+|---|---|---|---|---|
+| 23 Jul → 16 Aug (before) | 24 | 4000 | 0.28 (0.26–0.29) | 0.42 (0.41–0.43) |
+| 16 → 28 Aug (across the event) | 12 | 2000 | 0.16 (0.15–0.18) | 0.54 (0.53–0.55) |
+| 28 Aug → 9 Sep | 12 | 2000 | 0.26 (0.24–0.28) | 0.59 (0.58–0.60) |
+| 9 → 21 Sep | 12 | 2000 | 0.38 (0.35–0.39) | 0.59 (0.58–0.60) |
+| 21 Sep → 3 Oct | 12 | 2000 | 0.41 (0.38–0.43) | 0.62 (0.61–0.63) |
+
+The pattern matches frame 74: the gap opens across the event (0.14 before, 0.37 across), then narrows. Unlike frame 74, the lower mudflow was already clearly less coherent than the ground around it before the event, so less of the across-event gap is new.
 
 **From the opposite side.** Track 98, frame 16, the same zone and method. Every Track 98 pair was acquired in the same radar mode (4000), so mode cannot explain the difference here; the pair before is still twice as long. Valid inside is 77% in every pair: only the river is masked, and the water mask is the same in all five.
 

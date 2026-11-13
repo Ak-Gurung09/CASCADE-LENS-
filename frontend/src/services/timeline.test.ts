@@ -12,8 +12,10 @@ const layer = shipped.layers.find((l) => l.id === 'rasuwa-2026:coherence-timelin
 const compact = (iso: string) => iso.replace(/-/g, '')
 
 describe('coherence through time (shipped Rasuwa layer)', () => {
-  it('holds the five frame 74 pairs, 23 Jul to 3 Oct 2026, as consecutive pair steps', () => {
+  it('holds the five Track 48 pairs, 23 Jul to 3 Oct 2026, over frames 74 and 75, as consecutive pair steps', () => {
     const steps = layer?.timeSteps ?? []
+    expect(layer?.frames).toEqual([74, 75])
+    expect(layer?.name).toBe('Coherence through time (Track 48, frames 74 and 75)')
     expect(steps.map((s) => s.label)).toEqual([
       '2026-07-23/2026-08-16', '2026-08-16/2026-08-28', '2026-08-28/2026-09-09', '2026-09-09/2026-09-21', '2026-09-21/2026-10-03',
     ])
@@ -22,15 +24,15 @@ describe('coherence through time (shipped Rasuwa layer)', () => {
     expect(stepLabel(steps[1].label)).toBe('16–28 Aug')
   })
 
-  it('reads each step from the granule of that pair, with its sampling raster and validity on disk', () => {
+  it('reads each step from that pair\'s own granule in each frame, with its sampling raster and validity on disk', () => {
     for (const step of layer?.timeSteps ?? []) {
       const [ref, sec] = step.label.split('/').map(compact)
-      expect(step.sources).toHaveLength(1)
-      const src = step.sources[0]
-      expect(src.frame).toBe(74)
-      expect(src.granule).toMatch(new RegExp(`_${ref}T\\d{6}_${ref}T\\d{6}_${sec}T\\d{6}_${sec}T\\d{6}_`))
-      expect(src.sourceDataset).toMatch(/unwrappedInterferogram\/HH\/coherenceMagnitude$/)
-      for (const f of [src.sampling, src.validity]) expect(existsSync(resolve(data, String(f).replace(/^data\//, ''))), String(f)).toBe(true)
+      expect(step.sources.map((s) => s.frame).sort()).toEqual([74, 75])
+      for (const src of step.sources) {
+        expect(src.granule).toMatch(new RegExp(`_048_D_0${src.frame}_\\d{3}_\\d{4}_\\w{2}_${ref}T\\d{6}_${ref}T\\d{6}_${sec}T\\d{6}_${sec}T\\d{6}_`))
+        expect(src.sourceDataset).toMatch(/unwrappedInterferogram\/HH\/coherenceMagnitude$/)
+        for (const f of [src.sampling, src.validity]) expect(existsSync(resolve(data, String(f).replace(/^data\//, ''))), String(f)).toBe(true)
+      }
     }
   })
 })

@@ -6423,23 +6423,29 @@
    },
    "id": "rasuwa-2026:coherence-timeline",
    "groupId": null,
-   "name": "Coherence through time (Track 48, frame 74)",
+   "name": "Coherence through time (Track 48, frames 74 and 75)",
    "category": "gunw",
    "measurementClass": "measurement",
    "measurementType": "gunw-coherence",
    "track": 48,
    "frames": [
-    74
+    74,
+    75
    ],
    "qualityLayerIds": [],
    "status": "sampleable",
    "statusReason": null,
    "sourceGranules": [
     "NISAR_L2_PR_GUNW_026_048_D_074_028_4000_SH_20260723T125813_20260723T125848_20260816T125812_20260816T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001",
     "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_028_048_D_075_029_2000_SH_20260816T125845_20260816T125920_20260828T125845_20260828T125920_P05023_N_F_J_001",
     "NISAR_L2_PR_GUNW_029_048_D_074_030_2000_SH_20260828T125812_20260828T125846_20260909T125811_20260909T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_029_048_D_075_030_2000_SH_20260828T125845_20260828T125920_20260909T125845_20260909T125920_P05023_N_F_J_001",
     "NISAR_L2_PR_GUNW_030_048_D_074_031_2000_SH_20260909T125811_20260909T125846_20260921T125811_20260921T125846_P05023_N_F_J_001",
-    "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001"
+    "NISAR_L2_PR_GUNW_030_048_D_075_031_2000_SH_20260909T125845_20260909T125920_20260921T125845_20260921T125920_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_031_048_D_074_032_2000_SH_20260921T125811_20260921T125846_20261003T125812_20261003T125846_P05023_N_F_J_001",
+    "NISAR_L2_PR_GUNW_031_048_D_075_032_2000_SH_20260921T125845_20260921T125920_20261003T125845_20261003T125920_P05023_N_F_J_001"
    ],
    "acquisition": {
     "reference": "2026-07-23",
@@ -6481,6 +6487,42 @@
       "count": 67
      },
      "maskTiles": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+    },
+    {
+     "frame": 75,
+     "granule": "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001.h5",
+     "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+     "sha256": "8784ded63fedeb7b1587310343909783735c38faecd9c03a9ef660a323a5629d",
+     "bounds": [
+      84.38475258192256,
+      27.714795075127526,
+      85.55941176995117,
+      28.28044921635347
+     ],
+     "shape": [
+      760,
+      1432
+     ],
+     "validFraction": 0.38059118641576006,
+     "maskedFraction": 0.08397713907674213,
+     "sourceDtype": "float32",
+     "clipWindow": [
+      0,
+      760,
+      604,
+      2036
+     ],
+     "displayOffset": 0.0,
+     "sampling": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f075.tif",
+     "validity": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f075_validity.tif",
+     "tiles": {
+      "url": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f075/{z}/{x}/{y}.png",
+      "minzoom": 8,
+      "maxzoom": 11,
+      "count": 46
+     },
+     "maskTiles": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f075_mask/{z}/{x}/{y}.png"
     }
    ],
    "timeSteps": [
@@ -6522,6 +6564,42 @@
         "count": 67
        },
        "maskTiles": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      },
+      {
+       "frame": 75,
+       "granule": "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_026_048_D_075_028_4000_SH_20260723T125847_20260723T125921_20260816T125845_20260816T125920_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "8784ded63fedeb7b1587310343909783735c38faecd9c03a9ef660a323a5629d",
+       "bounds": [
+        84.38475258192256,
+        27.714795075127526,
+        85.55941176995117,
+        28.28044921635347
+       ],
+       "shape": [
+        760,
+        1432
+       ],
+       "validFraction": 0.38059118641576006,
+       "maskedFraction": 0.08397713907674213,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        0,
+        760,
+        604,
+        2036
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f075.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260723/gunw-coherence_f075_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f075/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 46
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260723/gunw-coherence/f075_mask/{z}/{x}/{y}.png"
       }
      ]
     },
@@ -6563,6 +6641,42 @@
         "count": 70
        },
        "maskTiles": "data/tiles/rasuwa-2026-coherence-20260816/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      },
+      {
+       "frame": 75,
+       "granule": "NISAR_L2_PR_GUNW_028_048_D_075_029_2000_SH_20260816T125845_20260816T125920_20260828T125845_20260828T125920_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_075_029_2000_SH_20260816T125845_20260816T125920_20260828T125845_20260828T125920_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
+       "bounds": [
+        84.38475258192256,
+        27.714795075127526,
+        85.55941176995117,
+        28.28044921635347
+       ],
+       "shape": [
+        760,
+        1432
+       ],
+       "validFraction": 0.38052135401352544,
+       "maskedFraction": 0.14044123052043517,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        0,
+        760,
+        604,
+        2036
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260816/gunw-coherence_f075.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260816/gunw-coherence_f075_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260816/gunw-coherence/f075/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 54
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260816/gunw-coherence/f075_mask/{z}/{x}/{y}.png"
       }
      ]
     },
@@ -6604,6 +6718,42 @@
         "count": 70
        },
        "maskTiles": "data/tiles/rasuwa-2026-coherence-20260828/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      },
+      {
+       "frame": 75,
+       "granule": "NISAR_L2_PR_GUNW_029_048_D_075_030_2000_SH_20260828T125845_20260828T125920_20260909T125845_20260909T125920_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_029_048_D_075_030_2000_SH_20260828T125845_20260828T125920_20260909T125845_20260909T125920_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "a1f31270e5f054d13aace9e10b3857d563547004f2fedd36ea67254cf2f25907",
+       "bounds": [
+        84.38475258192256,
+        27.714795075127526,
+        85.55941176995117,
+        28.28044921635347
+       ],
+       "shape": [
+        760,
+        1432
+       ],
+       "validFraction": 0.3275277491914143,
+       "maskedFraction": 0.14794913260805645,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        0,
+        760,
+        604,
+        2036
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260828/gunw-coherence_f075.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260828/gunw-coherence_f075_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260828/gunw-coherence/f075/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 53
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260828/gunw-coherence/f075_mask/{z}/{x}/{y}.png"
       }
      ]
     },
@@ -6645,6 +6795,42 @@
         "count": 73
        },
        "maskTiles": "data/tiles/rasuwa-2026-coherence-20260909/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      },
+      {
+       "frame": 75,
+       "granule": "NISAR_L2_PR_GUNW_030_048_D_075_031_2000_SH_20260909T125845_20260909T125920_20260921T125845_20260921T125920_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_030_048_D_075_031_2000_SH_20260909T125845_20260909T125920_20260921T125845_20260921T125920_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "1885033475a5ea8d16e552c590a27b8e032be6cf8d9c51dc8c17e18fb7190c83",
+       "bounds": [
+        84.38475258192256,
+        27.714795075127526,
+        85.55941176995117,
+        28.28044921635347
+       ],
+       "shape": [
+        760,
+        1432
+       ],
+       "validFraction": 0.3648467362540429,
+       "maskedFraction": 0.13594347250808586,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        0,
+        760,
+        604,
+        2036
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260909/gunw-coherence_f075.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260909/gunw-coherence_f075_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260909/gunw-coherence/f075/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 55
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260909/gunw-coherence/f075_mask/{z}/{x}/{y}.png"
       }
      ]
     },
@@ -6686,12 +6872,48 @@
         "count": 70
        },
        "maskTiles": "data/tiles/rasuwa-2026-coherence-20260921/gunw-coherence/f074_mask/{z}/{x}/{y}.png"
+      },
+      {
+       "frame": 75,
+       "granule": "NISAR_L2_PR_GUNW_031_048_D_075_032_2000_SH_20260921T125845_20260921T125920_20261003T125845_20261003T125920_P05023_N_F_J_001",
+       "sourceFilename": "NISAR_L2_PR_GUNW_031_048_D_075_032_2000_SH_20260921T125845_20260921T125920_20261003T125845_20261003T125920_P05023_N_F_J_001.h5",
+       "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+       "sha256": "32d84a5185bb7635fbe9b1b2b0cb2062e4e08fdcdb438ebb951dcf3a8f3de424",
+       "bounds": [
+        84.38475258192256,
+        27.714795075127526,
+        85.55941176995117,
+        28.28044921635347
+       ],
+       "shape": [
+        760,
+        1432
+       ],
+       "validFraction": 0.3339210893854749,
+       "maskedFraction": 0.15400617465451338,
+       "sourceDtype": "float32",
+       "clipWindow": [
+        0,
+        760,
+        604,
+        2036
+       ],
+       "displayOffset": 0.0,
+       "sampling": "data/sampling/rasuwa-2026-coherence-20260921/gunw-coherence_f075.tif",
+       "validity": "data/sampling/rasuwa-2026-coherence-20260921/gunw-coherence_f075_validity.tif",
+       "tiles": {
+        "url": "data/tiles/rasuwa-2026-coherence-20260921/gunw-coherence/f075/{z}/{x}/{y}.png",
+        "minzoom": 8,
+        "maxzoom": 11,
+        "count": 54
+       },
+       "maskTiles": "data/tiles/rasuwa-2026-coherence-20260921/gunw-coherence/f075_mask/{z}/{x}/{y}.png"
       }
      ]
     }
    ],
    "explanation": {
-    "what": "Coherence of every catalogued Track 48 frame 74 pair, one time step per pair, from 2026-07-23 to 2026-10-03.",
+    "what": "Coherence of every catalogued Track 48 pair over frames 74 and 75, one time step per pair, from 2026-07-23 to 2026-10-03.",
     "measures": "How alike the radar echoes stayed between the two dates of each pair, 0 to 1, on the unwrapped grid, with the product's own mask applied.",
     "inspect": "Click a spot and open the Inspector: the chart shows that spot in each pair. Play the steps under Simulate, Time replay.",
     "establishes": "Whether a spot stayed coherent before, across and after the event. It does not say what changed, or measure movement."

@@ -2,6 +2,13 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 13 November 2026: the later frame 75 pairs
+
+- Downloaded the three later Track 48 frame 75 pairs (28 Aug to 3 Oct, 12 days, mode 2000), so coherence through time now reaches the lower mudflow and the Trishuli corridor. The frame 75 24-day pair (9 Sep to 3 Oct) overlaps them and is not used.
+- `prepare_timeline.py` takes several frames: each pair becomes one time step holding one raster per frame, as Pair A's layers do. The Track 48 layer is now "Coherence through time (Track 48, frames 74 and 75)".
+- Rebuilding from all ten raw files reproduced the 360 shipped frame 74 files byte for byte.
+- Cross-check, in SCIENTIFIC_VALIDATION only: the frame 75 before/after series shows the same pattern as frame 74, with the gap opening across the event (0.14 before, 0.37 across) and then narrowing. The lower mudflow was already less coherent than its surroundings before the event.
+
 ## 13 November 2026: explanations from both viewing directions
 
 - "What could explain this?" now gathers its clues once per viewing direction (Track 48 and Track 98), each from its own observability flags, event pair, pixel offsets, pre-event pair and control series. Each radar check is labelled with its track. Mapping, slope and height are counted or listed once.

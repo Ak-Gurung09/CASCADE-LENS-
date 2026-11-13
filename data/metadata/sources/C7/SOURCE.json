@@ -1,7 +1,7 @@
 {
  "dataset": "C7",
  "provider": "NASA/JPL, ISRO via ASF DAAC",
- "product": "NISAR L2 GUNW repeat series: Track 48 descending frame 74 (5 pairs), Track 98 ascending frame 16 (5 pairs)",
+ "product": "NISAR L2 GUNW repeat series: Track 48 descending frames 74 and 75 (5 pairs), Track 98 ascending frame 16 (5 pairs)",
  "version": "P05023",
  "url_or_request_ref": "data/metadata/catalogue.json",
  "licence": "NASA open data (attribution required)",

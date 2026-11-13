@@ -66,3 +66,11 @@ def test_regenerating_the_manifest_keeps_merged_blocks_and_their_layers():
     assert [l["id"] for l in out["layers"]] == ["pair-b:gunw-coherence", "pair-a:gunw-coherence", "x:observability-movement", "x:road-exposure"]
     assert "old" not in out["layers"][1]  # a layer the build produces is always the fresh one
     assert out["observability"] == {"track": 48} and out["observabilityViews"] == {"t98": {}} and out["hazards"] == {"h": 1}
+
+
+def test_re_merging_a_layer_replaces_it_where_it_stands():
+    merge = script("merge_observability").merge
+    m = {"layers": [{"id": "a"}, {"id": "x:coherence-timeline", "v": 1}, {"id": "x:coherence-timeline-t98"}]}
+    out = merge({"case": "x", "layers": [{"id": "x:coherence-timeline", "v": 2}, {"id": "new"}]}, m)
+    assert [l["id"] for l in out["layers"]] == ["a", "x:coherence-timeline", "x:coherence-timeline-t98", "new"]
+    assert out["layers"][1]["v"] == 2

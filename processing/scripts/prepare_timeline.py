@@ -100,7 +100,7 @@ def main(argv: list[str]) -> None:
              "qualityLayerIds": [], "status": "sampleable", "statusReason": None, "sourceGranules": granules,
              "acquisition": {"reference": steps[0]["label"].split("/")[0], "secondary": steps[-1]["label"].split("/")[1]},
              "sources": steps[0]["sources"], "timeSteps": [{"label": s["label"], "sources": s["sources"]} for s in steps],
-             "explanation": {"what": f"Coherence of every catalogued Track {track} {fr_text} pair, one time step per pair, from {steps[0]['label'][:10]} to {steps[-1]['label'][-10:]}.",
+             "explanation": {"what": f"Coherence of every catalogued Track {track} pair over {fr_text}, one time step per pair, from {steps[0]['label'][:10]} to {steps[-1]['label'][-10:]}.",
                              "measures": "How alike the radar echoes stayed between the two dates of each pair, 0 to 1, on the unwrapped grid, with the product's own mask applied.",
                              "inspect": "Click a spot and open the Inspector: the chart shows that spot in each pair. Play the steps under Simulate, Time replay.",
                              "establishes": "Whether a spot stayed coherent before, across and after the event. It does not say what changed, or measure movement."},

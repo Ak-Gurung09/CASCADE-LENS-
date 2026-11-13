@@ -15,8 +15,10 @@ FILES = {"rasuwa-2026": "manifest.json"}
 
 
 def merge(fragment: dict, manifest: dict) -> dict:
-    ids = {l["id"] for l in fragment["layers"]}
-    manifest["layers"] = [l for l in manifest["layers"] if l["id"] not in ids] + fragment["layers"]
+    # A layer that is already there is replaced where it stands, so re-merging never reorders the map's layer list
+    new = {l["id"]: l for l in fragment["layers"]}
+    kept = [new.pop(l["id"], l) for l in manifest["layers"]]
+    manifest["layers"] = kept + [l for l in fragment["layers"] if l["id"] in new]
     for key in ("observability", "hazards", "controlSeries", "access"):
         if key in fragment:
             manifest[key] = fragment[key]

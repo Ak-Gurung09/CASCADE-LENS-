@@ -28,7 +28,6 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 - **GSLC** is deferred: no justified use yet.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
 - **Parts of the study area lie outside both Track 48 frames**: 14% of the mapped mudflow, 18% of the Trishuli corridor and 19% of the whole case area. Track 98 frame 16 covers all of it, from the other side.
-- **Coherence through time** covers Track 48 frame 74 and Track 98 frame 16. The three later frame 75 pairs were not downloaded.
 - **Not built from the November master prompt** (need data or are out of scope): rainfall and river-flow context (IMERG, GloFAS), live processing, hosting. Slope screening and road exposure were built on 10 November as experimental screens. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
 - **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave up to 2 November, and in Chromium from 10 November. They have not run in Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
@@ -67,7 +66,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Snapshot view | Implemented and tested | Browser, fixture | Unavailable dependency | Shows *Download required* for Rasuwa |
 | Simulate mode (flow replay, what-if flood, radar explainer) | Implemented and tested | Unit, data and browser tests | Illustrations built on real geography | Not a forecast, see [LIMITATIONS.md](docs/LIMITATIONS.md) |
 | Time slider, day chart | Implemented and tested | Unit (labels), browser | Real: Tsho Rolpa GCOV dates, Rasuwa coherence pairs | Any layer with saved time steps; labels show dates or pair dates |
-| Coherence through time (P0.5) | Implemented and tested (13 Nov) | Python, unit, browser | Real: five Track 48 frame 74 pairs (23 Jul to 3 Oct 2026) and five Track 98 frame 16 pairs (26 Jul to 6 Oct) | Two layers, `rasuwa-2026:coherence-timeline` and `-t98`, built by `prepare_timeline.py`; Time replay picks the series; the inspector chart shows a clicked spot pair by pair |
+| Coherence through time (P0.5) | Implemented and tested (13 Nov) | Python, unit, browser | Real: five Track 48 pairs over frames 74 and 75 (23 Jul to 3 Oct 2026) and five Track 98 frame 16 pairs (26 Jul to 6 Oct) | Two layers, `rasuwa-2026:coherence-timeline` and `-t98`, built by `prepare_timeline.py`; Time replay picks the series; the inspector chart shows a clicked spot pair by pair |
 | Terrain, UNOSAT, OSM, boundaries | Implemented and tested | Browser | Real | |
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
 | LANDMET test case | Retired from the app (team decision, 6 Nov); data no longer shipped (13 Nov) | Pipeline tests only, with the file present | Real, test only | `prepare_landmet.py` can rebuild it |
@@ -98,17 +97,17 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 
 ## Commands executed and results
 
-After the explanations were extended to both viewing directions, on 2026-11-13, in a cloud copy, in Chromium:
+After the later frame 75 pairs were added, on 2026-11-13, in a cloud copy, in Chromium:
 
 ```text
-python -m pytest tests                       181 passed, 24 skipped (skips need NASA's samples or the LANDMET file)
+python -m pytest tests                       182 passed, 24 skipped (skips need NASA's samples or the LANDMET file)
 npx tsc --noEmit                             no errors
 npm test                                     98 passed
 npm run build                                OK
 npx playwright test                          32 passed
 ```
 
-When the second viewing direction (Track 98) was added, earlier the same day: Python 181 passed, 24 skipped; unit 92; browser 31.
+Earlier the same day: with the explanations from both directions, Python 181 passed, unit 98, browser 32; when the second viewing direction (Track 98) was added, Python 181, unit 92, browser 31.
 
 After the rebuild from the raw files, earlier the same day:
 
@@ -207,4 +206,4 @@ GOFF units check, ignored GOFF mask, unreliable phase shown as valid, GCOV mask 
 
 ## Remaining actions
 
-See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). The rebuild and the second viewing direction are done. The most valuable next steps need new downloads: the later frame 75 pairs (coherence through time downstream), and rainfall and river data for the models. The download list is kept with the project files.
+See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). The rebuild, the second viewing direction and the later frame 75 pairs are done. The most valuable next steps need new data: rainfall and river data for the models, and a 12-day pre-event pair. The download list is kept with the project files.
