@@ -59,7 +59,7 @@ test('every product has an honest status', async ({ page }) => {
   await expect(page.getByText('Download required').first()).toBeVisible()
 })
 
-test('the inspector reads real NISAR values and masks the source, where phase was not unwrapped', async ({ page }) => {
+test('the inspector reads real NISAR values and refuses the swath gap', async ({ page }) => {
   await open(page)
   await page.getByRole('radio', { name: /Coherence magnitude/ }).check()
   await inspect(page, 'Bhote Koshi corridor')

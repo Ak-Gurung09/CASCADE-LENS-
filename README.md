@@ -4,7 +4,7 @@
 
 GAIA: Seeing Earth Dance. A Team GAIA project for NASA Space Apps Challenge 2026, Dancing with the SARs.
 
-CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwa–Bhote Koshi–Trishuli disaster in Nepal, with a second case on the Tsho Rolpa glacial lake. It puts NISAR radar measurements on a map with their quality, provenance and limits in view, and it shows where the radar could and could not judge the ground. It is not a warning system.
+CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwa–Bhote Koshi–Trishuli disaster in Nepal, with a second case on the Tsho Rolpa glacial lake. It puts NISAR radar measurements on a map with their quality, provenance and limits in view. It is not a warning system.
 
 > **Data status: real NISAR measurements of the event are loaded.** Pair A (GUNW and GOFF) and Pair B (GOFF) passed QA. All are Provisional. GCOV is not downloaded for Rasuwa. No displacement is calculated. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
 
@@ -23,20 +23,18 @@ Do not open `index.html` directly. Browsers block a page opened that way from lo
 
 ## What the radar shows
 
-- **Coherence** is much lower along the UNOSAT-mapped channel than on the terrain beside it: 0.19 against 0.46 in frame 74, and 0.16 against 0.52 in frame 75.
-- **Against a pre-event pair** (23 Jul to 16 Aug) the drop is specific to the mudflow: its coherence falls from 0.41 to 0.28, while untouched ground nearby rises from 0.42 to 0.52.
-- **At the source**, Pair A recorded the ground, and a surface change would be visible on 66% of the detachment zone. Its phase was not unwrapped there, so movement cannot be measured. Pair B views the source from the other side, and image matching largely fails there: correlation peak 0.18 against 0.63.
-- **52% of the mapped mudflow** lies in the neighbouring frame 75, which is not assessed for observability yet. The app marks it as unchecked, not as unchanged.
+- **Coherence** is much lower along the UNOSAT-mapped channel than on the terrain beside it: 0.19 against 0.46, and 0.16 against 0.52.
+- **At the source**, Pair A has no data, because it falls in a swath gap. Pair B reaches it, and image matching largely fails there: correlation peak 0.18 against 0.63.
 - **Raw phase** is dominated by the ionosphere. Removing the product's own estimate cuts scatter by about half to two-thirds.
 - **Pixel offsets** show no large coherent shift.
 
-This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](docs/SCIENTIFIC_VALIDATION.md) and [RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md).
+This is evidence to examine, not proof of cause. See [SCIENTIFIC_VALIDATION.md](docs/SCIENTIFIC_VALIDATION.md).
 
 ## What works today
 
 - Interactive offline map with Copernicus DEM terrain, UNOSAT event layers, Sentinel-1 damage evidence, OSM geography and district boundaries.
 - An opening finding card and a five-step guided story. Their figures are read from the data, not typed in.
-- **Can the radar see it?** A per-pixel answer, with reasons, for two separate tasks: seeing a surface change and measuring ground movement.
+- **Can the radar see it?** A per-pixel answer, with reasons, for two separate tasks: seeing a surface change and measuring ground movement. Its first method is under correction, see [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
 - Real NISAR phase, coherence, connected components, ionosphere screen and pixel offsets, with a labelled ionosphere-removed phase layer.
 - A measurement inspector that reads stored raster values, with quality alongside.
 - **What could explain this?** Rule-based hypotheses for a clicked spot, with the checks for and against. They are never probabilities.
@@ -204,7 +202,7 @@ python processing/scripts/prepare_landmet.py path/to/landmet_L3_20071231_v1.nc
 
 ## Known limitations
 
-All NISAR products are Provisional, and GCOV is not downloaded for Rasuwa. Phase is not converted to displacement. Offsets are radar components, not geographic vectors. Frame 75 is not assessed for observability. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+All NISAR products are Provisional, and GCOV is not downloaded for Rasuwa. Phase is not converted to displacement. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
 ## Documentation
 

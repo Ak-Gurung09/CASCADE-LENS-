@@ -107,9 +107,10 @@ These now also run on every pull request, see `.github/workflows/ci.yml`.
 | The chosen tab's label vanished under the pointer | White text on the white pill, straight after the click | Hover rule corrected; browser test added |
 | The opening finding card stayed over the map while the reader explored | It hid the map behind the inspector's readings | It steps aside once a place, layer or spot is picked |
 | `scipy` was missing from `processing/requirements.txt` | A fresh install failed one hazard test | Added |
-| Four documents still said the source fell in a "swath gap" | The claim was withdrawn on 6 Nov | README, limitations, validation and demonstration script corrected |
 | The README and package notes described the LANDMET case | It left the app on 6 Nov | They now describe Tsho Rolpa |
 | A package built on Linux shipped a Windows launcher with Unix line endings | `.bat` files can misread their labels that way | `.gitattributes` fixes the endings; `start.sh` added for macOS and Linux |
+
+Not changed by this review: what the documents and the app say about the source area. The app on this branch says a surface change was visible on 66% of the detachment zone, while four documents say Pair A has no data there. The audit in pull requests #6 to #8 settles it with the product's own mask applied: Pair A holds no usable measurement at the source, and the 66% figure is withdrawn. Those pull requests carry the corrected app and documents.
 
 Still open from this review: the LANDMET tiles and rasters (about 28 MB) still ship in `frontend/public/data` although the app no longer lists that case. Removing them is a team decision.
 
@@ -166,7 +167,7 @@ See [SCIENTIFIC_VALIDATION.md](docs/SCIENTIFIC_VALIDATION.md).
 
 - Coherence is much lower along the mapped channel: 0.19 and 0.16 inside, against 0.46 and 0.52 nearby.
 - Pair A sees the detachment zone (wrapped coherence present, a change would be visible on 66% of it), but its unwrapped phase is zero-filled there, so movement cannot be measured. An earlier report called this a swath gap; that was wrong.
-- Against a pre-event control (23 Jul to 16 Aug), mudflow coherence falls from 0.41 to 0.28 while nearby untouched ground rises from 0.42 to 0.52, then recovers over later pairs.
+- Against a pre-event control (23 Jul to 16 Aug), mudflow coherence falls from 0.41 to 0.28 while nearby untouched ground rises from 0.43 to 0.52, then recovers over later pairs.
 - Pair B reaches it, and matching largely fails: correlation peak 0.18 against 0.63.
 - Raw phase is dominated by the ionosphere.
 - Pixel offsets show no large coherent shift.
