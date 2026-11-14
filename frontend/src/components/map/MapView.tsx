@@ -99,7 +99,14 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     const envelope = envelopeRef.current
     // MapLibre fires these for every tile. Passing on only real changes stops the whole page redrawing each time.
     let last: MapStatus | undefined
+    // The source that failed, for as long as it is on the map. Other tiles keep loading after a failure, and without this
+    // their "loading" then "ready" would wipe the warning. Choosing another layer removes the source, and the warning with it.
+    let failed: { id: string; source: unknown } | undefined
     const report = (s: MapStatus) => {
+      if (s.state !== 'error' && failed) {
+        if (mapRef.current?.getSource(failed.id) === failed.source) return
+        failed = undefined
+      }
       if (s.state === last?.state && s.message === last?.message) return
       if (s.state === 'ready' && last?.state === 'error') return // A failed layer must keep its warning: idle only means loading stopped
       last = s
@@ -125,6 +132,7 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       const err = e.error as Error & { status?: number }
       if (err?.status === 404) return // Sparse pyramids skip empty tiles
       const source = (e as unknown as { sourceId?: string }).sourceId
+      if (source) failed = { id: source, source: map.getSource(source) }
       report({ state: 'error', message: source ? `Could not load map source ${source}. ${err?.message ?? ''}` : (err?.message ?? 'Map error') })
     })
     if (import.meta.env.DEV) (window as unknown as { __clMap: MlMap }).__clMap = map

@@ -99,6 +99,14 @@ test('a failed raster source reports an error and leaves the app usable', async 
   await page.getByRole('button', { name: 'Bhote Koshi corridor' }).click()
   await expect(page.locator('.map-alert')).toContainText('Could not load map source')
   await expect(page.locator('.map-state')).toHaveText('Map source failed')
+  // Other map data that finishes loading afterwards must not wipe the warning
+  await page.evaluate(() => new Promise<void>((done) => {
+    const map = window.__clMap
+    map.once('idle', () => done())
+    ;(map.getSource('footprints') as unknown as { setData(d: unknown): void }).setData({ type: 'FeatureCollection', features: [] })
+  }))
+  await expect(page.locator('.map-alert')).toContainText('Could not load map source')
+  await expect(page.locator('.map-state')).toHaveText('Map source failed')
   await page.getByRole('radio', { name: /Coherence magnitude/ }).check()
   await expect(page.getByRole('heading', { name: 'Coherence magnitude' })).toBeVisible()
 })
