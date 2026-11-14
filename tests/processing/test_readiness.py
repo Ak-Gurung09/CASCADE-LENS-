@@ -156,3 +156,13 @@ def test_register_source_reads_a_geotiff(tmp_path):
     assert meta["crs"] == "EPSG:32645" and meta["resolution_m"] == 10.0
     w, s, e, n = meta["spatial_extent"]
     assert 84 < w < e < 86 and 27 < s < n < 29
+
+
+def test_a_validation_that_missed_its_own_criterion_does_not_count_and_says_so():
+    ev = {"flood.X.model": {}, "flood.X.calibration": {}, "flood.X.validation": {"summary": "CSI 0.04, chance 0.05", "criterionMet": False}}
+    r = state(ok_sources(), ev)
+    assert r["state"] == "VALIDATION REQUIRED"
+    check = next(c for c in r["checks"] if c["id"] == "flood.X.validation")
+    assert not check["ok"] and check["reason"].startswith("Ran, and missed its criterion: CSI 0.04")
+    ev["flood.X.validation"]["criterionMet"] = True
+    assert state(ok_sources(), ev)["state"] == "EXPERIMENTAL"

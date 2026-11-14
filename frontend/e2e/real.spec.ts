@@ -341,7 +341,9 @@ test('the first minute leads with the finding and an honest status list', async 
   await expect(status).toContainText('Flood and landslide outlooks: what the data allows')
   await expect(status.locator('.readiness li')).toHaveCount(12)
   await expect(status.locator('.readiness')).toContainText('not available')
-  await expect(status.locator('.readiness')).toContainText('Next: B1: GPM IMERG V07 rainfall')
+  await expect(status.locator('.readiness')).toContainText('Next: B2: DHM discharge')
+  // The rainfall threshold ran on real data and missed its criterion: shown as model work, never as a warning
+  await expect(status.locator('.readiness-model')).toContainText('Ran, and missed its criterion')
   await page.getByRole('button', { name: 'Close' }).click()
   await card.getByRole('button', { name: 'Walk through the evidence' }).click()
   await expect(page.locator('.story')).toContainText('The source')

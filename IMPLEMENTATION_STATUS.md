@@ -28,10 +28,13 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 - **GSLC** is deferred: no justified use yet.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
 - **Parts of the study area lie outside both Track 48 frames**: 14% of the mapped mudflow, 18% of the Trishuli corridor and 19% of the whole case area. Track 98 frame 16 covers all of it, from the other side.
-- **Not built from the November master prompt** (need data or are out of scope): rainfall and river-flow context (IMERG, GloFAS), live processing, hosting. Slope screening and road exposure were built on 10 November as experimental screens. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
+- **No landslide or flood warning.** The one model run on real data, the rainfall threshold (L2), did not beat chance in 2025-2026 (corridor CSI 0.20, chance 95th percentile 0.21). The susceptibility and river models wait for a geological map and DHM discharge. See [MODELS.md](docs/MODELS.md).
+- **BIPAD's licence is not established.** Its landslide reports are used for the threshold run but not redistributed; NDRRMA has to confirm terms.
+- **Not built from the November master prompt** (need data or are out of scope): river-flow context (GloFAS), a rainfall map layer (IMERG Late is on disk for the threshold model, but not drawn in the app), live processing, hosting. Slope screening and road exposure were built on 10 November as experimental screens. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
 - **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave up to 2 November, and in Chromium from 10 November. They have not run in Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
 - **The app cannot run from `index.html` directly.** Browsers block that, and the page now explains what to do.
+- **The Space Apps rules have not been checked.** On 13 November 2026, spaceappschallenge.org answered 503 or could not be reached from the cloud environment, so the submission requirements and judging criteria were not read.
 - **Not created:** a public repository, submission links or a hosted deployment.
 
 ## Feature status
@@ -86,12 +89,12 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Road-segment evidence inspector (P0.3) | Implemented and tested | Unit (panel and exports agree), browser (panel ID matches the downloaded JSON) | Real OSM + NISAR, derived | Stable stretch IDs, radar pair and source file, per-reason shares, what to verify |
 | Road access to health care (P0.4) | Experimental | 12 Python on synthetic networks, unit, browser | Real OSM + HOT bridge reports, derived | See [ACCESS_SCREEN.md](docs/ACCESS_SCREEN.md); stops at the study area |
 | Road exposure screen | Experimental | Unit, browser | Real OSM + DEM + NISAR, derived | Says whether the radar could watch each stretch, from the version 2 flags, and the share watched from Track 98 and from either direction |
-| Readiness engine (P1) | Implemented and tested | 18 Python, 3 unit, browser | Files on disk, with SOURCE.json | See [READINESS.md](docs/READINESS.md): 2 context only, 1 data available but processing required (L4, the NISAR series), 9 not available, each with its next requirement |
-| First models and verification harness (P2) | Code tested on synthetic data; not run on real data | 17 Python | Blocked: rainfall, discharge, geology, a current inventory | See [MODELS.md](docs/MODELS.md) |
-| Rainfall-triggered landslide risk (Model B) | Blocked by data | None | Needs IMERG, soil moisture | |
+| Readiness engine (P1) | Implemented and tested | 18 Python, 3 unit, browser | Files on disk, with SOURCE.json | See [READINESS.md](docs/READINESS.md): 2 context only, 2 data available but processing required (L2: BIPAD's licence; L4: the NISAR series), 8 not available, each with its next requirement. A validation that misses its own criterion does not count |
+| First models and verification harness (P2) | Implemented and tested; the rainfall threshold run on real data | 23 Python | Real: IMERG Late 2016 to 2026; BIPAD reports (licence not stated) | L1 and F3 still blocked: geology, DHM discharge. See [MODELS.md](docs/MODELS.md) |
+| Rainfall-triggered landslide risk (Model B, L2) | Run on real data; missed its pre-stated criterion | 6 Python (events, scoring, readiness rule), unit | Real, derived | Held-out 2025-2026 corridor CSI 0.20 against a chance 95th percentile of 0.21 (p = 0.12). Held at *data available* until BIPAD's licence is confirmed |
 | First-minute finding card | Implemented and tested | Unit, browser | Real, figures read from the manifest | |
 | Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names a test that calls its computation | n/a | Shown in the app as "What is real?" |
-| Claim register (`frontend/public/data/claims.json`) | Implemented and tested | Unit test keeps the wording of RED claims off every live surface | n/a | 28 claims: 25 from the Stage 0 audit, one added at the rebuild and two with the Track 98 view, with basis and status |
+| Claim register (`frontend/public/data/claims.json`) | Implemented and tested | Unit test keeps the wording of RED claims off every live surface | n/a | 30 claims: 25 from the Stage 0 audit, one added at the rebuild, two with the Track 98 view and two with the rainfall-threshold run (C29, and C30 as a guard against claiming landslide warnings), with basis and status |
 | Image swipe comparison | Implemented | No automated test | Real, Tsho Rolpa GCOV dates | Tsho Rolpa compare mode |
 | Public repository, deployment | Not implemented | None | n/a | Team decision |
 
@@ -111,6 +114,19 @@ A separate review of `main` on 13 November found the problems below. Its fixes a
 | The chosen tab's label vanished under the pointer | White text on the white pill, straight after the click | Hover rule corrected; browser test added |
 | The opening finding card stayed over the map while the reader explored | It hid the map behind the inspector's readings | It steps aside once a place, layer or spot is picked |
 | A package built on Linux shipped a Windows launcher with Unix line endings | `.bat` files can misread their labels that way | `.gitattributes` fixes the endings; `start.sh` added for macOS and Linux |
+
+After the rainfall-threshold run, on 2026-11-13, in a fresh cloud copy without the raw NISAR files, in Chromium:
+
+```text
+python -m pytest tests                       173 passed, 35 skipped (skips need the raw NISAR files, NASA's samples or the LANDMET file)
+npx tsc --noEmit                             no errors
+npm test                                     99 passed
+npm run build                                OK
+npx playwright test                          32 passed (22 on the real build, 10 on the synthetic fixture)
+python processing/scripts/run_rain_thresholds.py   corridor CSI 0.203, chance 95th percentile 0.2085, p 0.12: criterion not met
+```
+
+The Python total is lower than the 182 below only because this copy has no raw NISAR files, so their tests skip.
 
 After the later frame 75 pairs were added, on 2026-11-13, in a cloud copy, in Chromium:
 

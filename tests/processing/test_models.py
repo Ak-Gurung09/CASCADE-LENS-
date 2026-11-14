@@ -104,3 +104,33 @@ def test_calibration_recovers_a_known_catchment():
     fit = gr4j.calibrate(p, pet, q, temp=temp, warmup=300, maxiter=40, seed=1)
     assert fit["nse"] > 0.98
     assert fit["params"]["x4"] == pytest.approx(truth["x4"], rel=0.25)
+
+
+def test_ongoing_event_matches_event_at_on_every_day_and_reads_no_later_day():
+    rng = np.random.default_rng(3)
+    r = np.where(rng.random(400) < 0.45, rng.gamma(1.2, 12, 400), rng.random(400) * 0.9)  # wet spells, dry-day drizzle
+    e, d = thresholds.ongoing(r, dry_days=2, wet_mm=1.0)
+    for t in range(len(r)):
+        got = thresholds.event_at(r, t, dry_days=2, wet_mm=1.0)
+        assert (e[t], d[t]) == ((0.0, 0) if got is None else pytest.approx(got))
+        changed = r.copy()
+        changed[t + 1:] = 500.0  # a flood tomorrow changes nothing about today
+        e2, d2 = thresholds.ongoing(changed)
+        assert e2[t] == pytest.approx(e[t]) and d2[t] == d[t]
+        if t > 60:
+            break
+
+
+def test_event_at_closes_an_event_after_the_dry_spell():
+    r = np.array([0, 10, 20, 0, 0, 0, 5])
+    assert thresholds.event_at(r, 2) == (30.0, 2)
+    assert thresholds.event_at(r, 3) == (30.0, 2)  # one dry day: the event is still the trigger candidate
+    assert thresholds.event_at(r, 4) is None  # two dry days: it has ended
+    assert thresholds.event_at(r, 6) == (5.0, 1)
+
+
+def test_warnings_fire_when_the_event_so_far_reaches_the_line():
+    th = thresholds.Threshold(alpha=25.0, beta=0.5, level=0.05, n_events=10)
+    r = np.array([0, 10, 10, 20, 0, 0, 0, 30])
+    # day 1: 10 < 25; day 2: 20 < 25*sqrt(2)=35.4; day 3: 40 < 25*sqrt(3)=43.3; day 7: 30 >= 25
+    assert thresholds.warnings(r, th).tolist() == [False, False, False, False, False, False, False, True]

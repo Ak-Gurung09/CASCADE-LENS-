@@ -20,8 +20,16 @@ export async function loadReadiness(): Promise<Readiness | null> {
 
 // The missing or unfit inputs, in plain words, for one capability: only the failing checks, at most `n`.
 export function blockers(c: ReadinessCapability, n = 3): string[] {
-  return c.checks.filter((x) => !x.ok && !x.id.endsWith('.model') && !x.id.endsWith('.calibration') && !x.id.endsWith('.validation') && !x.id.endsWith('.operational'))
+  return c.checks.filter((x) => !x.ok && !RUNGS.some((r) => x.id.endsWith(r)))
     .slice(0, n).map((x) => x.reason)
+}
+
+const RUNGS = ['.model', '.calibration', '.validation', '.operational']
+
+// Model work that has been recorded for a capability (a model, its calibration, its validation), passed or not, in plain
+// words. A validation that missed the criterion it stated beforehand is listed here, and the state stays below it.
+export function modelRecords(c: ReadinessCapability): string[] {
+  return c.checks.filter((x) => RUNGS.some((r) => x.id.endsWith(r)) && !x.reason.startsWith('No ')).map((x) => x.reason)
 }
 
 export const stateClass = (s: string) => (s === 'NOT AVAILABLE' ? 'blocked' : s === 'CONTEXT ONLY' ? 'context' : s.startsWith('DATA') ? 'partial' : 'progress')

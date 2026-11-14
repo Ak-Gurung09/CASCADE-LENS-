@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Manifest } from '../../types/manifest'
 import { finding } from '../../services/finding'
-import { blockers, loadReadiness, stateClass, type Readiness } from '../../services/readiness'
+import { blockers, loadReadiness, modelRecords, stateClass, type Readiness } from '../../services/readiness'
 import { assetUrl } from '../../services/manifest'
 
 const KEY = 'cascadelens.finding.seen'
@@ -53,6 +53,7 @@ export function StatusPanel({ onClose }: { onClose: () => void }) {
         <li key={c.capability}>
           <span className={`readiness-state r-${stateClass(c.state)}`}>{c.state.toLowerCase()}</span><strong>{c.name}</strong>
           {blockers(c).length > 0 && <small>{blockers(c).join(' · ')}</small>}
+          {modelRecords(c).length > 0 && <small className="readiness-model">Model work recorded: {modelRecords(c).join(' · ')}</small>}
           {c.next_requirement && <small>Next: {c.next_requirement}</small>}
         </li>
       ))}</ul>}
