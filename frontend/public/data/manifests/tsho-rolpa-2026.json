@@ -730,231 +730,6 @@
   },
   {
    "groupId": null,
-   "mission": "NISAR",
-   "instrument": "L-SAR",
-   "crs": "EPSG:32645",
-   "qualityLayerIds": [],
-   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
-   "productMaturity": "Provisional (P05023)",
-   "postingM": [
-    20.0,
-    20.0
-   ],
-   "frames": [
-    74
-   ],
-   "track": 48,
-   "orbitDirection": "DESCENDING",
-   "id": "tsho-rolpa-2026:coherence",
-   "name": "Ground stability (16\u201328 Aug)",
-   "category": "gridded",
-   "measurementClass": "measurement",
-   "measurementType": "gunw-coherence",
-   "productType": "GUNW",
-   "kind": "continuous",
-   "units": "1",
-   "status": "sampleable",
-   "statusReason": null,
-   "sourceGranules": [
-    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001"
-   ],
-   "acquisition": {
-    "reference": "2026-08-16",
-    "secondary": "2026-08-28"
-   },
-   "sources": [
-    {
-     "frame": 74,
-     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
-     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
-     "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/wrappedInterferogram/HH/coherenceMagnitude",
-     "bounds": [
-      86.41367293064334,
-      27.82414533460846,
-      86.53595520825839,
-      27.905853213049983
-     ],
-     "sampling": "data/sampling/tsho-rolpa-2026/coherence.tif",
-     "validity": null,
-     "tiles": {
-      "url": "data/tiles/tsho-rolpa-2026/coherence/{z}/{x}/{y}.png",
-      "minzoom": 10,
-      "maxzoom": 14,
-      "count": 57
-     }
-    }
-   ],
-   "stats": {
-    "count": 2,
-    "min": 0.0,
-    "max": 1.0,
-    "mean": 0.5,
-    "median": 0.5,
-    "p2": 0.02,
-    "p98": 0.98,
-    "displayMin": 0.0,
-    "displayMax": 1.0,
-    "histogram": {
-     "edges": [
-      0.0,
-      0.025,
-      0.05,
-      0.075,
-      0.1,
-      0.125,
-      0.15,
-      0.175,
-      0.2,
-      0.225,
-      0.25,
-      0.275,
-      0.3,
-      0.325,
-      0.35,
-      0.375,
-      0.4,
-      0.425,
-      0.45,
-      0.475,
-      0.5,
-      0.525,
-      0.55,
-      0.575,
-      0.6,
-      0.625,
-      0.65,
-      0.675,
-      0.7,
-      0.725,
-      0.75,
-      0.775,
-      0.8,
-      0.825,
-      0.85,
-      0.875,
-      0.9,
-      0.925,
-      0.95,
-      0.975,
-      1.0
-     ],
-     "counts": [
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1
-     ]
-    }
-   },
-   "legend": {
-    "type": "continuous",
-    "stops": [
-     "#101417",
-     "#2c4a52",
-     "#5fe0c9",
-     "#e9fff9"
-    ],
-    "min": 0,
-    "max": 1,
-    "unit": null,
-    "lowLabel": "Dark: changed, or water",
-    "highLabel": "Bright: unchanged ground"
-   },
-   "explanation": {
-    "what": "How alike the radar echoes were on 2026-08-16 and 2026-08-28, from 0 (nothing alike) to 1 (identical).",
-    "measures": "Interferometric coherence. Bare rock and the moraine dam stay bright. Water, moving ice and fresh snow go dark.",
-    "inspect": "Look at the dam at the lake's western end: if it were slumping or soaking it would turn dark.",
-    "establishes": "Where the surface stayed the same for 12 days. It does not say how far anything moved."
-   },
-   "limitations": [
-    "Provisional data.",
-    "Steep slopes facing away from the radar are dark because of radar shadow, not change.",
-    "Twelve days in the monsoon: wet snow and rain lower coherence even on stable ground."
-   ]
-  },
-  {
-   "id": "ref:zones",
-   "groupId": null,
-   "name": "Dam and glacier zones tested for movement",
-   "category": "reference",
-   "mission": "NISAR",
-   "instrument": "L-SAR",
-   "productType": "Derived here",
-   "measurementClass": "derived",
-   "measurementType": "reference",
-   "kind": "vector",
-   "units": null,
-   "acquisition": {
-    "reference": "2026-08-16",
-    "secondary": null
-   },
-   "crs": "EPSG:4326",
-   "status": "prepared",
-   "statusReason": null,
-   "qualityLayerIds": [],
-   "orbitDirection": null,
-   "track": null,
-   "frames": [],
-   "sources": [],
-   "vector": {
-    "url": "data/vectors/tsho-rolpa-2026-zones.geojson",
-    "type": "line",
-    "color": "#FF7F66",
-    "opacity": 0.95,
-    "dash": true,
-    "bounds": [
-     86.41367293064334,
-     27.82414533460846,
-     86.53595520825839,
-     27.905853213049983
-    ]
-   },
-   "attribution": "Derived by CascadeLens",
-   "limitations": [
-    "The dam zone is a 500 m circle at the lake's lowest shore. The glacier zone is a 2.5 km circle beyond the far end of the lake. No glacier outline is loaded, so this zone is approximate."
-   ],
-   "sourceGranules": [],
-   "productMaturity": "Derived",
-   "page": null
-  },
-  {
-   "groupId": null,
    "category": "reference",
    "mission": "Copernicus DEM",
    "instrument": null,
@@ -1144,10 +919,10 @@
      "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "reason flags (see observability block)",
      "bounds": [
-      86.41306033475027,
-      27.82360112482148,
-      86.53656674132668,
-      27.90639689377046
+      86.413060335,
+      27.823601125,
+      86.536566741,
+      27.906396894
      ],
      "sampling": "data/sampling/tsho-rolpa-2026/observability-flags.tif",
      "tiles": {
@@ -1171,7 +946,8 @@
      "#F2C46B",
      "#B07CFF",
      "#6B7682",
-     "#2A3138"
+     "#2A3138",
+     "#A39B8B"
     ],
     "keys": [
      {
@@ -1188,24 +964,30 @@
      },
      {
       "color": "#6B7682",
-      "label": "No data in the product"
+      "label": "No valid data in the product"
      },
      {
       "color": "#2A3138",
       "label": "Outside the frame checked"
+     },
+     {
+      "color": "#A39B8B",
+      "label": "Not assessed"
      }
     ]
    },
    "explanation": {
     "what": "Could a surface change between these dates be seen here?",
-    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
+    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present and unflagged by the product's own mask or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality. Missing inputs are marked Not assessed, never Usable.",
     "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
     "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
    },
    "limitations": [
     "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
     "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+    "Coherence comes from the 80 m product, so features narrower than about 80 m are mixed with their surroundings.",
     "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+    "An exact zero in unwrapped phase is treated as unwrapping fill. A component's own reference pixel can be exactly zero, so at most one real pixel per component may be lost.",
     "Products are Provisional."
    ]
   },
@@ -1244,10 +1026,10 @@
      "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "reason flags (see observability block)",
      "bounds": [
-      86.41306033475027,
-      27.82360112482148,
-      86.53656674132668,
-      27.90639689377046
+      86.413060335,
+      27.823601125,
+      86.536566741,
+      27.906396894
      ],
      "sampling": "data/sampling/tsho-rolpa-2026/observability-flags.tif",
      "tiles": {
@@ -1271,7 +1053,8 @@
      "#F2C46B",
      "#B07CFF",
      "#6B7682",
-     "#2A3138"
+     "#2A3138",
+     "#A39B8B"
     ],
     "keys": [
      {
@@ -1288,32 +1071,219 @@
      },
      {
       "color": "#6B7682",
-      "label": "No data in the product"
+      "label": "No valid data in the product"
      },
      {
       "color": "#2A3138",
       "label": "Outside the frame checked"
+     },
+     {
+      "color": "#A39B8B",
+      "label": "Not assessed"
      }
     ]
    },
    "explanation": {
     "what": "Could ground movement be measured here?",
-    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
+    "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present and unflagged by the product's own mask or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality. Missing inputs are marked Not assessed, never Usable.",
     "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
     "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."
    },
    "limitations": [
     "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
     "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+    "Coherence comes from the 80 m product, so features narrower than about 80 m are mixed with their surroundings.",
     "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+    "An exact zero in unwrapped phase is treated as unwrapping fill. A component's own reference pixel can be exactly zero, so at most one real pixel per component may be lost.",
     "Products are Provisional."
+   ]
+  },
+  {
+   "groupId": null,
+   "mission": "NISAR",
+   "instrument": "L-SAR",
+   "crs": "EPSG:32645",
+   "qualityLayerIds": [],
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "productMaturity": "Provisional (P05023)",
+   "postingM": [
+    20.0,
+    20.0
+   ],
+   "frames": [
+    74
+   ],
+   "track": 48,
+   "orbitDirection": "DESCENDING",
+   "id": "tsho-rolpa-2026:coherence",
+   "name": "Ground stability (16\u201328 Aug)",
+   "category": "gridded",
+   "measurementClass": "measurement",
+   "measurementType": "gunw-coherence",
+   "productType": "GUNW",
+   "kind": "continuous",
+   "units": "1",
+   "status": "sampleable",
+   "statusReason": null,
+   "sourceGranules": [
+    "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001"
+   ],
+   "acquisition": {
+    "reference": "2026-08-16",
+    "secondary": "2026-08-28"
+   },
+   "sources": [
+    {
+     "frame": 74,
+     "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+     "sourceFilename": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
+     "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/wrappedInterferogram/HH/coherenceMagnitude",
+     "bounds": [
+      86.41367293064334,
+      27.82414533460846,
+      86.53595520825839,
+      27.905853213049983
+     ],
+     "sampling": "data/sampling/tsho-rolpa-2026/coherence.tif",
+     "validity": "data/sampling/tsho-rolpa-2026/coherence_validity.tif",
+     "tiles": {
+      "url": "data/tiles/tsho-rolpa-2026/coherence/{z}/{x}/{y}.png",
+      "minzoom": 10,
+      "maxzoom": 14,
+      "count": 57
+     }
+    }
+   ],
+   "stats": {
+    "count": 2,
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.5,
+    "median": 0.5,
+    "p2": 0.02,
+    "p98": 0.98,
+    "displayMin": 0.0,
+    "displayMax": 1.0,
+    "histogram": {
+     "edges": [
+      0.0,
+      0.025,
+      0.05,
+      0.075,
+      0.1,
+      0.125,
+      0.15,
+      0.175,
+      0.2,
+      0.225,
+      0.25,
+      0.275,
+      0.3,
+      0.325,
+      0.35,
+      0.375,
+      0.4,
+      0.425,
+      0.45,
+      0.475,
+      0.5,
+      0.525,
+      0.55,
+      0.575,
+      0.6,
+      0.625,
+      0.65,
+      0.675,
+      0.7,
+      0.725,
+      0.75,
+      0.775,
+      0.8,
+      0.825,
+      0.85,
+      0.875,
+      0.9,
+      0.925,
+      0.95,
+      0.975,
+      1.0
+     ],
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   },
+   "legend": {
+    "type": "continuous",
+    "stops": [
+     "#101417",
+     "#2c4a52",
+     "#5fe0c9",
+     "#e9fff9"
+    ],
+    "min": 0,
+    "max": 1,
+    "unit": null,
+    "lowLabel": "Dark: changed, or water",
+    "highLabel": "Bright: unchanged ground"
+   },
+   "explanation": {
+    "what": "How alike the radar echoes were on 2026-08-16 and 2026-08-28, from 0 (nothing alike) to 1 (identical).",
+    "measures": "Interferometric coherence. Bare rock and the moraine dam stay bright. Water, moving ice and fresh snow go dark.",
+    "inspect": "Compare the dam at the lake's western end with the ground around it.",
+    "establishes": "Where the surface stayed the same for 12 days. It does not say how far anything moved."
+   },
+   "limitations": [
+    "Provisional data.",
+    "Steep slopes facing away from the radar are dark because of radar shadow, not change.",
+    "Twelve days in the monsoon: wet snow and rain lower coherence even on stable ground.",
+    "Coherence shows where the surface stayed the same. It is not a measurement of movement."
    ]
   }
  ],
  "lake": {
   "name": "Tsho Rolpa",
   "basin": "Rolwaling Khola, then Tamakoshi and Sun Koshi, in the Koshi Basin",
-  "published": "Published surveys give about 1.5 to 1.6 km\u00b2 for Tsho Rolpa in the 2010s and 2020s.",
+  "published": "Published figures: about 1.55 km\u00b2 (2008 survey), 1.61 km\u00b2 (Peppa et al., 2020, satellite images) and 1.65 km\u00b2 (2022 DHM bathymetric survey, as reported by Dialogue Earth).",
   "series": [
    {
     "date": "2026-08-16",
@@ -2028,92 +1998,6 @@
   "changeKm2": -0.011,
   "methodHalfRangeKm2": 0.091,
   "method": "Dark area in HH + HV below -7 dB after 3x3 smoothing on a 20 m grid. The range reruns it at -6 and -8 dB.",
-  "motion": {
-   "wavelengthCm": 23.8,
-   "glacier": [
-    {
-     "track": 48,
-     "frame": 74,
-     "direction": "descending",
-     "dates": [
-      "2026-08-16",
-      "2026-08-28"
-     ],
-     "days": 12,
-     "pixels": 1330,
-     "parts": {
-      "range": {
-       "differenceM": 0.0,
-       "noiseM": 0.1
-      },
-      "alongTrack": {
-       "differenceM": 0.07,
-       "noiseM": 0.06
-      }
-     },
-     "limitM": 0.2,
-     "perYearM": 6,
-     "detected": false
-    },
-    {
-     "track": 98,
-     "frame": 15,
-     "direction": "ascending",
-     "dates": [
-      "2026-08-19",
-      "2026-08-31"
-     ],
-     "days": 12,
-     "pixels": 1169,
-     "parts": {
-      "range": {
-       "differenceM": 0.0,
-       "noiseM": 0.04
-      },
-      "alongTrack": {
-       "differenceM": 0.03,
-       "noiseM": 0.03
-      }
-     },
-     "limitM": 0.09,
-     "perYearM": 3,
-     "detected": false
-    }
-   ],
-   "zonesNote": "The dam zone is a 500 m circle at the lake's lowest shore. The glacier zone is a 2.5 km circle beyond the far end of the lake. No glacier outline is loaded, so this zone is approximate.",
-   "pair": [
-    "2026-08-16",
-    "2026-08-28"
-   ],
-   "dam": {
-    "ok": true,
-    "pixels": 97,
-    "refPixels": 2517,
-    "coherence": 0.75,
-    "differenceCm": 0.13,
-    "noiseCm": 0.79,
-    "limitCm": 1.6,
-    "detected": false
-   },
-   "damPairs": [
-    {
-     "pair": [
-      "2026-08-16",
-      "2026-08-28"
-     ],
-     "ok": true,
-     "pixels": 97,
-     "refPixels": 2517,
-     "coherence": 0.75,
-     "differenceCm": 0.13,
-     "noiseCm": 0.79,
-     "limitCm": 1.6,
-     "detected": false
-    }
-   ],
-   "coherenceLake": 0.26,
-   "coherenceLand": 0.52
-  },
   "scenario": {
    "routeKm": 107.7,
    "routeEnd": [
@@ -10287,6 +10171,19 @@
     28.0001
    ],
    "dem": "Copernicus_DSM_COG_10_N27_00_E086_00_DEM.tif"
+  },
+  "coherence": {
+   "pair": [
+    "2026-08-16",
+    "2026-08-28"
+   ],
+   "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+   "sourceDataset": "/science/LSAR/GUNW/grids/frequencyA/wrappedInterferogram/HH/coherenceMagnitude",
+   "maskApplied": true,
+   "lake": 0.36,
+   "land": 0.52,
+   "lakeValidPct": 8.0,
+   "landValidPct": 99.7
   }
  },
  "observability": {
@@ -10306,6 +10203,15 @@
   "look": "Left",
   "compositeReleaseId": "P05023",
   "productVersion": "1.0.11",
+  "methodVersion": 2,
+  "datasets": {
+   "coh": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude",
+   "cc": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/connectedComponents",
+   "phase": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/unwrappedPhase",
+   "mask": "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/mask"
+  },
+  "ccFillValue": 65535,
+  "geometryNotAssessedPct": 0.0,
   "incidenceDeg5to95": [
    43.3,
    43.9
@@ -10323,7 +10229,10 @@
    "shadow": 8,
    "lowCoherence": 16,
    "noConnectedComponent": 32,
-   "lowBaselineCoherence": 64
+   "lowBaselineCoherence": 64,
+   "productMasked": 128,
+   "geometryNotAssessed": 256,
+   "baselineNoData": 512
   },
   "classes": {
    "disturbance": [
@@ -10347,15 +10256,21 @@
     },
     {
      "code": 4,
-     "label": "No data in the product",
+     "label": "No valid data in the product",
      "color": "#6B7682",
-     "meaning": "Inside the frame, but the product holds no value here."
+     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."
     },
     {
      "code": 5,
      "label": "Outside the frame checked",
      "color": "#2A3138",
      "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."
+    },
+    {
+     "code": 6,
+     "label": "Not assessed",
+     "color": "#A39B8B",
+     "meaning": "An input needed for this check is missing or invalid here (terrain geometry, or the baseline pair). No conclusion."
     }
    ],
    "movement": [
@@ -10363,13 +10278,13 @@
      "code": 1,
      "label": "Usable",
      "color": "#5FE0C9",
-     "meaning": "Phase is coherent and unwrapped, so ground movement could be measured here."
+     "meaning": "Phase is coherent and reliably unwrapped, so ground movement could be measured here. Nothing has been measured yet."
     },
     {
      "code": 2,
      "label": "Seen, but not reliable",
      "color": "#F2C46B",
-     "meaning": "Phase is too noisy (low coherence) or was not unwrapped here, so no movement value can be trusted."
+     "meaning": "Phase is too noisy (low coherence) or was not reliably unwrapped here, so no movement value can be trusted."
     },
     {
      "code": 3,
@@ -10379,15 +10294,21 @@
     },
     {
      "code": 4,
-     "label": "No data in the product",
+     "label": "No valid data in the product",
      "color": "#6B7682",
-     "meaning": "Inside the frame, but the product holds no value here."
+     "meaning": "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."
     },
     {
      "code": 5,
      "label": "Outside the frame checked",
      "color": "#2A3138",
      "meaning": "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."
+    },
+    {
+     "code": 6,
+     "label": "Not assessed",
+     "color": "#A39B8B",
+     "meaning": "The terrain geometry needed for this check is missing or invalid here. No conclusion."
     }
    ]
   },
@@ -10403,17 +10324,27 @@
    "shadow": {
     "value": "range slope away from the radar > 90 deg - incidence angle",
     "provenance": "Standard SAR geometry (active radar shadow)."
+   },
+   "coherenceProduct": {
+    "value": "unwrappedInterferogram coherenceMagnitude, 80 m, sampled nearest onto the 40 m grid",
+    "provenance": "The coherence that belongs to the unwrapped phase and shares its mask; the same layer the app shows."
    }
   },
-  "sensitivityUsableMovementPct": {
-   "0.2": 94.9,
-   "0.3": 76.9,
-   "0.4": 62.3
+  "sensitivity": {
+   "movementUsablePct": {
+    "0.2": 46.9,
+    "0.3": 44.8,
+    "0.4": 41.6
+   },
+   "denominator": "All analysis cells inside the frame footprint, over the whole case area.",
+   "rule": "The same rule as the movement class, with only the coherence threshold changed."
   },
   "limitations": [
    "Only active layover and shadow from the local slope. Passive shadow cast by a distant ridge is not modelled, so some shadowed valleys may be marked visible.",
    "The DEM is Copernicus GLO-30 resampled to the analysis grid; small features below the grid size are smoothed.",
+   "Coherence comes from the 80 m product, so features narrower than about 80 m are mixed with their surroundings.",
    "Coherence also falls for reasons that are not surface change (wet snow, vegetation, a long time gap). The disturbance task only says whether a change could be seen, not whether one happened.",
+   "An exact zero in unwrapped phase is treated as unwrapping fill. A component's own reference pixel can be exactly zero, so at most one real pixel per component may be lost.",
    "Products are Provisional."
   ],
   "zones": {
@@ -10422,11 +10353,12 @@
      "name": "Tsho Rolpa lake",
      "pixels": 15575,
      "percent": {
-      "Usable": 69.8,
-      "Seen, but not reliable": 22.7,
+      "Usable": 65.0,
+      "Seen, but not reliable": 20.6,
       "Hidden by terrain": 7.5,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 6.9,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10435,11 +10367,12 @@
      "name": "Rolwaling valley",
      "pixels": 68172,
      "percent": {
-      "Usable": 61.0,
-      "Seen, but not reliable": 30.3,
+      "Usable": 55.2,
+      "Seen, but not reliable": 34.5,
       "Hidden by terrain": 8.6,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 1.7,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10448,37 +10381,26 @@
      "name": "tsho-rolpa-2026-lake",
      "pixels": 1037,
      "percent": {
-      "Usable": 17.6,
-      "Seen, but not reliable": 82.4,
+      "Usable": 4.3,
+      "Seen, but not reliable": 5.2,
       "Hidden by terrain": 0.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 90.5,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Insufficient evidence",
-     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
-    },
-    "vector:tsho-rolpa-2026-zones.geojson": {
-     "name": "tsho-rolpa-2026-zones",
-     "pixels": 420,
-     "percent": {
-      "Usable": 72.6,
-      "Seen, but not reliable": 21.2,
-      "Hidden by terrain": 6.2,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
-     },
-     "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "_case": {
      "name": "Whole case area",
      "pixels": 69084,
      "percent": {
-      "Usable": 60.9,
-      "Seen, but not reliable": 30.4,
+      "Usable": 55.1,
+      "Seen, but not reliable": 34.6,
       "Hidden by terrain": 8.6,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 1.6,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10489,11 +10411,12 @@
      "name": "Tsho Rolpa lake",
      "pixels": 15575,
      "percent": {
-      "Usable": 64.8,
-      "Seen, but not reliable": 27.7,
+      "Usable": 61.7,
+      "Seen, but not reliable": 23.9,
       "Hidden by terrain": 7.5,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 6.9,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Enough evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10502,11 +10425,12 @@
      "name": "Rolwaling valley",
      "pixels": 68172,
      "percent": {
-      "Usable": 45.8,
-      "Seen, but not reliable": 45.6,
+      "Usable": 44.8,
+      "Seen, but not reliable": 44.9,
       "Hidden by terrain": 8.6,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 1.7,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
@@ -10515,37 +10439,26 @@
      "name": "tsho-rolpa-2026-lake",
      "pixels": 1037,
      "percent": {
-      "Usable": 25.0,
-      "Seen, but not reliable": 75.0,
+      "Usable": 5.7,
+      "Seen, but not reliable": 3.9,
       "Hidden by terrain": 0.0,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 90.5,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
-     "verdict": "Partial evidence",
-     "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
-    },
-    "vector:tsho-rolpa-2026-zones.geojson": {
-     "name": "tsho-rolpa-2026-zones",
-     "pixels": 420,
-     "percent": {
-      "Usable": 56.2,
-      "Seen, but not reliable": 37.6,
-      "Hidden by terrain": 6.2,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
-     },
-     "verdict": "Enough evidence",
+     "verdict": "Insufficient evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."
     },
     "_case": {
      "name": "Whole case area",
      "pixels": 69084,
      "percent": {
-      "Usable": 45.5,
-      "Seen, but not reliable": 45.8,
+      "Usable": 44.8,
+      "Seen, but not reliable": 44.9,
       "Hidden by terrain": 8.6,
-      "No data in the product": 0.0,
-      "Outside the frame checked": 0.0
+      "No valid data in the product": 1.6,
+      "Outside the frame checked": 0.0,
+      "Not assessed": 0.0
      },
      "verdict": "Partial evidence",
      "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."

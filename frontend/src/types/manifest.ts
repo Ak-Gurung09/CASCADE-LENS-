@@ -193,7 +193,7 @@ export interface LakeSeries {
 }
 
 // Written by processing/src/cascade_lens/motion.py add_coherence_layer: medians of one pair's coherence over the lake and the land.
-export interface LakeCoherence { pair: [string, string]; granule: string; sourceDataset: string; maskApplied: boolean; lake: number; land: number }
+export interface LakeCoherence { pair: [string, string]; granule: string; sourceDataset: string; maskApplied: boolean; lake: number; land: number; lakeValidPct?: number | null; landValidPct?: number | null }
 
 // Written by processing/src/cascade_lens/scenario.py: what would happen IF the dam breached. Ranges, not predictions.
 export interface LakeScenarioCase {
@@ -246,8 +246,22 @@ export interface Manifest {
   granules: GranuleRecord[]
   lake?: LakeSeries
   controlSeries?: ControlSeries
+  // the same comparison from another viewing direction, keyed by view id such as 't98'
+  controlSeriesViews?: Record<string, ControlSeries & { label?: string }>
   observability?: Observability
+  // further viewing directions (another track) beside the main block, keyed by view id such as 't98'; never merged into it
+  observabilityViews?: Record<string, ObservabilityView>
   hazards?: Hazards
+  access?: AccessSummary
+}
+
+// Written by processing/scripts/prepare_access.py. The detail (per-place results) is a separate file at url, fetched on demand.
+export interface AccessSummary {
+  url: string
+  maturity: string
+  states: Record<string, { ways: number; km: number }>
+  summary: Record<string, { name: string; placesWithHealthPath: number; places: number; pieces: number }>
+  limitations: string[]
 }
 
 export interface ObservabilityZone { name: string; pixels: number; percent?: Record<string, number>; verdict?: string; verdictRule?: string }
@@ -267,6 +281,7 @@ export interface Observability {
   incidenceDeg5to95: [number, number] | null
   postingM: number
   methodVersion?: number // absent before version 2, which applies the product masks; see services/observability.ts
+  frames?: { frame: number; pair: [string, string]; baselinePair: [string, string] | null; granule: string; baselineGranule: string | null; cells: number }[]
   datasets?: Record<string, string>
   geometryNotAssessedPct?: number | null
   classes: Record<string, { code: number; label: string; color: string; meaning: string }[]>
@@ -275,6 +290,17 @@ export interface Observability {
   sensitivityUsableMovementPct?: Record<string, number | null> // version 1 only, computed without the unwrapping rule
   limitations: string[]
   zones: Record<string, Record<string, ObservabilityZone>>
+}
+
+export interface ObservabilityComparison { name: string; pixels: number; onlyThis?: number; onlyOther?: number; both?: number; either?: number; neither?: number }
+
+// One more viewing direction, written by prepare_observability.py --view. comparedWith holds, per zone and task, the share usable
+// from this view only, the main view only, both, either and neither (same analysis grid; only "Usable" counts).
+export interface ObservabilityView extends Observability {
+  view: string
+  label: string
+  layerIds: string[]
+  comparedWith?: { flags: string; note: string; zones: Record<string, Record<string, ObservabilityComparison>> }
 }
 
 // Coherence inside an affected zone against nearby control ground, one entry per real GUNW pair.
@@ -300,7 +326,7 @@ export interface ControlSeries {
 // Terrain screen and road exposure, written by processing/scripts/prepare_hazards.py
 export interface Hazards {
   terrain: { layerId: string; flags: Record<string, number>; classes: { code: number; label: string; color: string; meaning: string }[]; maturity: string
-    validation: { detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
-  roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number }>; rules: Record<string, string>; maturity: string }
+    validation: { kind?: string; caveats?: string[]; detachmentZone: { pixels: number; percentByClass: Record<string, number>; aucVsRestOfArea: number | null }; mudflowRunout: { percentByClass: Record<string, number>; note: string }; wholeArea: Record<string, number> } }
+  roads: { layerId: string; kmByExposure: Record<string, { km: number; unwatchedKm: number; unwatchedEitherKm?: number }>; rules: Record<string, string>; maturity: string }
   dynamicTrigger: { maturity: string; needs: string[] }
 }

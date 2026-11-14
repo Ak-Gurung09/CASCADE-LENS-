@@ -1,7 +1,7 @@
-import type { Manifest } from '../types/manifest'
+import type { Manifest, ObservabilityView } from '../types/manifest'
 import { isUsable } from '../services/manifest'
 import { comparability } from '../services/finding'
-import { observabilityCurrent, STALE_NOTE } from '../services/observability'
+import { beyondFrames, observabilityCurrent, STALE_NOTE } from '../services/observability'
 
 export interface StoryStep {
   id: string
@@ -48,12 +48,33 @@ const SOURCE_TEXT = {
   mixed: 'NISAR’s 16–28 August pair holds no usable measurement over the detachment zone: parts hold no value and the product’s own quality mask flags the rest.',
 }
 
-function sourceFromPairB(m: Manifest) {
-  const peak = (m.analysis?.['pair-b']?.frames ? Object.values(m.analysis['pair-b'].frames) : []).map((f) => f.zones['goff-peak']).find((z) => (z?.[SOURCE]?.validPct ?? 0) > 0)
-  if (!peak) return null
-  const inside = peak[SOURCE].median
-  const outside = peak[RING].median
+// Pair B (Track 98, the opposite side) at the source, from data/qa/pair-b-analysis.json: a measurement's median at the
+// detachment zone against the ground near the channel, in the frame that reaches the zone
+function sourceFromPairB(m: Manifest, measurement: string) {
+  const z = (m.analysis?.['pair-b']?.frames ? Object.values(m.analysis['pair-b'].frames) : []).map((f) => f.zones[measurement]).find((x) => (x?.[SOURCE]?.validPct ?? 0) > 0)
+  if (!z) return null
+  const inside = z[SOURCE].median
+  const outside = z[RING].median
   return inside == null || outside == null ? null : `${inside.toFixed(2)} at the detachment zone against ${outside.toFixed(2)} in terrain near the channel`
+}
+
+function pairBText(m: Manifest) {
+  const coh = sourceFromPairB(m, 'gunw-coherence')
+  const peak = sourceFromPairB(m, 'goff-peak')
+  if (!coh && !peak) return null
+  return `The 19–31 August pair views the slope from the opposite side and does reach it.${coh ? ` Its coherence there is very low: the median is ${coh}.` : ''}${peak ? ` Radar image matching largely fails too: the median correlation peak is ${peak}.` : ''} That is what a heavily changed surface can look like, but steep slopes, snow and a 12-day gap lower coherence as well.`
+}
+
+// A second viewing direction, only from numbers in the manifest. The views are compared, never merged.
+function otherViewText(m: Manifest, v: ObservabilityView): string | null {
+  const z = (task: string, id: string) => v.zones[task]?.[id]?.percent?.Usable
+  const either = (task: string, id: string) => v.comparedWith?.zones[task]?.[id]?.either
+  const src = [z('disturbance', 'vector:unosat_detachment_zone.geojson'), z('movement', 'vector:unosat_detachment_zone.geojson')]
+  const flow = [z('disturbance', 'vector:unosat_mudflow_extent.geojson'), z('movement', 'vector:unosat_mudflow_extent.geojson')]
+  if ([...src, ...flow].some((x) => x == null)) return null
+  const main = m.observability?.zones.disturbance?.['vector:unosat_detachment_zone.geojson']?.percent?.Usable
+  const flowEither = either('disturbance', 'vector:unosat_mudflow_extent.geojson')
+  return `From the other side (${v.label}, pair ${day(v.pair[0])}–${day(v.pair[1])}${v.baselinePair ? `, before pair ${day(v.baselinePair[0])}–${day(v.baselinePair[1])}` : ''}), a surface change could be judged on ${src[0]!.toFixed(0)}% of the detachment zone${main === 0 && src[0]! > 0 ? ', where the first direction could judge none of it' : ''}, and ground movement on ${src[1]!.toFixed(0)}%. Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for change and ${flow[1]!.toFixed(0)}% for movement${flowEither != null ? `; ${flowEither.toFixed(0)}% is usable for change from at least one of the two directions` : ''}. Each direction is judged on its own; the map can show either.`
 }
 
 function ionosphereNote(m: Manifest) {
@@ -74,6 +95,27 @@ function controlText(m: Manifest) {
   return `A pair from before the event gives a comparison. Between ${day(before.pair[0])} and ${day(before.pair[1])} the mapped area and the ground around it had similar median coherence (${before.inside.toFixed(2)} against ${before.outside.toFixed(2)}). Across the event the gap opened to ${gap(across).toFixed(2)} (${across.inside.toFixed(2)} against ${across.outside.toFixed(2)})${after.length ? `, then narrowed to ${after.map((p) => gap(p).toFixed(2)).join(', ')} in the pairs after` : ''}. A seasonal change would be expected to lower both areas; a gap that opens only inside the mapped area is consistent with surface change there, but it does not establish the cause. ${comparability(before, across)}`.trim()
 }
 
+// The same before/after comparison from the opposite side (controlSeriesViews), only from its own numbers
+function opens(cs: Manifest['controlSeries']): boolean | null {
+  if (!cs) return null
+  const before = cs.pairs.find((p) => p.pair[1] <= cs.eventDate)
+  const across = cs.pairs.find((p) => p.pair[0] < cs.eventDate && p.pair[1] > cs.eventDate)
+  return before && across ? across.outside - across.inside > before.outside - before.inside : null
+}
+
+function otherControlText(m: Manifest) {
+  const mainOpens = opens(m.controlSeries)
+  return Object.values(m.controlSeriesViews ?? {}).flatMap((cs) => {
+    const before = cs.pairs.find((p) => p.pair[1] <= cs.eventDate)
+    const across = cs.pairs.find((p) => p.pair[0] < cs.eventDate && p.pair[1] > cs.eventDate)
+    if (!before || !across) return []
+    const modes = new Set(cs.pairs.map((p) => p.mode).filter(Boolean))
+    const same = modes.size === 1 && cs.pairs.every((p) => p.mode)
+    const ci = (p: typeof before) => (p.insideCi95 && p.outsideCi95 && (p.insideCi95[1] < p.outsideCi95[0] || p.outsideCi95[1] < p.insideCi95[0]))
+    return [`From the opposite side (${cs.label ?? `Track ${cs.track}`}), ${same ? `every pair was acquired in the same radar mode (${[...modes][0]}), so a change of mode cannot explain the difference` : 'the pairs were not all acquired in the same radar mode'}. Before the event (${day(before.pair[0])}–${day(before.pair[1])}) the mapped area was ${before.inside.toFixed(2)} against ${before.outside.toFixed(2)} nearby${ci(before) ? ', already a little lower' : ''}; across the event it was ${across.inside.toFixed(2)} against ${across.outside.toFixed(2)}. ${opens(cs) ? (mainOpens ? 'Both directions show the gap opening across the event.' : 'From this side the gap opens across the event.') : 'From this side the gap does not open across the event.'} ${before.days !== across.days ? `The pre-event pair still spans ${before.days} days against ${across.days}.` : ''}`.trim()]
+  })
+}
+
 // Radar Observability: what the radar could and could not judge, from the observability block (prepare_observability.py)
 function observabilityStep(m: Manifest): StoryStep[] {
   const o = m.observability
@@ -88,7 +130,8 @@ function observabilityStep(m: Manifest): StoryStep[] {
     'Before reading any radar result, CascadeLens checks whether the radar could judge the place at all, for the question being asked. Each spot keeps its own reasons: outside the frame, no data or flagged by the product’s own quality mask, hidden by the mountain’s own slope (layover or shadow), a weak signal, or an input missing so the spot is not assessed.',
     ...(!current ? [STALE_NOTE] : []),
     ...(current && src.every((v) => v != null) ? [`At the detachment zone, a surface change could be judged on ${src[0]!.toFixed(0)}% of the ground and ground movement could be measured on ${src[1]!.toFixed(0)}%. Click the zone to see the reason for each spot.`] : []),
-    ...(current && flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for judging change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies beyond this frame, in the neighbouring one, which is not checked yet. No conclusion there is different from no damage.` : ''}`] : []),
+    ...(current && flow.every((v) => v != null) ? [`Over the mapped mudflow, ${flow[0]!.toFixed(0)}% is usable for judging change and ${flow[1]!.toFixed(0)}% for movement.${out ? ` ${out.toFixed(0)}% lies ${beyondFrames(m)}. No conclusion there is different from no damage.` : ''}`] : []),
+    ...(current ? Object.values(m.observabilityViews ?? {}).map((v) => otherViewText(m, v)).filter((x): x is string => Boolean(x)) : []),
     'Click anywhere on the map to see the reasons for that exact spot.',
   ]
   const inc = o.incidenceDeg5to95 ? ` (incidence ${o.incidenceDeg5to95[0]}–${o.incidenceDeg5to95[1]}°)` : ''
@@ -103,14 +146,19 @@ export function buildStory(m: Manifest): StoryStep[] {
   const offset = has(m, 'pair-a:goff-range')
   const clean = has(m, 'pair-a:gunw-phase-iono')
   const coherenceText = contrast(m, 'gunw-coherence', 2)
+  const validText = frames(m).flatMap(([name, f]) => {
+    const v = f.zones['gunw-coherence']?.[EXTENT]?.validPct
+    return v == null ? [] : [`${Math.round(v)}% of the mapped extent in frame ${Number(name.slice(1))}`]
+  }).join(' and ')
   const offsetText = contrast(m, 'goff-range |x - scene median|', 2)
   const iono = ionosphereNote(m)
-  const pairB = sourceFromPairB(m)
+  const pairB = pairBText(m)
   const control = controlText(m)
   const radar = coherence
     ? ['The map shows coherence from the descending Track 48 pair of 16 and 28 August 2026: how consistent the radar signal stayed between the two passes.',
-       ...(coherenceText ? [`Along the channel that UNOSAT mapped, coherence is much lower than on the terrain beside it. The median is ${coherenceText}, comparing inside the mapped extent with the area within 1 km of it.`] : []),
+       ...(coherenceText ? [`Along the channel that UNOSAT mapped, coherence is much lower than on the terrain beside it. The median is ${coherenceText}, comparing inside the mapped extent with the area within 1 km of it.${validText ? ` Only pixels the product marks valid count: ${validText}.` : ''}`] : []),
        ...(control ? [control] : []),
+       ...otherControlText(m),
        'This agrees with independent mapping, but it does not prove what happened. Low coherence has other causes too, and river channels are often low anyway.']
     : ['The descending Track 48 pair of 16 and 28 August 2026 brackets the event, and the catalogue footprints show both frames reach this corridor.',
        'The GUNW science files for this pair are not loaded in this build, so no phase or coherence is shown. They need a NASA Earthdata login to download.']
@@ -121,7 +169,7 @@ export function buildStory(m: Manifest): StoryStep[] {
         'On 26 August 2026 a mountain mass movement was reported in the Langtang/Lhende area, near the Nepal–China border. Reports describe an ice-and-rock avalanche that blocked the upper Lhende Khola. Details of the source are still debated.',
         'The red polygon is UNOSAT’s mapped detachment zone and the blue polygons are barrier lakes. Both are independent satellite mapping, not NISAR results, and neither is field validated.',
         ...(sourceNoValid(m) ? [SOURCE_TEXT[sourceNoValid(m)!]] : []),
-        ...(pairB ? [`The 19–31 August pair views the slope from the opposite side and does reach it. There, radar image matching largely fails: the median correlation peak is ${pairB}. That is what a heavily changed surface can look like, but other causes are possible.`] : []),
+        ...(pairB ? [pairB] : []),
       ],
     },
     {
@@ -142,7 +190,7 @@ export function buildStory(m: Manifest): StoryStep[] {
       paragraphs: [
         'Phase and pixel offsets are different kinds of radar evidence. Phase is sensitive to small changes but fails where the surface is disrupted. Offsets are coarser but can survive larger change. They measure different things and are not combined here.',
         ...(iono ? [iono] : []),
-        ...(offsetText ? [`Pixel offsets add little here: the typical offset size inside the mapped extent is close to the terrain beside it, at ${offsetText}, in metres. Most phase inside the extent could not be reliably unwrapped.`] : []),
+        ...(offsetText ? [`Pixel offsets add little here: the typical offset size inside the mapped extent is close to the terrain beside it, at ${offsetText}, in metres. These offsets come from the product layer with the smallest search window, which could miss a very large shift. Most phase inside the extent could not be reliably unwrapped.`] : []),
         coherence || offset
           ? 'No displacement is calculated. The phase sign convention is not documented, so phase stays in radians.'
           : 'In this build, no NISAR measurement is loaded, so this story establishes where to look and which observations exist. It does not establish any radar-measured change.',
@@ -154,7 +202,7 @@ export function buildStory(m: Manifest): StoryStep[] {
 
 
 const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-const BACKGROUND = 'Background facts: ICIMOD (2011), Glacial Lakes and Glacial Lake Outburst Floods in Nepal, and the Department of Hydrology and Meteorology, Nepal.'
+const BACKGROUND = 'Background facts: ICIMOD (2011), Glacial Lakes and Glacial Lake Outburst Floods in Nepal; Peppa et al. (2020), ISPRS Annals V-3-2020, 633–640; the Department of Hydrology and Meteorology, Nepal, 2022 bathymetric survey, as reported by Dialogue Earth.'
 
 // Compare only dates taken in the same radar mode, so a change of mode cannot pose as a change of lake
 export function sameMode(s: NonNullable<Manifest['lake']>['series'], noise: number) {
@@ -196,42 +244,38 @@ function lakeStory(m: Manifest): StoryStep[] {
     {
       id: 'verdict', title: 'The lake did not change size', bookmarkId: 'lake', layerId: `${id}:hh`, references: ['ref:lake-edge'], chart: 'lake',
       paragraphs: [
-        `On every date the lake measured between ${lo.toFixed(2)} and ${hi.toFixed(2)} km². That spread is smaller than the method's own uncertainty, about ±${lake.methodHalfRangeKm2.toFixed(2)} km², so the radar sees no change in these ${Math.round((Date.parse(s[s.length - 1].date) - Date.parse(s[0].date)) / 86400000)} days.`,
-        'Our number matches published surveys, which give about 1.5 to 1.6 km² in recent years. That agreement is a check that the method works.',
+        `On every date the lake measured between ${lo.toFixed(2)} and ${hi.toFixed(2)} km². That spread is smaller than the method's own range, about ±${lake.methodHalfRangeKm2.toFixed(2)} km² (half the largest change in area when the water threshold moves between −8 and −6 dB; a method range, not a formal error), so the radar sees no change in these ${Math.round((Date.parse(s[s.length - 1].date) - Date.parse(s[0].date)) / 86400000)} days.`,
+        'Our number falls inside the range of published figures: about 1.55 km² in a 2008 survey, 1.61 km² from satellite images (Peppa et al., 2020) and 1.65 km² in a 2022 bathymetric survey for the Department of Hydrology and Meteorology. That agreement is a check on the method, not proof of an exact area.',
         sameMode(s, lake.methodHalfRangeKm2),
       ],
     },
   ]
-  const coh = lake.coherence ?? (mo?.pair && mo.coherenceLake !== undefined && mo.coherenceLand !== undefined ? { pair: mo.pair, lake: mo.coherenceLake, land: mo.coherenceLand } : null)
+  const coh: { pair: [string, string]; lake: number; land: number; lakeValidPct?: number | null } | null = lake.coherence ?? (mo?.pair && mo.coherenceLake !== undefined && mo.coherenceLand !== undefined ? { pair: mo.pair, lake: mo.coherenceLake, land: mo.coherenceLand } : null)
+  // When the product's water mask covers most of the lake, a lake median would rest on its shoreline: say what is masked instead
+  const lakeMasked = coh?.lakeValidPct != null && coh.lakeValidPct < 50
   if (coh && has(`${id}:coherence`)) {
     steps.push({
       id: 'coherence', title: 'Where did the ground stay the same?', bookmarkId: 'valley', layerId: `${id}:coherence`, references: ['ref:lake-edge'],
       paragraphs: [
-        `The map shows how alike the radar echoes were on ${day(coh.pair[0])} and ${day(coh.pair[1])}. Bright means the surface stayed the same; dark means it changed, or is water or radar shadow. The lake is dark (median ${coh.lake.toFixed(2)}); the land around it has a median of ${coh.land.toFixed(2)}.`,
+        lakeMasked
+          ? `The map shows how alike the radar echoes were on ${day(coh.pair[0])} and ${day(coh.pair[1])}. Bright means the surface stayed the same; dark means it changed, or is radar shadow. The radar product's own water mask covers ${Math.round(100 - coh.lakeValidPct!)}% of the lake, so the lake itself has no usable value here; the land around it has a median of ${coh.land.toFixed(2)}.`
+          : `The map shows how alike the radar echoes were on ${day(coh.pair[0])} and ${day(coh.pair[1])}. Bright means the surface stayed the same; dark means it changed, or is water or radar shadow. The lake is dark (median ${coh.lake.toFixed(2)}); the land around it has a median of ${coh.land.toFixed(2)}.`,
         'Coherence says where the surface stayed the same between two passes. It does not measure how far anything moved: turning radar phase into movement needs a confirmed sign convention and reference, which CascadeLens does not have yet.',
       ],
     })
   }
-  const sc = lake.scenario
-  const mid = sc?.scenarios.find((q) => q.breachM === 20) ?? sc?.scenarios[0]
-  if (sc && mid) {
-    const at = (k: number) => mid.arrival.find((q) => q[0] >= k)
-    const t = (q?: [number, number, number]) => (q ? `${q[1]} to ${q[2]} minutes` : 'unknown')
-    steps.push({
-      id: 'scenario', title: 'What if the dam failed?', bookmarkId: 'valley', layerId: 'context:hillshade', references: ['ref:lake-edge', 'ref:scenario-route', 'ref:scenario-extent'],
-      paragraphs: [
-        'Nobody can calculate whether or when a moraine dam will fail. What real numbers can do is work out what would follow if it did. This is a scenario, not a prediction, and not a warning.',
-        `If a ${mid.breachM} m deep breach opened, about ${Math.round(mid.volumeM3 / 1e6)} million m³ of water would escape: NISAR's lake area times the depth. Two published formulas put the peak flow at the dam between ${mid.peakRange[0].toLocaleString('en-GB')} and ${mid.peakRange[1].toLocaleString('en-GB')} m³/s.`,
-        `Cross-sections through the real terrain give the speed: the water would reach 10 km down the valley in ${t(at(10))}, and 30 km, where the route turns down the Tamakoshi, in ${t(at(30))}. Open "What if" at the top for the full table and the other breach sizes.`,
-      ],
-    })
-  }
+  // The dam-break scenario stays out of the guided story (audit, Category D): it rests on assumed breach depths and is
+  // offered only under Illustrations, as "What if", with its ranges and assumptions in view.
+  const scenarioNote = lake.scenario
+    ? ['A labelled what-if dam-break scenario, built on assumed breach depths, is under Illustrations: What if. It is not a prediction and not a warning.']
+    : []
   steps.push({
     id: 'why', title: 'Why it held steady, and what would change it', bookmarkId: 'valley', layerId: `${id}:rgb`, references: ['ref:lake-edge'],
     paragraphs: [
       'Why no change: the engineered channel at the dam lets extra monsoon water drain out instead of raising the lake. And lakes like this grow at the glacier end, as ice melts and breaks off into the water. That takes years: a change of a few percent would hide inside the radar’s 20 m pixels over five weeks.',
       'What would make it grow: warmer years melting the glacier faster, the glacier front retreating up the valley, or the moraine dam weakening as the ice buried inside it melts.',
       'What comes next: put these five weeks into decades of history with older satellite images, add NISAR dates after the monsoon, and check the outline against an optical image. The result we want to test: stable this season, but grown over decades.',
+      ...scenarioNote,
     ],
     sources: BACKGROUND,
   })

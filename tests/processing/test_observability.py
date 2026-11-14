@@ -213,3 +213,14 @@ def test_a_product_without_its_mask_is_refused(synthetic_case):
         del f["/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/mask"]
     with pytest.raises(ValueError, match="mask"):
         ob.assess(d / GUNW_NAME, None, d / "dem.tif", bounds)
+
+
+def test_a_neighbouring_frame_fills_only_cells_the_first_frame_does_not_cover():
+    O, NODATA = ob.OUTSIDE, ob.FLAG_NODATA
+    first = np.array([0, ob.LOWCOH, O, O, O, NODATA])
+    other = np.array([ob.MASKED, 0, ob.LAYOVER, O, NODATA, 0])
+    combined, took = ob.combine_frames(first, other)
+    assert combined.tolist() == [0, ob.LOWCOH, ob.LAYOVER, O, O, NODATA]  # the first frame wins where both cover a cell
+    assert took.tolist() == [False, False, True, False, False, False]
+    with pytest.raises(ValueError):
+        ob.combine_frames(first, other[:3])

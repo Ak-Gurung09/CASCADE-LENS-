@@ -212,7 +212,8 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   useEffect(() => { if (m.lake && story.length) goStory(0) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const caseSimulation = currentCase().simulation
-  const timeLayer = m.layers.find((l) => (l.timeSteps?.length ?? 0) > 1 && isUsable(l))
+  const timeLayers = m.layers.filter((l) => (l.timeSteps?.length ?? 0) > 1 && isUsable(l))
+  const timeLayer = timeLayers[0]
   const canSimulate = Boolean(caseSimulation)
   const showTimeLayer = () => { if (!active?.timeSteps && timeLayer) selectLayer(timeLayer.id) }
 
@@ -238,6 +239,11 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
             <button className={storyStep === null && !simOn && !compareOn && !threeOn && !scenarioOn ? 'on' : ''} aria-pressed={storyStep === null && !simOn && !compareOn && !threeOn && !scenarioOn} onClick={goExplore}>Explore</button>
             {m.lake && <button className={compareOn ? 'on' : ''} aria-pressed={compareOn} onClick={() => !compareOn && startCompare()}>Compare</button>}
             {m.lake?.terrain && <button className={threeOn ? 'on' : ''} aria-pressed={threeOn} onClick={() => !threeOn && start3d()}>3D</button>}
+          </div>
+        )}
+        {(m.lake?.scenario || canSimulate) && (
+          <div className="modes illustrations" role="group" aria-label="Illustrations, not forecasts">
+            <span className="modes-label" aria-hidden="true">Illustrations</span>
             {m.lake?.scenario && <button className={scenarioOn && storyStep === null ? 'on' : ''} aria-pressed={scenarioOn && storyStep === null} onClick={() => !(scenarioOn && storyStep === null) && startScenario()}>What if</button>}
             {canSimulate && <button className={simOn ? 'on' : ''} aria-pressed={simOn} onClick={() => !simOn && startSim()}>Simulate</button>}
           </div>
@@ -294,7 +300,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
 
       {simOn && (
         <div className="sim-dock">
-          <SimPanel manifest={m} simulation={caseSimulation} layer={active} step={step} canTime={Boolean(timeLayer)} onStep={setStep} onTimeTab={showTimeLayer} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
+          <SimPanel manifest={m} simulation={caseSimulation} layer={active} step={step} canTime={Boolean(timeLayer)} timeLayers={timeLayers} onTimeLayer={selectLayer} onStep={setStep} onTimeTab={showTimeLayer} onView={setSim} onLoaded={frameSim} onExit={exitSim} />
         </div>
       )}
 

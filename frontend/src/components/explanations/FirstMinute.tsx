@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Manifest } from '../../types/manifest'
 import { finding } from '../../services/finding'
+import { blockers, loadReadiness, stateClass, type Readiness } from '../../services/readiness'
 import { assetUrl } from '../../services/manifest'
 
 const KEY = 'cascadelens.finding.seen'
@@ -32,8 +33,10 @@ interface Capability { id: string; name: string; priority: string; maturity: str
 export function StatusPanel({ onClose }: { onClose: () => void }) {
   const [caps, setCaps] = useState<Capability[] | null>(null)
   const [error, setError] = useState(false)
+  const [ready, setReady] = useState<Readiness | null | undefined>(undefined)
   useEffect(() => {
     fetch(assetUrl('data/status.json')).then((r) => r.json()).then((s) => setCaps(s.capabilities)).catch(() => setError(true))
+    loadReadiness().then(setReady)
   }, [])
   return (
     <section className="status-panel" role="dialog" aria-label="What is real here?">
@@ -42,6 +45,16 @@ export function StatusPanel({ onClose }: { onClose: () => void }) {
       {error && <p className="muted">The status list could not be loaded.</p>}
       {caps && <ul>{caps.map((c) => (
         <li key={c.id}><span className={`maturity m-${c.maturity.split(/[ ,]/)[0].toLowerCase()}`}>{c.maturity.toLowerCase()}</span><strong>{c.name}</strong><small>{c.evidence}</small></li>
+      ))}</ul>}
+      <h3>Flood and landslide outlooks: what the data allows</h3>
+      <p className="muted small">Worked out from the files on disk, not asserted. A capability is shown only at the state it has earned. None of these is a forecast.</p>
+      {ready === null && <p className="muted small">The readiness list could not be loaded.</p>}
+      {ready && <ul className="readiness">{ready.capabilities.map((c) => (
+        <li key={c.capability}>
+          <span className={`readiness-state r-${stateClass(c.state)}`}>{c.state.toLowerCase()}</span><strong>{c.name}</strong>
+          {blockers(c).length > 0 && <small>{blockers(c).join(' · ')}</small>}
+          {c.next_requirement && <small>Next: {c.next_requirement}</small>}
+        </li>
       ))}</ul>}
     </section>
   )

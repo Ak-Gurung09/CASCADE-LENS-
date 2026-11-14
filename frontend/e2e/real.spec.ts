@@ -1,11 +1,13 @@
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type ConsoleMessage, type Page } from '@playwright/test'
 
 // The production build with its real data, served under a CSP that blocks every request off this origin.
-const SHOTS = '../docs/screenshots'
+// Screenshots go to the gitignored test-results folder. To refresh the documentation pictures on purpose, run with
+// CL_SCREENSHOTS_DIR=../docs/screenshots, look at them, and commit them as a change of their own.
+const SHOTS = process.env.CL_SCREENSHOTS_DIR ?? 'test-results/screenshots'
 const TSHO = '/?case=tsho-rolpa-2026'
 
 async function open(page: Page, path = '/') {
@@ -81,6 +83,33 @@ test('Pair B reaches the source that Pair A cannot', async ({ page }) => {
   await inspect(page, 'Mountain source area')
   await expect(inspector(page)).toHaveAttribute('data-state', 'valid')
   await expect(inspector(page)).toContainText('ascending, Track 98, frame 16')
+})
+
+test('Track 98 coherence reaches the source, and each viewing direction is judged on its own', async ({ page }) => {
+  await open(page)
+  await page.getByRole('radio', { name: /19–31 August 2026/ }).check()
+  await page.getByRole('radio', { name: /Coherence magnitude/ }).check()
+  await inspect(page, 'Mountain source area')
+  await expect(inspector(page)).toHaveAttribute('data-state', 'valid')
+  await expect(inspector(page)).toContainText('Track 98')
+  const views = page.locator('.obs-at .obs-view')
+  await expect(views).toHaveCount(2)
+  await expect(views.nth(0).locator('h4')).toHaveText('Track 48, descending, frames 74 and 75')
+  await expect(views.nth(1).locator('h4')).toHaveText('Track 98, ascending, frame 16')
+  for (const v of [views.nth(0), views.nth(1)]) await expect(v.locator('.obs-tasks li')).toHaveCount(2)
+  await expect(page.locator('.obs-at')).toContainText('Each viewing direction is judged on its own')
+})
+
+test('the explanations read Track 98 where Track 48 cannot see, and label each check with its track', async ({ page }) => {
+  await open(page)
+  await page.getByRole('button', { name: 'Mountain source area' }).click()
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  const panel = page.locator('.hypotheses')
+  await expect(panel.locator('.hyp').first()).toBeVisible({ timeout: 20000 })
+  await expect(panel).not.toContainText('No NISAR explanation')
+  await expect(panel.locator('.hyp-views')).toContainText('Track 48 (descending): cannot judge this spot')
+  await expect(panel.locator('.hyp-views')).toContainText('Track 98 (ascending): coherence')
+  await expect(panel.locator('.hyp-measured')).toContainText('Coherence, Track 98 (ascending)')
 })
 
 test('completes the story with the outside world blocked', async ({ page }) => {
@@ -303,16 +332,33 @@ test('the first minute leads with the finding and an honest status list', async 
   await page.addInitScript(() => localStorage.removeItem('cascadelens.finding.seen'))
   await open(page)
   const card = page.getByRole('dialog', { name: 'The key finding' })
-  await expect(card).toContainText('beyond this radar frame')
+  await expect(card).toContainText('beyond the radar frames checked')
   await expect(card).toContainText('Provisional products')
   await card.getByRole('button', { name: 'What is real here?' }).click()
   const status = page.getByRole('dialog', { name: 'What is real here?' })
   await expect(status).toContainText('blocked by data')
   await expect(status).toContainText('experimental')
+  await expect(status).toContainText('Flood and landslide outlooks: what the data allows')
+  await expect(status.locator('.readiness li')).toHaveCount(12)
+  await expect(status.locator('.readiness')).toContainText('not available')
+  await expect(status.locator('.readiness')).toContainText('Next: B1: GPM IMERG V07 rainfall')
   await page.getByRole('button', { name: 'Close' }).click()
   await card.getByRole('button', { name: 'Walk through the evidence' }).click()
   await expect(page.locator('.story')).toContainText('The source')
   await expect(card).toHaveCount(0)
+})
+
+test('the access screen names places that lose their road path, and what closed it', async ({ page }) => {
+  await open(page)
+  await page.getByText('Road access to health care').click()
+  const panel = page.locator('.access-panel')
+  await expect(panel).toContainText('No road path in this network', { timeout: 20000 })
+  await expect(panel).toContainText('Trishuli')
+  await expect(panel).toContainText('Closed on those routes')
+  await expect(panel).toContainText('Furke Khola Bridge')
+  await expect(panel).not.toContainText(/isolated|cut off/i)
+  await panel.getByRole('checkbox', { name: 'Show road and bridge states' }).check()
+  await expect(page.locator('.legend')).toContainText('Closed: mapped destroyed or reported washed out')
 })
 
 test('hazard screens explain a road stretch and say whether the radar could watch it', async ({ page }) => {
@@ -326,4 +372,14 @@ test('hazard screens explain a road stretch and say whether the radar could watc
   await expect(hz).toContainText('exposure', { timeout: 20000 })
   await expect(hz).toContainText(/Radar (can|cannot) watch|Partly watchable/)
   await expect(page.locator('.legend')).toContainText('High exposure')
+  // P0.3: the stretch's own evidence, and the exported report carries the same stretch
+  await hz.getByText('Evidence for this stretch').click()
+  const ev = hz.locator('.road-evidence')
+  await expect(ev).toContainText(/way\/\d+:\d+/)
+  await expect(ev).toContainText('NISAR_L2_PR_GUNW_028_048_D_074')
+  await expect(ev).toContainText('What to verify')
+  const id = (await ev.locator('dd.mono').first().textContent())!.trim()
+  const [json] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'JSON', exact: true }).click()])
+  const saved = JSON.parse(readFileSync((await json.path())!, 'utf8'))
+  expect(saved.hazards.road.id).toBe(id)
 })

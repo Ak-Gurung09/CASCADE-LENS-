@@ -223,16 +223,16 @@
     }
    },
    "ionosphere": {
-    "pixels": 425703,
-    "pearsonR": 0.842,
-    "stdPhase": 8.87,
-    "stdIono": 7.28,
-    "stdPhaseMinusIono": 4.79,
-    "stdPhasePlusIono": 15.5
+    "pixels": 424199,
+    "pearsonR": 0.986,
+    "stdPhase": 7.75,
+    "stdIono": 7.27,
+    "stdPhaseMinusIono": 1.35,
+    "stdPhasePlusIono": 14.96
    },
    "components": {
-    "0": 49496,
-    "1": 425703
+    "0": 49494,
+    "1": 424199
    }
   },
   "f075": {
@@ -246,7 +246,7 @@
      "mapped extent": {
       "pixels": 6754,
       "validPct": 44.0,
-      "maskedPct": 19.4,
+      "maskedPct": 19.5,
       "p25": 0.11,
       "median": 0.164,
       "p75": 0.262
@@ -254,7 +254,7 @@
      "1 km ring outside extent": {
       "pixels": 71261,
       "validPct": 52.3,
-      "maskedPct": 11.3,
+      "maskedPct": 11.4,
       "p25": 0.409,
       "median": 0.518,
       "p75": 0.619
@@ -374,19 +374,19 @@
    "phase": {
     "mapped extent": {
      "pixels": 6754,
-     "validPct": 19.1,
+     "validPct": 19.0,
      "maskedPct": 45.3,
-     "p25": 21.012,
-     "median": 23.598,
-     "p75": 26.593
+     "p25": 21.02,
+     "median": 23.601,
+     "p75": 26.595
     },
     "1 km ring outside extent": {
      "pixels": 71261,
-     "validPct": 50.9,
+     "validPct": 50.8,
      "maskedPct": 13.7,
-     "p25": 21.636,
-     "median": 24.833,
-     "p75": 27.135
+     "p25": 21.64,
+     "median": 24.836,
+     "p75": 27.136
     },
     "detachment zone": {
      "pixels": 0
@@ -396,16 +396,16 @@
     }
    },
    "ionosphere": {
-    "pixels": 401707,
-    "pearsonR": 0.951,
-    "stdPhase": 6.41,
+    "pixels": 400054,
+    "pearsonR": 0.972,
+    "stdPhase": 6.28,
     "stdIono": 6.3,
-    "stdPhaseMinusIono": 1.98,
-    "stdPhasePlusIono": 12.56
+    "stdPhaseMinusIono": 1.49,
+    "stdPhasePlusIono": 12.49
    },
    "components": {
     "0": 14462,
-    "1": 401707
+    "1": 400054
    }
   }
  }

@@ -16,7 +16,7 @@ describe('first-minute finding', () => {
     expect(text).toContain(co.inside.toFixed(2))
     expect(text).toContain(co.outside.toFixed(2))
     expect(f.points).toHaveLength(3)
-    expect(text).toMatch(/beyond this radar frame/)
+    expect(text).toMatch(/beyond the radar frames checked \(74 and 75\)/)
   })
   it('follows the data rather than fixed numbers', () => {
     const m = shipped()
@@ -53,7 +53,20 @@ describe('status registry', () => {
   it('backs every "complete and tested" claim with a test that exists', () => {
     for (const c of s.capabilities.filter((x: { maturity: string }) => x.maturity === 'COMPLETE AND TESTED')) {
       expect(c.tests.length, c.id).toBeGreaterThan(0)
-      for (const t of c.tests) expect(existsSync(resolve(root, t)), t).toBe(true)
+      for (const t of c.tests) expect(existsSync(resolve(root, t.split('::')[0])), t).toBe(true)
+    }
+  })
+  // A test file that exists is not enough: at least one must call the computation the claim is about ("file::symbol").
+  it('names, for every "complete and tested" claim, a test that calls the computation behind it', () => {
+    for (const c of s.capabilities.filter((x: { maturity: string }) => x.maturity === 'COMPLETE AND TESTED')) {
+      const named = c.tests.filter((t: string) => t.includes('::'))
+      expect(named.length, `${c.id} names no function its test calls`).toBeGreaterThan(0)
+    }
+    for (const c of s.capabilities) {
+      for (const t of c.tests.filter((x: string) => x.includes('::'))) {
+        const [file, symbol] = t.split('::')
+        expect(readFileSync(resolve(root, file), 'utf8'), `${c.id}: ${file} never uses ${symbol}`).toContain(symbol)
+      }
     }
   })
 })

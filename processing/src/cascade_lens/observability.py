@@ -11,7 +11,7 @@ Every cell of a 40 m analysis grid gets reason flags (uint16), never one blended
     LOWBASE       (64)  pre-event (baseline) coherence below COH_MIN
     MASKED       (128)  the event product's own mask flags the pixel: water, or an invalid subswath
     GEOM_UNKNOWN (256)  layover and shadow could not be assessed: DEM, incidence or line of sight missing or invalid
-    BASE_NODATA  (512)  the baseline product holds no valid value (non-finite, mask fill, water or invalid subswath)
+    BASE_NODATA  (512)  the baseline product holds no valid value (non-finite, mask fill, water, invalid subswath or image anomaly)
 
 Classes are then decided per task, because what spoils one task does not spoil another:
 
@@ -79,7 +79,7 @@ CLASSES = {
         (1, "Usable", "#5FE0C9", "The radar saw this ground clearly before and across the event, so a change here would show."),
         (2, "Seen, but not reliable", "#F2C46B", "The ground was already incoherent in the baseline pair, so a drop across the event cannot be told apart from normal noise."),
         (3, "Hidden by terrain", "#B07CFF", "Layover or radar shadow: the slope's geometry hides it from this viewing angle."),
-        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."),
+        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."),
         (5, "Outside the frame checked", "#2A3138", "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no change."),
         (6, "Not assessed", "#A39B8B", "An input needed for this check is missing or invalid here (terrain geometry, or the baseline pair). No conclusion."),
     ],
@@ -87,7 +87,7 @@ CLASSES = {
         (1, "Usable", "#5FE0C9", "Phase is coherent and reliably unwrapped, so ground movement could be measured here. Nothing has been measured yet."),
         (2, "Seen, but not reliable", "#F2C46B", "Phase is too noisy (low coherence) or was not reliably unwrapped here, so no movement value can be trusted."),
         (3, "Hidden by terrain", "#B07CFF", "Layover or radar shadow: the slope's geometry hides it from this viewing angle."),
-        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water or an invalid subswath)."),
+        (4, "No valid data in the product", "#6B7682", "Inside the frame, but the product holds no value here, or its own mask flags it (water, an invalid subswath or an image anomaly)."),
         (5, "Outside the frame checked", "#2A3138", "Outside the radar frame assessed here. A neighbouring frame or another track may cover it, but it is not checked yet: no conclusion, not no movement."),
         (6, "Not assessed", "#A39B8B", "The terrain geometry needed for this check is missing or invalid here. No conclusion."),
     ],
@@ -153,6 +153,21 @@ def summary(classes: np.ndarray, mask: np.ndarray, task: str) -> dict:
     return {"pixels": n, "percent": pct, "verdict": verdict, "verdictRule": "Usable share: 50% or more = enough, 20 to 50% = partial, under 20% = insufficient."}
 
 
+def compare_usable(classes_this: np.ndarray, classes_other: np.ndarray, mask: np.ndarray) -> dict:
+    """Share of a zone usable from this viewing direction only, the other only, both, either, or neither (same grid, same task).
+
+    Only class 1 counts as usable. Everything else, including outside the frame and not assessed, counts as not usable, so
+    'only this view' is ground the other view could not judge. The views are compared, never merged into one reason."""
+    if classes_this.shape != classes_other.shape:
+        raise ValueError("views are not on one analysis grid")
+    n = int(mask.sum())
+    if not n:
+        return {"pixels": 0}
+    a, b = (classes_this == 1) & mask, (classes_other == 1) & mask
+    pct = lambda x: round(100 * float(x.sum()) / n, 1)  # noqa: E731
+    return {"pixels": n, "onlyThis": pct(a & ~b), "onlyOther": pct(b & ~a), "both": pct(a & b), "either": pct(a | b), "neither": pct(mask & ~(a | b))}
+
+
 def _on_grid(h5, ds_path: str, gxc: np.ndarray, gyc: np.ndarray) -> tuple[np.ndarray, nisar.Grid]:
     """Nearest product pixel for every analysis-cell centre, as float64 (exact for the uint8/uint16 masks and labels).
     Cells beyond the product grid are NaN."""
@@ -187,11 +202,22 @@ def _pair_layers(path: pathlib.Path, pol: str, gxc: np.ndarray, gyc: np.ndarray,
         out["frame"] = int(np.asarray(h["/science/LSAR/identification/frameNumber"][()]).item())
     with np.errstate(invalid="ignore"):
         out["coh"][~(out["coh"] > 0)] = np.nan  # coherence of 0 or below is not an estimate here: no value
-    m = np.where(np.isfinite(out["mask"]), out["mask"], 255).astype(np.uint16)
+    m = np.where(np.isfinite(out["mask"]), out["mask"], 255).astype(np.int64)  # all 32 bits: anomaly flags sit above bit 8
     d = quality.decode_gunw_mask(m)
-    out["maskFill"], out["maskInvalid"] = d["fill"], d["water"] | d["invalid_subswath"]
+    out["maskFill"], out["maskInvalid"] = d["fill"], d["unusable"]
     out["datasets"] = paths
     return out
+
+
+def combine_frames(primary: np.ndarray, other: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Flags for two neighbouring frames of the same pair on one analysis grid. A cell keeps the primary frame's flags
+    wherever that frame covers it; a cell outside the primary frame takes the other frame's flags when that frame covers it.
+    Returns the combined flags and the cells taken from the other frame. Where both cover a cell, the primary frame wins,
+    so a reason is never mixed from two products."""
+    if primary.shape != other.shape:
+        raise ValueError("frames are not on one analysis grid")
+    take = ((primary & OUTSIDE) != 0) & ((other & OUTSIDE) == 0) & (other != FLAG_NODATA) & (primary != FLAG_NODATA)
+    return np.where(take, other, primary), take
 
 
 def assess(gunw: pathlib.Path, baseline: pathlib.Path | None, dem_path: pathlib.Path, bounds_lonlat, posting: float = 40.0, pol: str = "HH") -> dict:

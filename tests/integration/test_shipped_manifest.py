@@ -78,12 +78,12 @@ def test_sentinel1_layers_never_claim_to_be_nisar():
             assert any("Not NISAR" in t for t in l["limitations"]) or "analysed" in " ".join(l["limitations"]), l["id"]
 
 
-def test_landmet_case_is_complete_and_clearly_labelled():
-    path = PUBLIC / "data/manifests/landmet.json"
-    lm = json.loads(path.read_text(encoding="utf-8"))
-    assert mf.validate(lm, PUBLIC) == []
-    assert lm["fixture"] is True and "not NISAR" in lm["fixtureLabel"]
-    assert {l["mission"] for l in lm["layers"]} == {"LANDMET"}
+def test_the_retired_landmet_case_no_longer_ships():
+    """LANDMET left the app on 6 Nov 2026; its data stopped shipping on 13 Nov. prepare_landmet.py can still rebuild it."""
+    assert not (PUBLIC / "data/manifests/landmet.json").exists()
+    assert not (PUBLIC / "data/tiles/landmet").exists() and not (PUBLIC / "data/sampling/landmet").exists()
+    cases = (PUBLIC.parent / "src/services/manifest.ts").read_text(encoding="utf-8")
+    assert "landmet" not in cases.lower()
 
 
 def test_real_measurements_are_published_for_both_pairs():

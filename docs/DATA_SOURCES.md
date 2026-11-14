@@ -12,7 +12,7 @@ Every source keeps its own identity in the app. Only NISAR layers are NISAR resu
 | Dates | See [DATA_ACQUISITION.md](DATA_ACQUISITION.md) |
 | Maturity | PROVISIONAL (CRID P05023), calibrated and partly validated, per ASF |
 | Limitations | NASA's general maturity definition says Provisional products are not intended for scientific research. [ASF known issues](https://nisar-docs.asf.alaska.edu/provisional-known-issues/) |
-| Status here | Pair A GUNW and GOFF, Pair B GOFF: real measurements. GCOV: catalogue records only |
+| Status here | Pair A GUNW and GOFF, Pair B GUNW and GOFF, and five-pair GUNW series on Track 48 and Track 98: real measurements. GCOV: Tsho Rolpa only; Rasuwa catalogue records only |
 | Attribution | NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC |
 
 ## UNOSAT event layers
@@ -27,6 +27,7 @@ Every source keeps its own identity in the app. Only NISAR layers are NISAR resu
 | Type | Derived reference map, EPSG:4326 |
 | Licence | CC BY-SA |
 | Limitations | `FieldValidation = 0`, "Not yet field validated", in the source's own coded domain |
+| Attributes kept | `SiteID`, `SensorDate`, `SensorID`, `ConfidenceID`, `FieldValidation`, `Settlement_Name`, `Notes`, `Main_Damage_Site_Class`, `Grouped_Damage_Classes`, `EventCode`, `ImageID_Num`; for roads `SourceID`, `RoadID`, `ONme`, `RteNme`, `FClass`, `OpStatus`. `StaffID` is left out |
 
 Source issues found and how they are handled:
 
@@ -59,6 +60,27 @@ Source issues found and how they are handled:
 | Type | Contextual, EPSG:4326 |
 | Licence | ODbL, © OpenStreetMap contributors |
 | Limitations | Community data; features may predate or postdate the event. HydroRIVERS was not needed |
+| Attributes kept | OSM `id` (for example `way/345313941`) on every feature; roads also keep `highway`, `name`, `name_en`, `bridge`, `layer` and `surface`. The export has no `tunnel` tag |
+
+## HOT post-event mapping and bridge reports
+
+| | |
+|---|---|
+| Provider | Humanitarian OpenStreetMap Team, [HOT export on HDX](https://data.humdata.org/dataset/hot_flood_npl) |
+| Layers used | Health facilities, education facilities, helipads, destroyed and damaged features (OSM), and the volunteer bridge damage assessment |
+| Type | Contextual and reported, EPSG:4326 |
+| Licence | ODbL, © OpenStreetMap contributors |
+| Limitations | Volunteer reports and mapping, not field verified here. The bridge assessment gives points with a status (washed out, damaged, intact) and no link to OSM, so CascadeLens matches each to the nearest OSM bridge within 60 m and leaves the rest unused |
+
+## NASA Global Landslide Catalog, Nepal subset
+
+| | |
+|---|---|
+| Provider | NASA Goddard Space Flight Center, [Global Landslide Catalog Export](https://data.nasa.gov/dataset/global-landslide-catalog-export) |
+| Used as | Readiness dataset C1 (dated landslide inventory); no model is fitted to it |
+| Content | 481 Nepal events, 2007-03-21 to 2016-10-13, in `data/reference/hazard/nasa-glc/glc_nepal.csv` |
+| Licence | Not stated on data.nasa.gov; NASA-produced. The readiness engine marks the licence as not established |
+| Limitations | Compiled from media and reports, so unrecorded places are not confirmed negatives. Only 29 locations are exact or within 1 km; most are within 5 to 50 km |
 
 ## Sentinel-1 damage proxy map
 

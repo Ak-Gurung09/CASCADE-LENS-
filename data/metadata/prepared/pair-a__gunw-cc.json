@@ -13,7 +13,7 @@
  ],
  "goffLayer": null,
  "stats": {
-  "count": 891368,
+  "count": 888209,
   "labels": [
    0,
    1
@@ -42,14 +42,14 @@
     84.53594788265075,
     27.717578024937264,
     85.55941176995117,
-    28.36707937156769
+    28.367079371567687
    ],
    "shape": [
     880,
     1244
    ],
-   "validFraction": 0.4340826878105817,
-   "maskedFraction": 0.5659173121894183,
+   "validFraction": 0.43270699356913184,
+   "maskedFraction": 0.13445812627886583,
    "sourceDtype": "uint16",
    "clipWindow": [
     2616,
@@ -64,7 +64,7 @@
     "url": "data/tiles/pair-a/gunw-cc/f074/{z}/{x}/{y}.png",
     "minzoom": 8,
     "maxzoom": 11,
-    "count": 86
+    "count": 70
    },
    "maskTiles": "data/tiles/pair-a/gunw-cc/f074_mask/{z}/{x}/{y}.png"
   },
@@ -76,16 +76,16 @@
    "sha256": "933b71fa40b14cc2e61b0996ed04cacfde0be2c9d62a17168f63f39312f78e67",
    "bounds": [
     84.38475258192256,
-    27.714795075127522,
+    27.714795075127526,
     85.55941176995117,
-    28.280449216353468
+    28.28044921635347
    ],
    "shape": [
     760,
     1432
    ],
-   "validFraction": 0.3823958027050867,
-   "maskedFraction": 0.6176041972949132,
+   "validFraction": 0.3808769479564834,
+   "maskedFraction": 0.16531810496912672,
    "sourceDtype": "uint16",
    "clipWindow": [
     0,
@@ -100,12 +100,12 @@
     "url": "data/tiles/pair-a/gunw-cc/f075/{z}/{x}/{y}.png",
     "minzoom": 8,
     "maxzoom": 11,
-    "count": 64
+    "count": 56
    },
    "maskTiles": "data/tiles/pair-a/gunw-cc/f075_mask/{z}/{x}/{y}.png"
   }
  ],
- "processedAt": "2026-11-01T16:11:56+00:00",
+ "processedAt": "2026-11-13T06:54:24+00:00",
  "parameters": {
   "gross_outlier_mad_k": 10,
   "snr_min": null,

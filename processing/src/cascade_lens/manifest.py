@@ -44,7 +44,7 @@ def maturity(ident: dict, crid: str) -> str:
         return f"Provisional per catalogue ({crid}); confirm from file"
     doi = str(ident.get("productDoi") or "")
     name = {"B": "Beta", "P": "Provisional", "V": "Validated"}.get(doi.rsplit("-", 1)[-1][:1], "Unknown")
-    return f"{name} ({ident.get('compositeReleaseId')})"
+    return f"{name} ({ident.get('compositeReleaseId') or 'release not recorded'})"
 
 
 def _status(granules: list[dict], states: dict, raw: pathlib.Path) -> tuple[str, str | None]:
@@ -118,6 +118,18 @@ def build(root: pathlib.Path, cfg: dict) -> dict:
             "caseStudy": {**CASE_STUDY, "searchEnvelope": cfg["aoi_bbox"]}, "bookmarks": context["bookmarks"], "groups": grps, "layers": layers,
             "granules": [{k: g.get(k) for k in ("file_id", "group", "product", "frame", "direction", "track", "ref_date", "sec_date", "size_mb", "geometry")}
                          | {"status": states.get(g["file_id"], {}).get("status", "catalogued")} for g in selected]}
+
+
+MERGED_KEYS = ("observability", "observabilityViews", "controlSeries", "controlSeriesViews", "hazards", "access")
+
+
+def keep_merged(built: dict, current: dict) -> dict:
+    """The freshly built manifest plus what merge_observability.py had folded into the current one: those blocks, and the
+    layers they added (any layer the build does not produce), in their existing order."""
+    out = {**built, **{k: current[k] for k in MERGED_KEYS if k in current}}
+    ids = {l["id"] for l in built["layers"]}
+    out["layers"] = built["layers"] + [l for l in current.get("layers", []) if l["id"] not in ids]
+    return out
 
 
 def validate(manifest: dict, public_root: pathlib.Path) -> list[str]:

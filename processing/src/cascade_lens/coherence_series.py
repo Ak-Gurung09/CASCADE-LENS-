@@ -104,7 +104,7 @@ def pair_stats(path, zone_lonlat, pol: str = "HH", ring_m=RING_M, block_m: float
     in_ring = burn(outer) & ~burn(zone.buffer(ring_m[0]))
     md = quality.decode_gunw_mask(mask)
     with np.errstate(invalid="ignore"):
-        valid = np.isfinite(coh) & (coh > 0) & ~(md["fill"] | md["water"] | md["invalid_subswath"])
+        valid = np.isfinite(coh) & (coh > 0) & ~(md["fill"] | md["unusable"])
     block_px = max(1, int(round(block_m / abs(grid.dx))))
     rng = np.random.default_rng(seed)
     out = {}

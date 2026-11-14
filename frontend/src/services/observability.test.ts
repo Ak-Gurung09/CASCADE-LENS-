@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Manifest } from '../types/manifest'
-import { classify, FLAG, observabilityCurrent, reasons } from './observability'
+import { beyondFrames, classify, FLAG, framesChecked, observabilityCurrent, reasons } from './observability'
 
 describe('observability classes', () => {
   it('keeps low coherence usable for change detection but not for movement', () => {
@@ -28,5 +28,14 @@ describe('observability classes', () => {
   it('holds back figures made before the masks were applied', () => {
     expect(observabilityCurrent({ observability: {} } as unknown as Manifest)).toBe(false)
     expect(observabilityCurrent({ observability: { methodVersion: 2 } } as unknown as Manifest)).toBe(true)
+  })
+  it('names the frames assessed, and says the rest lies beyond them, not that the radar never saw it', () => {
+    const two = { observability: { frame: 74, frames: [{ frame: 74 }, { frame: 75 }] } } as unknown as Manifest
+    expect(framesChecked(two)).toEqual([74, 75])
+    expect(beyondFrames(two)).toBe('beyond the radar frames checked (74 and 75), where no frame of this pair was assessed')
+    const one = { observability: { frame: 74 } } as unknown as Manifest
+    expect(framesChecked(one)).toEqual([74])
+    expect(beyondFrames(one)).toContain('neighbouring frame')
+    expect(framesChecked(undefined)).toEqual([])
   })
 })

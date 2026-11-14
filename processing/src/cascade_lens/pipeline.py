@@ -27,8 +27,11 @@ GROUP_PRODUCTS = {"GUNW": ("gunw-phase", "gunw-coherence", "gunw-cc", "gunw-iono
 
 
 def groups(cfg: dict) -> list[dict]:
-    """Observation pairs and GCOV snapshots as one list of (group, product, frames)."""
-    out = [{"id": p["id"], "kind": "pair", "product": prod, **{k: p[k] for k in ("direction", "track", "frames", "ref_date", "sec_date")}}
+    """Observation pairs and GCOV snapshots as one list of (group, product, frames). A pair may limit a product to some of
+    its frames ("framesByProduct"), for a frame that does not reach the study area: a missing frame would otherwise hold the
+    whole layer back."""
+    out = [{"id": p["id"], "kind": "pair", "product": prod, **{k: p[k] for k in ("direction", "track", "ref_date", "sec_date")},
+            "frames": p.get("framesByProduct", {}).get(prod, p["frames"])}
            for p in cfg["pairs"] for prod in p["products"]]
     out += [{"id": s["id"], "kind": "snapshot", "product": "GCOV", "direction": s["direction"], "track": s["track"],
              "frames": s["frames"], "ref_date": s["date"], "sec_date": None} for s in cfg["snapshots"]]

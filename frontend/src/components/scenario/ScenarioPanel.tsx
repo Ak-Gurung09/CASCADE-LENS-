@@ -78,7 +78,6 @@ export function ScenarioPanel({ lake, onExit }: { lake: LakeSeries; onExit: () =
         <p><strong>Not included:</strong> the flood shrinking as it spreads (so times are on the early, cautious side, and far-downstream depths too high), rock and mud carried by the water, landslides it could trigger, and bridges or dams in the way.</p>
         <p className="notice small">Real hazard work uses a full flood model calibrated on surveyed river channels. This is a first estimate to show what the data can do.</p>
       </details>
-      <p className="muted small"><strong>Next:</strong> a forecast of the lake's size in 2030 and 2040, once the yearly images are in.</p>
       <footer><button className="ghost" onClick={onExit}>Close scenario</button></footer>
     </section>
   )

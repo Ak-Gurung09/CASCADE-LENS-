@@ -89,6 +89,23 @@ def test_mask_decoding_follows_rev_e():
     assert d["fill"].tolist() == [False, False, False, False, True, False]
 
 
+def test_mask_decoding_reads_the_32_bit_layout_of_p05023_files():
+    """Values seen in the real Rasuwa GUNW masks. The digits live in the low byte; bit 24 marks an interpolated ionosphere
+    screen; bits 8-23 are anomaly flags. Read from the whole number, 16777230 (bit 24 + "014") looked like an invalid
+    subswath and 16777236 (bit 24 + "020") looked valid."""
+    B24 = 1 << 24
+    vals = np.array([B24 + 12, B24 + 14, B24 + 20, B24 + 112, 10, (1 << 8) + 12, (1 << 16) + 12, 255, B24 + 255], np.uint32)
+    d = quality.decode_gunw_mask(vals)
+    assert d["invalid_subswath"].tolist() == [False, False, True, False, True, False, False, False, False]
+    assert d["water"].tolist() == [False, False, False, True, False, False, False, False, False]
+    assert d["anomaly"].tolist() == [False, False, False, False, False, True, True, False, False]
+    assert d["iono_interpolated"].tolist() == [True, True, True, True, False, False, False, False, False]
+    assert d["fill"].tolist() == [False, False, False, False, False, False, False, True, True]
+    assert d["unusable"].tolist() == [False, False, True, True, True, True, True, False, False]
+    v = quality.gunw_validity(np.ones((1, len(vals)), np.float32), vals.reshape(1, -1))
+    assert v[0].tolist() == [quality.VALID, quality.VALID] + [quality.MASKED] * 5 + [quality.NODATA] * 2
+
+
 def test_gunw_validity_classes():
     v = np.ones((1, 5), np.float32)
     v[0, 4] = np.nan

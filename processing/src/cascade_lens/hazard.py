@@ -33,10 +33,18 @@ THRESHOLDS = {
 }
 LIMITS = [
     "Terrain only. Geology, soil, land cover, rainfall and earthquakes are not included, so this is a screen of where terrain favours failure, not a susceptibility map in the full sense.",
-    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is against one event (UNOSAT 2026 detachment zone).",
+    "Not trained or calibrated: no Nepal landslide inventory is loaded. The only check is a one-event consistency check against the UNOSAT 2026 detachment zone. It is not a validation: every unmapped pixel counts as a negative, and neighbouring pixels are not independent.",
     "Not a forecast and not a warning. A high class does not mean a slope is about to fail.",
     "Copernicus DEM GLO-30 resampled to 40 m; flow paths ignore pits and flats, and small gullies are smoothed.",
 ]
+
+
+def steep_share(classes: np.ndarray) -> float | None:
+    """Percent of cells in class High or Very high, over cells with a valid elevation only. Class 0 (no valid elevation)
+    is not assessed, so it counts neither as steep nor as gentle. None when no cell could be assessed."""
+    c = np.asarray(classes)
+    ok = c > 0
+    return round(100 * float((c[ok] >= 3).mean()), 1) if ok.any() else None
 
 
 def to_grid(src_path, transform, crs, shape) -> np.ndarray:

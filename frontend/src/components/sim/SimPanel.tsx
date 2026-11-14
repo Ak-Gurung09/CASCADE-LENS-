@@ -10,6 +10,9 @@ interface Props {
   layer?: Layer
   step: number
   canTime: boolean
+  // every layer with saved time steps, so a case with more than one series (one per radar track) can switch between them
+  timeLayers?: Layer[]
+  onTimeLayer?: (id: string) => void
   onStep: (i: number) => void
   onTimeTab: () => void
   onView: (v: SimView | null) => void
@@ -102,7 +105,7 @@ function WhatIf({ data, reach, setReach, rise, setRise }: { data: SimData; reach
   )
 }
 
-function TimeReplay({ layer, step, onStep }: { layer?: Layer; step: number; onStep: (i: number) => void }) {
+function TimeReplay({ layer, step, onStep, layers = [], onLayer }: { layer?: Layer; step: number; onStep: (i: number) => void; layers?: Layer[]; onLayer?: (id: string) => void }) {
   const [playing, setPlaying] = useState(false)
   const steps = layer?.timeSteps
   const last = (steps?.length ?? 1) - 1
@@ -116,7 +119,14 @@ function TimeReplay({ layer, step, onStep }: { layer?: Layer; step: number; onSt
   if (!steps || last < 1) return <p className="notice">Choose a map layer that changes over time, in the panel on the left.</p>
   return (
     <>
-      <p>This plays the stored data for {layer!.name} in order, one saved time after another. Choose another layer on the left to play that instead.</p>
+      <p>This plays the stored data for {layer!.name} in order, one saved time after another.{layers.length > 1 ? '' : ' Choose another layer on the left to play that instead.'}</p>
+      {layers.length > 1 && onLayer && (
+        <label className="slider">Series
+          <select value={layer!.id} onChange={(e) => { onStep(0); onLayer(e.target.value) }}>
+            {layers.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        </label>
+      )}
       <div className="sim-controls">
         <button className="primary" onClick={() => { if (at >= last) onStep(0); setPlaying(!playing) }}>{playing ? 'Pause' : at >= last ? 'Replay' : 'Play'}</button>
         <label className="slider grow">Saved time <span>{steps[at].label}</span>
@@ -169,7 +179,7 @@ function Radar({ manifest }: { manifest: Manifest }) {
   )
 }
 
-export function SimPanel({ manifest, simulation, layer, step, canTime, onStep, onTimeTab, onView, onLoaded, onExit }: Props) {
+export function SimPanel({ manifest, simulation, layer, step, canTime, timeLayers, onTimeLayer, onStep, onTimeTab, onView, onLoaded, onExit }: Props) {
   const tabs: Tab[] = [...(simulation ? ['replay', 'whatif'] as const : []), ...(canTime ? ['time'] as const : []), ...(coherenceGroups(manifest).length ? ['radar'] as const : [])]
   const [tab, setTab] = useState<Tab>(tabs[0])
   const [data, setData] = useState<SimData | null>(null)
@@ -195,7 +205,7 @@ export function SimPanel({ manifest, simulation, layer, step, canTime, onStep, o
         {tabs.map((id) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>{TAB_LABELS[id]}</button>)}
       </div>
       {tab === 'radar' ? <Radar manifest={manifest} />
-        : tab === 'time' ? <TimeReplay layer={layer} step={step} onStep={onStep} />
+        : tab === 'time' ? <TimeReplay layer={layer} step={step} onStep={onStep} layers={timeLayers} onLayer={onTimeLayer} />
           : failure ? <p className="notice">The simulation could not start: {failure}</p>
           : !data ? <p className="muted">Loading the flow path…</p>
             : tab === 'replay' ? <Replay data={data} km={km} setKm={setKm} />

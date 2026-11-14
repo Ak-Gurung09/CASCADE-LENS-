@@ -4,6 +4,7 @@ import { CASES, currentCase, formatDate, isUsable, STATUS_LABEL } from '../../se
 import { evidenceOf } from '../../services/evidence'
 import { isObservability } from '../../services/observability'
 import { isTerrainScreen } from '../../services/hazards'
+import { AccessPanel } from '../hazards/AccessPanel'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 import { missionStyle, splitName } from '../explanations/AboutSource'
 
@@ -158,6 +159,7 @@ export function LeftPanel(p: Props) {
           <p className="muted small">Where terrain favours slope failure, and which road stretches are exposed. Screens, not forecasts.</p>
           {screens.map((l) => <LayerRow key={l.id} layer={l} active={l.id === p.activeId} onSelect={() => p.onLayer(l.id)} />)}
           {roadScreen && <label className="check"><input type="checkbox" checked={p.referenceIds.includes(roadScreen.id)} onChange={(e) => p.onReference(roadScreen.id, e.target.checked)} />Show road exposure</label>}
+          {m.access && <AccessPanel manifest={m} showStates={p.referenceIds.includes(`${m.caseStudy.id}:road-states`)} onShowStates={(on) => { p.onReference(`${m.caseStudy.id}:road-states`, on); p.onReference(`${m.caseStudy.id}:facilities`, on) }} />}
         </section>
       )}
 

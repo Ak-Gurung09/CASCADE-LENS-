@@ -109,6 +109,10 @@ button.link:hover:not(:disabled) { background: none; color: #fff; }
 .modes button { border: 0; background: none; min-height: 44px; padding: 0 14px; color: #fff; white-space: nowrap; }
 .modes button:hover:not(:disabled) { background: rgba(255, 255, 255, .12); }
 .modes button.on, .modes button.on:hover:not(:disabled) { background: #fff; color: var(--on-white); }
+/* Illustrations sit apart from the evidence modes: scenarios and simulations, never forecasts (audit, Category D). */
+.modes:has(+ .modes.illustrations) { margin-right: 0; }
+.modes.illustrations { margin: 0 auto 0 8px; padding-left: 10px; border-left: 1px solid var(--outline); }
+.modes-label { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding-right: 4px; }
 .top-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 .top-actions button { white-space: nowrap; }
 .badge { display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--muted); white-space: nowrap; }
@@ -209,6 +213,22 @@ input:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Interpretation */
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.access-panel { margin-top: 12px; border-top: 1px solid var(--line-strong); padding-top: 10px; }
+.access-panel > summary { cursor: pointer; font-weight: 600; font-size: 13px; min-height: 36px; display: flex; align-items: center; gap: 8px; }
+.access-panel .tabs { margin: 8px 0; }
+.access-list { padding-left: 18px; margin: 4px 0 10px; }
+.access-list li { margin: 4px 0; overflow-wrap: anywhere; }
+.access-panel details > summary { cursor: pointer; }
+.road-evidence { grid-column: 1 / -1; margin-top: 10px; border-top: 1px solid var(--line-strong); padding-top: 8px; }
+.road-evidence summary { cursor: pointer; font-weight: 600; font-size: 12.5px; min-height: 32px; display: flex; align-items: center; }
+.ev-facts { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 4px 12px; margin: 8px 0; font-size: 12px; }
+.ev-facts dt { color: var(--label); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding-top: 2px; }
+.ev-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.road-evidence .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+.road-evidence table.shares { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.road-evidence table.shares caption { text-align: left; color: var(--label); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding-bottom: 4px; }
+.road-evidence table.shares th { text-align: left; font-weight: 500; padding: 2px 0; }
+.road-evidence table.shares td { text-align: right; padding: 2px 0; font-variant-numeric: tabular-nums; }
 .facts > div { border: 1px solid var(--line-strong); border-radius: 16px; padding: 10px 13px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .facts > div.wide { grid-column: 1 / -1; }
 .facts dt { color: var(--label); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
@@ -383,6 +403,7 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
   .legend, .place-chip, .map-alert { left: 314px; }
   .map-foot, .maplibregl-ctrl-top-right { right: 354px !important; }
   .modes button { padding: 0 11px; }
+  .modes-label { display: none; }
   .brand-text span { display: none; }
   .story.guided { inset: 92px 12px 12px 28px; grid-template-columns: minmax(0, 1fr) 360px; column-gap: 26px; }
   .story-on .map-foot, .story-on .maplibregl-ctrl-top-right { right: 384px !important; }
@@ -761,6 +782,11 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .m-experimental, .m-implemented, .m-partially { color: var(--amber); }
 .m-blocked { color: var(--coral); }
 .m-planned { color: var(--muted); }
+.status-panel h3 { font: 400 22px/1.1 var(--serif); margin: 22px 0 4px; }
+.readiness-state { justify-self: start; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; }
+.r-blocked { color: var(--coral); }
+.r-partial, .r-progress { color: var(--amber); }
+.r-context { color: var(--muted); }
 @media (max-width: 760px) {
   .status-btn { display: none; }
   .finding { top: 70px; max-height: calc(100% - 82px); padding: 18px 16px 16px; gap: 10px; border-radius: 26px; }

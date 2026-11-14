@@ -122,6 +122,40 @@
    ],
    "crs": "EPSG:32645",
    "zones": {
+    "gunw-coherence": {
+     "mapped extent": {
+      "pixels": 9227,
+      "validPct": 81.2,
+      "maskedPct": 18.8,
+      "p25": 0.083,
+      "median": 0.126,
+      "p75": 0.228
+     },
+     "1 km ring outside extent": {
+      "pixels": 80232,
+      "validPct": 99.9,
+      "maskedPct": 0.1,
+      "p25": 0.324,
+      "median": 0.46,
+      "p75": 0.593
+     },
+     "detachment zone": {
+      "pixels": 307,
+      "validPct": 100.0,
+      "maskedPct": 0.0,
+      "p25": 0.068,
+      "median": 0.086,
+      "p75": 0.121
+     },
+     "barrier lakes": {
+      "pixels": 48,
+      "validPct": 100.0,
+      "maskedPct": 0.0,
+      "p25": 0.075,
+      "median": 0.103,
+      "p75": 0.171
+     }
+    },
     "goff-snr": {
      "mapped extent": {
       "pixels": 9227,
@@ -266,6 +300,52 @@
    "maskedPct": {
     "goff-range": 0.47,
     "goff-azimuth": 0.38
+   },
+   "phase": {
+    "mapped extent": {
+     "pixels": 9227,
+     "validPct": 30.8,
+     "maskedPct": 69.2,
+     "p25": 0.755,
+     "median": 3.299,
+     "p75": 5.462
+    },
+    "1 km ring outside extent": {
+     "pixels": 80232,
+     "validPct": 93.0,
+     "maskedPct": 7.0,
+     "p25": 2.415,
+     "median": 4.42,
+     "p75": 6.154
+    },
+    "detachment zone": {
+     "pixels": 307,
+     "validPct": 0.0,
+     "maskedPct": 100.0,
+     "p25": null,
+     "median": null,
+     "p75": null
+    },
+    "barrier lakes": {
+     "pixels": 48,
+     "validPct": 0.0,
+     "maskedPct": 100.0,
+     "p25": null,
+     "median": null,
+     "p75": null
+    }
+   },
+   "ionosphere": {
+    "pixels": 1193964,
+    "pearsonR": 0.82,
+    "stdPhase": 1.74,
+    "stdIono": 1.07,
+    "stdPhaseMinusIono": 1.06,
+    "stdPhasePlusIono": 2.7
+   },
+   "components": {
+    "0": 63391,
+    "1": 1193964
    }
   }
  }

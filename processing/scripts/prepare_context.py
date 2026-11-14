@@ -76,8 +76,18 @@ def terrain():
             "limitations": ["A pre-event surface model: it does not show changes from the 2026 event."], "sourceGranules": [], "productMaturity": "Released product"}
 
 
+# Source attributes kept with every feature (E6), so a map click can show the source's own record. Staff IDs are left out.
+UNOSAT_KEEP = ("SiteID", "SensorDate", "SensorID", "ConfidenceID", "FieldValidation", "Settlement_Name", "Notes",
+               "Main_Damage_Site_Class", "Grouped_Damage_Classes", "EventCode", "ImageID_Num")
+UNOSAT_ROAD_KEEP = ("SourceID", "RoadID", "ONme", "RteNme", "FClass", "OpStatus", "Notes", "EventCode")
+
+
 def write_vector(gdf, name, keep=(), tol=None):
+    keep = [k for k in keep if k in gdf.columns]
     g = gdf[[*keep, "geometry"]].copy()
+    for k in keep:  # dates as ISO text, missing values as null, so the GeoJSON stays plain JSON
+        if pd.api.types.is_datetime64_any_dtype(g[k]):
+            g[k] = g[k].dt.strftime("%Y-%m-%d").where(g[k].notna(), None)
     if tol:
         g["geometry"] = g.geometry.simplify(tol, preserve_topology=True)
     g = g[~g.geometry.is_empty & g.geometry.notna()].copy()
@@ -109,12 +119,12 @@ def unosat():
     roads["geometry"] = roads.geometry.intersection(extent.union_all())  # Source geometry has stray vertices far outside Nepal
     km2 = lambda g: round(float(g.to_crs(32645).area.sum()) / 1e6, 2)  # noqa: E731
     page = SRC["unosat_extent"]["page"]
-    fp, fb = write_vector(flood, "unosat_mudflow_extent", tol=0.00005)
-    ep, eb = write_vector(extent, "unosat_analysis_extent")
-    lp, lb = write_vector(lakes, "unosat_barrier_lakes", tol=0.00002)
-    zp, zb = write_vector(zone, "unosat_detachment_zone")
-    rp, rb = write_vector(roads, "unosat_affected_roads", tol=0.00005)
-    bp, bb = write_vector(bld, "unosat_affected_buildings")
+    fp, fb = write_vector(flood, "unosat_mudflow_extent", keep=UNOSAT_KEEP, tol=0.00005)
+    ep, eb = write_vector(extent, "unosat_analysis_extent", keep=("Site_ID", "SiteName", "Notes", "EventCode"))
+    lp, lb = write_vector(lakes, "unosat_barrier_lakes", keep=UNOSAT_KEEP, tol=0.00002)
+    zp, zb = write_vector(zone, "unosat_detachment_zone", keep=UNOSAT_KEEP)
+    rp, rb = write_vector(roads, "unosat_affected_roads", keep=UNOSAT_ROAD_KEEP, tol=0.00005)
+    bp, bb = write_vector(bld, "unosat_affected_buildings", keep=UNOSAT_KEEP)
     fill = lambda c, o=0.45: {"type": "fill", "color": c, "opacity": o}  # noqa: E731
     layers = [
         vector_layer("ref:unosat-extent", f"UNOSAT mudflow/rockflow extent ({km2(flood)} km²)", fp, fb, fill("#e8590c"), "Multi-sensor optical/satellite analysis", UNOSAT_ATTR,
@@ -143,14 +153,15 @@ def osm():
     name = next(n for n in z.namelist() if n.endswith(".gpkg"))
     roads = gpd.read_file(f"zip://{RAW.as_posix()}/osm_roads/hot_flood_npl_roads_osm_gpkg.zip!/{name}")
     roads = roads[roads.intersects(aoi)].copy()
-    keep = [c for c in ("highway",) if c in roads]
-    major = roads[roads["highway"].isin(["trunk", "primary", "secondary", "tertiary", "unclassified", "track"])] if keep else roads
+    # OSM way IDs and bridge/layer tags are kept (E6): road segments get stable IDs, and a road graph needs them (P0.4)
+    keep = [c for c in ("id", "highway", "name", "name_en", "bridge", "layer", "surface", "status") if c in roads]
+    major = roads[roads["highway"].isin(["trunk", "primary", "secondary", "tertiary", "unclassified", "track"])] if "highway" in roads else roads
     water["label"] = water["name_en"].fillna(water["name"])
     places["label"] = places["name_en"].fillna(places["name"])
     places = places[places["label"].fillna("").map(lambda s: bool(re.fullmatch(r"[\x00-\x7f]+", s)))].copy()
-    wp, wb = write_vector(water, "osm_rivers", keep=["label", "waterway"], tol=0.00005)
+    wp, wb = write_vector(water, "osm_rivers", keep=["id", "label", "waterway"], tol=0.00005)
     rp, rb = write_vector(major, "osm_roads", keep=keep, tol=0.00005)
-    pp, pb = write_vector(places, "osm_places", keep=["label", "place"])
+    pp, pb = write_vector(places, "osm_places", keep=["id", "label", "place"])
     src = SRC["osm_waterways"]["page"]
     notes = ["Community mapping exported after the event; features may predate or postdate the disaster."]
     layers = [vector_layer("ref:rivers", "Rivers (OSM)", wp, wb, {"type": "line", "color": "#74c0fc", "opacity": 0.85}, "OpenStreetMap", OSM_ATTR, notes, "HDX export, 2026", "contextual", "OpenStreetMap", src),
