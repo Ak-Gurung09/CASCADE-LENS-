@@ -6,6 +6,8 @@ import { CASES, currentCase, isUsable, loadManifest, STATUS_LABEL } from '../ser
 import { buildStory } from '../data/story'
 import { LeftPanel, type EvidenceView } from '../components/layout/LeftPanel'
 import type { MapStatus } from '../components/map/MapView'
+import { ViewControls } from '../components/map/ViewControls'
+import type { Map as MlMap } from 'maplibre-gl'
 import { Legend } from '../components/legends/Legend'
 import { Credits } from '../components/legends/Credits'
 import { Inspector } from '../components/inspector/Inspector'
@@ -100,6 +102,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   const [scenarioOn, setScenarioOn] = useState(false)
   const [sim, setSim] = useState<SimView | null>(null)
   const [mapStatus, setMapStatus] = useState<MapStatus>({ state: 'loading' })
+  const [mapObj, setMapObj] = useState<MlMap | null>(null)
   const [covered, setCovered] = useState(true)
   const [panel, setPanel] = useState<'left' | 'right' | null>(null)
   // The guided story is a headline over the map, so the controls panel waits at the screen edge while it runs
@@ -269,9 +272,10 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
         <MapBoundary>
           <Suspense fallback={null}>
             <MapView envelope={m.caseStudy.searchEnvelope} terrain={terrain} showTerrain={showTerrain} active={shownLayer} overlay={overlay} showMask={showMask} opacity={opacity} references={references}
-              footprints={simOn ? NO_FOOTPRINTS : footprints} point={point} focus={focus} sim={sim} onPoint={(p) => { setExploring(true); setPoint(p); setTab('inspect'); setAboutId(null); edges.showRight() }} onStatus={setMapStatus} onCoverage={setCovered} />
+              footprints={simOn ? NO_FOOTPRINTS : footprints} point={point} focus={focus} sim={sim} onPoint={(p) => { setExploring(true); setPoint(p); setTab('inspect'); setAboutId(null); edges.showRight() }} onStatus={setMapStatus} onCoverage={setCovered} onMap={setMapObj} />
           </Suspense>
         </MapBoundary>
+        {!threeOn && <ViewControls map={mapObj} envelope={m.caseStudy.searchEnvelope} layer={shownLayer ?? (showTerrain ? terrain : undefined)} />}
         {threeOn && m.lake?.terrain && (
           <Suspense fallback={<p className="terrain-status">Loading the 3D viewer…</p>}>
             <Terrain3D lake={m.lake} onExit={() => setThreeOn(false)} />

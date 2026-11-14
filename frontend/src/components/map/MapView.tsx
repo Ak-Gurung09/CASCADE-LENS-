@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Map as MlMap, Marker, NavigationControl, ScaleControl, setWorkerUrl, type GeoJSONSource, type LngLatBoundsLike, type StyleSpecification } from 'maplibre-gl'
+import { LngLatBounds, Map as MlMap, Marker, ScaleControl, setWorkerUrl, type GeoJSONSource, type LngLatBoundsLike, type StyleSpecification } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { Bounds, GranuleRecord, Layer } from '../../types/manifest'
 import { assetUrl } from '../../services/manifest'
@@ -26,6 +26,7 @@ interface Props {
   onPoint: (p: [number, number]) => void
   onStatus: (s: MapStatus) => void
   onCoverage: (covered: boolean) => void
+  onMap?: (map: MlMap | null) => void
 }
 
 // No glyphs and no remote sources: the map must work with the network off. Place names are DOM markers for the same reason.
@@ -79,7 +80,7 @@ function addReference(map: MlMap, l: Layer) {
   }
 }
 
-export function MapView({ envelope, terrain, showTerrain, active, overlay, showMask, opacity, references, footprints, point, focus, sim, onPoint, onStatus, onCoverage }: Props) {
+export function MapView({ envelope, terrain, showTerrain, active, overlay, showMask, opacity, references, footprints, point, focus, sim, onPoint, onStatus, onCoverage, onMap }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MlMap | null>(null)
   const pointMarker = useRef<Marker | null>(null)
@@ -90,6 +91,8 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
   const onPointRef = useRef(onPoint)
   const onStatusRef = useRef(onStatus)
   const onCoverageRef = useRef(onCoverage)
+  const onMapRef = useRef(onMap)
+  onMapRef.current = onMap
   onPointRef.current = onPoint
   onStatusRef.current = onStatus
   onCoverageRef.current = onCoverage
@@ -112,9 +115,17 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       last = s
       onStatusRef.current(s)
     }
-    const map = new MlMap({ container: host.current, style: STYLE, bounds: envelope as LngLatBoundsLike, fitBoundsOptions: { padding: 30 }, attributionControl: false, dragRotate: false, pitchWithRotate: false, renderWorldCopies: false })
+    // The map is locked: no drag, wheel, pinch, double-click, box or keyboard moves. The reader moves it only with the View controls
+    // (ViewControls.tsx), and the story, bookmarks and Simulate still move it in code. A click still inspects a spot.
+    const map = new MlMap({ container: host.current, style: STYLE, bounds: envelope as LngLatBoundsLike, fitBoundsOptions: { padding: 30 }, attributionControl: false, renderWorldCopies: false,
+      dragRotate: false, pitchWithRotate: false, dragPan: false, scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false, touchPitch: false, keyboard: false })
     mapRef.current = map
-    map.addControl(new NavigationControl({ showCompass: false }), 'top-right')
+    // maxBounds is the opening view (which holds the whole envelope at its fit zoom, plus the slack from the screen's shape), widened by a quarter
+    // on each side so a story or Simulate frame padded for the side panels is not cut short. The View sliders keep to the envelope itself.
+    const opening = map.getBounds()
+    const [ow, os, oe, on] = [opening.getWest(), opening.getSouth(), opening.getEast(), opening.getNorth()]
+    const [dx, dy] = [(oe - ow) / 4, (on - os) / 4]
+    map.setMaxBounds(new LngLatBounds([Math.min(ow, envelope[0]) - dx, Math.min(os, envelope[1]) - dy], [Math.max(oe, envelope[2]) + dx, Math.max(on, envelope[3]) + dy]))
     map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left')
     map.on('load', () => {
       const [w, s, e, n] = envelope
@@ -135,8 +146,10 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       if (source) failed = source
       report({ state: 'error', message: source ? `Could not load map source ${source}. ${err?.message ?? ''}` : (err?.message ?? 'Map error') })
     })
-    if (import.meta.env.DEV) (window as unknown as { __clMap: MlMap }).__clMap = map
-    return () => { map.remove(); mapRef.current = null; setReady(false) }
+    // Exposed in every build so the browser tests can check that the locked map really stays put. It changes nothing the reader sees.
+    ;(window as unknown as { __clMap: MlMap }).__clMap = map
+    onMapRef.current?.(map)
+    return () => { onMapRef.current?.(null); map.remove(); mapRef.current = null; setReady(false) }
   }, [])
 
   useEffect(() => {

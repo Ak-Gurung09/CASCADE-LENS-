@@ -9,6 +9,7 @@ import { expect, test, type ConsoleMessage, type Page } from '@playwright/test'
 // CL_SCREENSHOTS_DIR=../docs/screenshots, look at them, and commit them as a change of their own.
 const SHOTS = process.env.CL_SCREENSHOTS_DIR ?? 'test-results/screenshots'
 const TSHO = '/?case=tsho-rolpa-2026'
+declare global { interface Window { __clMap: import('maplibre-gl').Map } }
 
 async function open(page: Page, path = '/') {
   await page.goto(path)
@@ -384,4 +385,104 @@ test('hazard screens explain a road stretch and say whether the radar could watc
   const [json] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'JSON', exact: true }).click()])
   const saved = JSON.parse(readFileSync((await json.path())!, 'utf8'))
   expect(saved.hazards.road.id).toBe(id)
+})
+
+// The flat map is locked: only the View controls move it, and they never leave the study envelope.
+const camera = (page: Page) => page.evaluate(() => { const m = window.__clMap; const c = m.getCenter(); return { lng: c.lng, lat: c.lat, zoom: m.getZoom() } })
+const viewBox = (page: Page) => page.evaluate(() => {
+  const m = window.__clMap
+  const b = m.getBounds()
+  const env = (m.getStyle().sources['study-envelope'] as unknown as { data: { geometry: { coordinates: number[][][] } } }).data.geometry.coordinates[0]
+  return { view: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], env: [env[0][0], env[0][1], env[2][0], env[2][1]] }
+})
+const settle = (page: Page) => page.evaluate(() => new Promise<void>((r) => { const m = window.__clMap; if (!m.isMoving()) r(); else m.once('moveend', () => r()) }))
+
+for (const [name, path] of [['Rasuwa', '/'], ['Tsho Rolpa', TSHO]] as const) {
+  test(`${name}: the flat map ignores drag and wheel, and moves only with the View controls`, async ({ page }) => {
+    await open(page, path)
+    await page.waitForFunction(() => window.__clMap?.isStyleLoaded())
+    await page.getByRole('button', { name: 'Explore', exact: true }).click() // Tsho Rolpa opens in its story, which moves the map itself
+    const finding = page.getByRole('button', { name: 'Explore the map' }) // Rasuwa opens with its key-finding card over the map
+    if (await finding.isVisible()) await finding.click()
+    await settle(page)
+    await page.waitForTimeout(1000)
+    await settle(page)
+    const controls = page.getByTestId('view-controls')
+    await expect(controls).toBeVisible()
+    await expect(controls).toContainText('Whole study area')
+    const start = await camera(page)
+    // A drag and a wheel over open map, clear of the side panels
+    await page.mouse.move(720, 470)
+    await page.mouse.down()
+    await page.mouse.move(820, 560, { steps: 8 })
+    await page.mouse.up()
+    await page.mouse.wheel(0, -600)
+    await page.mouse.dblclick(720, 470)
+    await page.keyboard.press('Equal')
+    await page.waitForTimeout(400)
+    const after = await camera(page)
+    expect(after.lng).toBeCloseTo(start.lng, 9)
+    expect(after.lat).toBeCloseTo(start.lat, 9)
+    expect(after.zoom).toBeCloseTo(start.zoom, 9)
+    // At the whole-area view there is nothing to pan
+    await expect(controls.getByLabel('Move the view west or east')).toBeDisabled()
+    await expect(controls.getByLabel('Move the view south or north')).toBeDisabled()
+    // The zoom slider zooms
+    const zoom = controls.getByLabel(/^Zoom/)
+    const max = Number(await zoom.getAttribute('max'))
+    await zoom.fill(String(max))
+    await settle(page)
+    expect((await camera(page)).zoom).toBeCloseTo(max, 1)
+    // The pan sliders reach both ends and never show ground outside the envelope
+    for (const [label, value] of [['Move the view west or east', '0'], ['Move the view west or east', '1000'], ['Move the view south or north', '0'], ['Move the view south or north', '1000']] as const) {
+      await expect(controls.getByLabel(label)).toBeEnabled()
+      await controls.getByLabel(label).fill(value)
+      await settle(page)
+      const { view, env } = await viewBox(page)
+      const eps = 1e-6
+      expect(view[0]).toBeGreaterThanOrEqual(env[0] - eps)
+      expect(view[1]).toBeGreaterThanOrEqual(env[1] - eps)
+      expect(view[2]).toBeLessThanOrEqual(env[2] + eps)
+      expect(view[3]).toBeLessThanOrEqual(env[3] + eps)
+    }
+    if (name === 'Rasuwa') await page.screenshot({ path: `${SHOTS}/locked-map-rasuwa.png` })
+    else await page.screenshot({ path: `${SHOTS}/locked-map-tsho-rolpa.png` })
+    await controls.getByRole('button', { name: 'Whole area' }).click()
+    await settle(page)
+    await expect(controls).toContainText('Whole study area')
+    await expect(controls.getByLabel('Move the view west or east')).toBeDisabled()
+    // A click still inspects a spot
+    await page.mouse.click(720, 470)
+    await expect(inspector(page)).toBeVisible()
+    await expect(inspector(page)).not.toHaveAttribute('data-state', 'loading')
+    // A story step still moves the map, and the sliders follow it
+    const before = await camera(page)
+    await page.getByRole('button', { name: 'Guided story', exact: true }).click()
+    await page.getByRole('button', { name: 'Next' }).click()
+    await expect.poll(async () => { const c = await camera(page); return Math.abs(c.lng - before.lng) + Math.abs(c.lat - before.lat) + Math.abs(c.zoom - before.zoom) }, { timeout: 8000 }).toBeGreaterThan(1e-4)
+  })
+}
+
+test('Compare zoom keeps the before and after pictures aligned', async ({ page }) => {
+  await open(page, TSHO)
+  await page.getByRole('button', { name: 'Compare', exact: true }).click()
+  const panel = page.locator('.compare-panel')
+  const wrap = panel.getByTestId('swipe-zoom')
+  await expect(wrap.locator('img')).toHaveCount(2)
+  await expect(panel.getByLabel('Move both pictures west or east')).toBeDisabled()
+  await panel.getByLabel('Zoom into both pictures together').fill('2')
+  await panel.getByLabel('Move both pictures west or east').fill('900')
+  await panel.getByLabel('Move both pictures south or north').fill('200')
+  // Both pictures and the edge drawing sit inside one transformed wrapper: they share one transform, and none has its own
+  expect(await wrap.evaluate((e) => getComputedStyle(e).transform)).not.toBe('none')
+  const own = await wrap.evaluate((e) => [...e.querySelectorAll('img, svg')].map((c) => getComputedStyle(c).transform))
+  expect(own.every((t) => t === 'none')).toBe(true)
+  const boxes = await wrap.evaluate((e) => [...e.querySelectorAll('img')].map((c) => { const r = c.getBoundingClientRect(); return [r.x, r.y, r.width, r.height] }))
+  expect(boxes[0]).toEqual(boxes[1])
+  // The divider and the date tags stay fixed to the frame
+  expect(await panel.locator('.swipe-line').evaluate((e) => e.parentElement?.classList.contains('swipe-frame'))).toBe(true)
+  await page.waitForTimeout(400)
+  await panel.locator('.swipe').screenshot({ path: `${SHOTS}/compare-zoom.png` })
+  await panel.getByRole('button', { name: 'Whole picture' }).click()
+  await expect(panel.getByLabel('Move both pictures west or east')).toBeDisabled()
 })
