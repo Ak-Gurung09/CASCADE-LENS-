@@ -17,7 +17,7 @@ Use the finished package, `CascadeLens.zip` (see "Build the package" below). Unz
 - **Windows:** double-click **Start CascadeLens.bat**.
 - **macOS or Linux:** open a terminal in the unzipped folder and run `sh start.sh`.
 
-It needs Python 3 and no internet connection. To use Brave or another browser, paste the address the launcher prints.
+It needs no internet connection. On Windows it needs nothing installed: the launcher uses Python 3 when it is there, and Windows' own PowerShell when it is not. On macOS or Linux it needs Python 3. To use Brave or another browser, paste the address the launcher prints.
 
 Do not open `index.html` directly. Browsers block a page opened that way from loading its scripts and data, so it cannot start.
 

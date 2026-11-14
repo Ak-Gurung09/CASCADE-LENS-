@@ -28,7 +28,7 @@ The working folder was empty, with no repository or existing code. Python 3.14 a
 | 18 | Sidecar URLs stored in the catalogue | ASF lists exact QA and browse links, so nothing is guessed | Rerun discovery to refresh |
 | 19 | `renderable` for colour-only layers | The damage proxy and browse pictures hold no values | The inspector explains why it cannot sample them |
 | 21 | Case studies as separate manifests, chosen by a URL parameter | The brief asks for a case selector, and a reload cannot leak state between cases | `?case=landmet-2007` |
-| 22 | `serve.py` with the standard library, not `vite preview` | The finished product must run with no `npm install` | Needs Python 3 |
+| 22 | `serve.py` with the standard library, not `vite preview` | The finished product must run with no `npm install` | Needs Python 3; on Windows, `serve.ps1` does the same job with the built-in PowerShell when Python is missing |
 | 23 | Colours relative to each frame's median for phase-like layers | Real frames sit about 50 radians apart | Inspector still shows stored values |
 | 24 | Keep real values and classify, even for impossible LANDMET readings | Same rule as NISAR: flag, never alter | Masked in the inspector |
 | 25 | Static start-up message inside `#root` | Opening `index.html` directly gave a blank page: browsers block scripts on `file://`. Plain HTML needs no scripts, so it also covers blocked scripts. React replaces it on a normal start | Appears after 2 s, so a normal start never shows it |

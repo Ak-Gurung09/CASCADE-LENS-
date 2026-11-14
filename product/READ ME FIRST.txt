@@ -15,8 +15,9 @@ loading its scripts and data, so it cannot start.
 
 On macOS or Linux, open a terminal in this folder and run:  sh start.sh
 
-It needs Python 3, and nothing else. It needs no internet connection, no login,
-and no installing.
+On Windows it needs nothing installed: it uses Python 3 when you have it, and
+Windows' own PowerShell when you do not. On macOS or Linux it needs Python 3.
+It needs no internet connection and no login.
 
 
 WHAT IS INSIDE
@@ -52,5 +53,6 @@ WHAT IS IN THIS FOLDER
   Start CascadeLens.bat   Starts the app on Windows
   start.sh                Starts the app on macOS or Linux
   serve.py                The small local server it runs
+  serve.ps1               The same server for a Windows PC with no Python
   app\                    The finished app and its prepared data
   source\                 Code, tests and documentation

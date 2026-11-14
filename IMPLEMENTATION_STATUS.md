@@ -66,7 +66,7 @@ Report date: 2026-11-13. Two main cases now ship: Rasuwa (flagship, opens first)
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
 | LANDMET test case | Implemented and tested | Real file, browser | Real, test only | |
 | Offline operation | Implemented and tested | CSP-enforced browser test | Real | |
-| One-click package | Implemented and tested | Fresh unzip, via the `.bat`; `start.sh` run on Linux only | Real | Needs Python 3 |
+| One-click package | Implemented and tested | Fresh unzip, via the `.bat`; `start.sh` run on Linux only; the no-Python path (`serve.ps1`) is checked on a Windows runner in CI, with a small stand-in app, not the full package | Real | macOS and Linux need Python 3. Windows needs nothing installed |
 | Accessibility | Implemented and tested | axe, keyboard | n/a | No serious findings |
 | Responsive layout | Implemented and tested | 375 px emulation, with the story's place checked to be in view | n/a | Not on a physical phone |
 | Evidence classes on every layer | Implemented and tested | Unit, browser | Real | Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown |
