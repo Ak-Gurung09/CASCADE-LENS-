@@ -486,3 +486,66 @@ test('Compare zoom keeps the before and after pictures aligned', async ({ page }
   await panel.getByRole('button', { name: 'Whole picture' }).click()
   await expect(panel.getByLabel('Move both pictures west or east')).toBeDisabled()
 })
+
+// The steepest-slope line must read as the same water as the lake. Pixels are found by difference: the line by drawing it
+// and not, the lake fill by showing it and not. Teal edge pixels (green above blue) are the measured outline, not water.
+test('in 3D the steepest-slope line is the same colour as the lake', async ({ page, context }) => {
+  test.setTimeout(120_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await open(page, TSHO)
+  await page.getByRole('button', { name: '3D', exact: true }).click()
+  const panel = page.locator('.terrain-panel')
+  let k = 0
+  // The camera eases to rest after it opens, so each picture waits for it to settle
+  const shot = async () => {
+    await page.waitForTimeout(5000)
+    return (await page.locator('.terrain-canvas').screenshot({ path: `${SHOTS}/3d-colour-step${k++}.png` })).toString('base64')
+  }
+  // The lake toggle lives on the Look tab. The camera does not move between tabs.
+  const lakeBox = panel.getByLabel(/Show the lake in blue/)
+  await expect(lakeBox).toBeChecked()
+  const withLake = await shot()
+  await lakeBox.uncheck()
+  const noLake = await shot()
+  await lakeBox.check()
+  await panel.getByRole('tab', { name: 'Steepest slope' }).click()
+  const distance = panel.getByLabel(/Distance from the lake/)
+  await distance.fill('0')
+  const noLine = await shot()
+  await distance.fill('1')
+  const withLine = await shot()
+  await page.screenshot({ path: `${SHOTS}/3d-water-colour.png` })
+  const scratch = await context.newPage() // The app's offline policy blocks data: URLs, so the pixels are read on a blank page
+  const averages = await scratch.evaluate(async ([l1, l0, r0, r1]) => {
+    const pixels = async (b64: string) => {
+      const bmp = await createImageBitmap(await (await fetch(`data:image/png;base64,${b64}`)).blob())
+      const cv = new OffscreenCanvas(bmp.width, bmp.height)
+      const g = cv.getContext('2d')!
+      g.drawImage(bmp, 0, 0)
+      return g.getImageData(0, 0, bmp.width, bmp.height).data
+    }
+    const [L1, L0, R0, R1] = await Promise.all([pixels(l1), pixels(l0), pixels(r0), pixels(r1)])
+    const W = (await createImageBitmap(await (await fetch(`data:image/png;base64,${l1}`)).blob())).width
+    // Only pixels whose four neighbours also qualify: edge pixels are blended with the terrain beside them and would say nothing about the water
+    const mean = (on: (i: number) => boolean, src: Uint8ClampedArray) => {
+      const s = [0, 0, 0]; let n = 0
+      // The canvas fills the screen: keep to the model, clear of the top bar and the side panel, whose buttons change on hover
+      const scene = (i: number) => { const x = (i / 4) % W, y = Math.floor(i / 4 / W); return y > 100 && x < W - 400 }
+      const core = (i: number) => scene(i) && on(i) && on(i - 4) && on(i + 4) && on(i - 4 * W) && on(i + 4 * W)
+      for (let i = 4 * W; i < src.length - 4 * W; i += 4) if (core(i)) { s[0] += src[i]; s[1] += src[i + 1]; s[2] += src[i + 2]; n++ }
+      return { rgb: s.map((v) => Math.round(v / Math.max(1, n))), n }
+    }
+    const diff = (x: Uint8ClampedArray, y: Uint8ClampedArray, i: number) => Math.abs(x[i] - y[i]) + Math.abs(x[i + 1] - y[i + 1]) + Math.abs(x[i + 2] - y[i + 2]) > 30
+    // The lake: changed when the fill is shown, and not the teal edge (green at or above blue)
+    const lake = mean((i) => diff(L1, L0, i) && L1[i + 2] > L1[i + 1], L1)
+    // The line: changed when it is drawn, and not the pale marker
+    const line = mean((i) => diff(R0, R1, i) && R1[i] + R1[i + 1] + R1[i + 2] < 450, R1)
+    return { line, lake }
+  }, [withLake, noLake, noLine, withLine])
+  await scratch.close()
+  console.log(`3D water colour: lake ${averages.lake.rgb.join(', ')} (${averages.lake.n} px); line ${averages.line.rgb.join(', ')} (${averages.line.n} px)`)
+  expect(averages.lake.n).toBeGreaterThan(200)
+  expect(averages.line.n).toBeGreaterThan(100)
+  for (let k = 0; k < 3; k++) expect(Math.abs(averages.lake.rgb[k] - averages.line.rgb[k])).toBeLessThanOrEqual(10)
+  await expect(panel).toContainText('Not a flood model.')
+})

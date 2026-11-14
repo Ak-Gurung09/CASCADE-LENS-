@@ -5,7 +5,7 @@ import type { LakeSeries, LakeTerrain } from '../../types/manifest'
 import { assetUrl, formatDate } from '../../services/manifest'
 import { COLOUR_KEY, LakeChart } from '../compare/ComparePanel'
 import { CountUp } from '../motion/CountUp'
-import { buildRadarPass, buildRoute, makeGrid, type Frame } from './sims3d'
+import { buildRadarPass, buildRoute, LAKE_WATER_FILL, makeGrid, type Frame } from './sims3d'
 import { elapsedMs } from '../../services/simulation'
 
 // A block model of the lake valley: Copernicus DEM heights, with a NISAR radar image draped on top and layered earth on the sides.
@@ -44,7 +44,7 @@ function drapeTexture(img: HTMLImageElement, size: [number, number], outline: st
   g.drawImage(img, 0, 0, size[0], size[1])
   if (outline && showLake) {
     const p = new Path2D(outline)
-    g.fillStyle = 'rgba(40, 140, 255, 0.55)'
+    g.fillStyle = LAKE_WATER_FILL // The same water colour as the steepest-slope line (sims3d.ts)
     g.fill(p, 'evenodd')
     g.strokeStyle = '#5fe0c9'
     g.lineWidth = 1.5
