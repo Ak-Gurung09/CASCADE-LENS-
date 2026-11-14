@@ -21,10 +21,18 @@ case = cfg["id"]
 mpath = public / f"manifests/{case}.json"
 m = json.loads(mpath.read_text(encoding="utf-8"))
 lake = json.loads((public / f"vectors/{case}-lake.geojson").read_text(encoding="utf-8"))
-area = round(sum(p["areaKm2"] for p in m["lake"]["series"]) / len(m["lake"]["series"]), 3)
+series = m["lake"]["series"]
+area = round(sum(p["areaKm2"] for p in series) / len(series), 3)
+# The NISAR method's own range over all dates: the lowest low and the highest high
+area_range = (min(p["lowKm2"] for p in series), max(p["highKm2"] for p in series))
 work = ROOT / "data/processed" / case
 work.mkdir(parents=True, exist_ok=True)
-sc = scenario.run(dems[0], lake, area, (cfg["lake"]["lng"], cfg["lake"]["lat"]), public, case, work)
+csv_path = ROOT / f"data/qa/{case}-scenario-sections.csv"
+sc = scenario.run(dems[0], lake, area, (cfg["lake"]["lng"], cfg["lake"]["lat"]), public, case, work, area_range=area_range, sections_csv=csv_path)
+# A copy the app can link to: it is static and offline, so it can only open files under frontend/public
+(public / "working").mkdir(exist_ok=True)
+(public / f"working/{csv_path.name}").write_bytes(csv_path.read_bytes())
+sc["sectionsCsv"] = f"data/working/{csv_path.name}"
 shade = sc.pop("_shade")
 sc["dem"] = dems[0].name
 m["lake"]["scenario"] = sc
@@ -52,7 +60,10 @@ if shade:
                                    "inspect": "Use it to follow the river route.", "establishes": "Landscape context only."},
                    "attribution": "Copernicus DEM GLO-30: © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA",
                    "limitations": ["Shading only, from 60 m averaged heights."]})
-m["layers"] = [l for l in m["layers"] if l["id"] not in {x["id"] for x in layers}] + layers
+# Replace layers in place, so a rerun does not reorder the manifest
+by_id = {x["id"]: x for x in layers}
+kept = [by_id.pop(l["id"], l) for l in m["layers"]]
+m["layers"] = kept + list(by_id.values())
 errors = manifest.validate(m, ROOT / "frontend/public")
 if errors:
     sys.exit("Manifest not written:\n" + "\n".join(errors))
@@ -61,4 +72,6 @@ print(f"Route {sc['routeKm']} km to {sc['routeEnd']}")
 for s in sc["scenarios"]:
     a = s["arrival"]
     pick = [x for x in a if x[0] in (5.0, 10.0, 20.0, 30.0, 50.0)] or a[::20]
-    print(f"breach {s['breachM']} m: {s['volumeM3'] / 1e6:.0f} million m3, peak {s['peakRange'][0]:,} to {s['peakRange'][1]:,} m3/s, arrival (km, fastest min, slowest min): {pick}")
+    pick = [[float(k), f, w] for k, f, w in pick]
+    print(f"breach {s['breachM']} m: {s['volumeM3'] / 1e6:.2f} million m3, peak {s['peakRange'][0]:,} to {s['peakRange'][1]:,} m3/s, arrival (km, fastest min, slowest min): {pick}, floors {s['floors']}")
+print(f"Sections: {csv_path.relative_to(ROOT)}")

@@ -8,7 +8,14 @@
    give the likely range; Huggel et al. (2002) Qp = 0.00077 V^1.017 is an upper envelope of past floods, shown as the worst case only.
 4. Arrival time: at cross-sections cut through the DEM every ~500 m, the flow depth that carries the peak flow is solved from
    Manning's equation, v = R^(2/3) S^(1/2) / n, with roughness n from 0.07 to 0.15. The front is taken to move at the water
-   speed v. The peak is not reduced downstream, so the times are on the early (cautious) side.
+   speed v. Two simplifications pull the times in opposite directions: a flood wave front travels faster than the water
+   (about 5/3 v in a wide channel, which would make every time 40% shorter), and the peak is not reduced downstream
+   (a real peak shrinks and slows as it spreads, which would make far times later). Neither is corrected; the kinematic-wave
+   times are reported beside the main ones as a sensitivity line only.
+5. The lake area carries its own range: the volume and peaks are computed for the lowest, mean and highest area the NISAR
+   method allows, and the fastest arrival pairs the highest area with the higher peak formula and the smoothest channel,
+   the slowest the lowest area with the lower formula and the roughest channel.
+Every cross-section is written out (data/qa/<case>-scenario-sections.csv) so the times can be rebuilt by hand.
 Everything is a scenario with a range. It is not a hazard map and not a warning.
 """
 from __future__ import annotations
@@ -29,6 +36,9 @@ N_RANGE = (0.07, 0.15)   # Manning roughness for steep boulder channels carrying
 SECTION_EVERY_M = 500
 HALF_WIDTH_M = 1500
 GAMMA = 9800.0
+SLOPE_FLOOR = 0.002      # bed slope never taken below this, so flat DEM stretches cannot stop the water
+SPEED_FLOOR = 0.3        # m/s, the front never taken slower than this
+KINEMATIC = 5 / 3        # wide-channel Manning: a flood wave moves at c = 5/3 v. Sensitivity only, not the default
 FORMULAS = {
     "popov": ("Popov (1991)", lambda v, h: 0.0048 * v ** 0.896),
     "huggel": ("Huggel et al. (2002), upper envelope", lambda v, h: 0.00077 * v ** 1.017),
@@ -123,13 +133,15 @@ def sections(z, t, rows, cols, lat0):
         up = max(0, int(np.searchsorted(dist, d - 1000)))
         dn = min(len(dist) - 1, int(np.searchsorted(dist, d + 1000)))
         zr = z[rows, cols]
-        slope = max(0.002, float((zr[up] - zr[dn]) / max(1.0, dist[dn] - dist[up])))
-        out.append({"i": i, "km": d / 1000, "s": s, "prof": prof, "slope": slope, "rr": rr, "cc": cc})
+        raw = float((zr[up] - zr[dn]) / max(1.0, dist[dn] - dist[up]))
+        slope = max(SLOPE_FLOOR, raw)
+        out.append({"i": i, "km": d / 1000, "s": s, "prof": prof, "slope": slope, "slopeRaw": raw, "slopeFloor": raw < SLOPE_FLOOR, "rr": rr, "cc": cc})
     return out
 
 
-def _hydraulics(sec, q: float, n: float):
-    """Depth above the lowest point of the section that carries q, by bisection. Returns depth, speed, wet span."""
+def section_flow(sec, q: float, n: float) -> dict:
+    """The depth above the section's lowest point that carries q, by bisection, with everything a hand check needs:
+    bed height, depth h, wetted top width, flow area, hydraulic radius R = area / (width + 2h), speed v and the wet span."""
     s, prof = sec["s"], sec["prof"]
     mid = len(s) // 2
     bed_i = mid - 10 + int(np.argmin(prof[mid - 10: mid + 11]))
@@ -143,10 +155,10 @@ def _hydraulics(sec, q: float, n: float):
         area = float(depth.sum() * 30.0)
         width = float(k.sum() * 30.0)
         if area <= 0:
-            return 0.0, 0.0, k
+            return 0.0, 0.0, k, 0.0, 0.0, 0.0
         r = area / (width + 2 * h)
         v = r ** (2 / 3) * sec["slope"] ** 0.5 / n
-        return area * v, v, k
+        return area * v, v, k, area, width, r
 
     lo, hi = 0.01, 200.0
     for _ in range(40):
@@ -156,9 +168,51 @@ def _hydraulics(sec, q: float, n: float):
         else:
             hi = h
     h = (lo + hi) / 2
-    _, v, k = flow(h)
+    _, v, k, area, width, r = flow(h)
     idx = np.nonzero(k)[0]
-    return h, v, (int(idx[0]), int(idx[-1])) if idx.size else (bed_i, bed_i)
+    return {"bed": float(bed), "h": h, "v": v, "width": width, "area": area, "R": r,
+            "span": (int(idx[0]), int(idx[-1])) if idx.size else (bed_i, bed_i)}
+
+
+def _hydraulics(sec, q: float, n: float):
+    """Depth above the lowest point of the section that carries q. Returns depth, speed, wet span."""
+    f = section_flow(sec, q, n)
+    return f["h"], f["v"], f["span"]
+
+
+def volume_and_peaks(area_km2: float, breach_m: float) -> tuple[float, dict]:
+    """Released volume V = A x h (m3) and the peak flow at the dam from each formula (m3/s), unrounded."""
+    v = area_km2 * 1e6 * breach_m
+    return v, {k: f(v, breach_m) for k, (_, f) in FORMULAS.items()}
+
+
+def travel(secs, q: float, n: float) -> list[dict]:
+    """Walk the front down the sections at speed max(v, SPEED_FLOOR). One row per section with the hand-check numbers."""
+    rows, prev, cum = [], 0.0, 0.0
+    for sec in secs:
+        f = section_flow(sec, q, n)
+        seg = (sec["km"] - prev) * 1000
+        speed = max(f["v"], SPEED_FLOOR)
+        t = seg / speed
+        cum += t
+        prev = sec["km"]
+        rows.append({**f, "q": q, "n": n, "speedFloor": f["v"] < SPEED_FLOOR, "segM": seg, "segS": t, "cumS": cum})
+    return rows
+
+
+SECTION_COLUMNS = ["breach_m", "km", "bed_m", "slope_raw", "slope_S", "slope_floor_applied"] + [
+    f"{b}_{c}" for b in ("fast", "slow") for c in ("Q_m3s", "n", "h_m", "width_m", "area_m2", "R_m", "v_ms", "speed_floor_applied", "seg_m", "seg_s", "cum_s", "cum_min")]
+
+
+def section_rows(breach_m: float, secs, fast: list[dict], slow: list[dict]) -> list[list]:
+    out = []
+    for sec, f, w in zip(secs, fast, slow):
+        row = [breach_m, round(sec["km"], 3), round(f["bed"], 2), round(sec["slopeRaw"], 6), round(sec["slope"], 6), int(sec["slopeFloor"])]
+        for b in (f, w):
+            row += [round(b["q"], 1), b["n"], round(b["h"], 3), round(b["width"], 1), round(b["area"], 1), round(b["R"], 4), round(b["v"], 4),
+                    int(b["speedFloor"]), round(b["segM"], 3), round(b["segS"], 2), round(b["cumS"], 3), round(b["cumS"] / 60, 6)]
+        out.append(row)
+    return out
 
 
 def hillshade(z: np.ndarray, t, lat0: float) -> np.ndarray:
@@ -171,9 +225,12 @@ def hillshade(z: np.ndarray, t, lat0: float) -> np.ndarray:
     return np.clip(np.sin(alt) * np.cos(slope) + np.cos(alt) * np.sin(slope) * np.cos(az - aspect), 0, 1).astype(np.float32)
 
 
-def run(dem: pathlib.Path, lake_geojson: dict, area_km2: float, centre_lnglat, public: pathlib.Path, case: str, work: pathlib.Path | None = None) -> dict:
+def run(dem: pathlib.Path, lake_geojson: dict, area_km2: float, centre_lnglat, public: pathlib.Path, case: str, work: pathlib.Path | None = None,
+        area_range: tuple[float, float] | None = None, sections_csv: pathlib.Path | None = None) -> dict:
+    """area_km2 is the mean lake area; area_range the (lowest, highest) area the NISAR method allows. Without a range the mean is used for both."""
     lon, lat = centre_lnglat
-    bounds = (np.floor(lon) - 0.0, np.floor(lat), np.floor(lon) + 1.0, np.floor(lat) + 1.0)  # the whole 1 degree tile
+    a_lo, a_hi = area_range or (area_km2, area_km2)
+    areas = {"low": a_lo, "mean": area_km2, "high": a_hi}
     with rasterio.open(dem) as src:
         b = src.bounds
     bounds = (max(b.left, lon - 0.5), max(b.bottom, lat - 0.6), min(b.right, lon + 0.5), min(b.top, lat + 0.15))
@@ -188,40 +245,45 @@ def run(dem: pathlib.Path, lake_geojson: dict, area_km2: float, centre_lnglat, p
     lng_lat = lambda r, c: [round(float(v), 5) for v in (t * (c + 0.5, r + 0.5))]  # noqa: E731
     kx, ky = _km(t, lat)
     km = np.concatenate([[0], np.cumsum(np.hypot(np.diff(cols) * kx, np.diff(rows) * ky))])
-    area_m2 = area_km2 * 1e6
     scenarios = []
     extent = None
+    table = []
     for depth in BREACH_M:
-        v = area_m2 * depth
-        peaks = {k: round(f(v, depth)) for k, (_, f) in FORMULAS.items()}
-        likely = [peaks["popov"], peaks["costa"]]
-        q_lo, q_hi = min(likely), max(likely)
-        fast, slow = [0.0], [0.0]
-        pts = []
-        spans = []
-        for sec in secs:
-            _, v_fast, span = _hydraulics(sec, q_hi, N_RANGE[0])
-            h_slow, v_slow, _ = _hydraulics(sec, q_lo, N_RANGE[1])
-            h_fast, _, _ = _hydraulics(sec, q_hi, N_RANGE[1])
-            pts.append((sec["km"], v_fast, v_slow, _hydraulics(sec, q_lo, N_RANGE[0])[0], h_fast))
-            spans.append(span)
-        arrival, depth_m = [], []
-        prev = 0.0
-        tf = ts = 0.0
-        for k_, cf, cs, h, h2 in pts:
-            ds = (k_ - prev) * 1000
-            tf += ds / max(cf, 0.3)
-            ts += ds / max(cs, 0.3)
-            prev = k_
-            arrival.append([round(k_, 1), round(tf / 60), round(ts / 60)])
-            depth_m.append([round(k_, 1), round(h, 1), round(h2, 1)])
-        scenarios.append({"breachM": depth, "volumeM3": round(v), "peakM3s": peaks, "peakRange": [q_lo, q_hi], "worstM3s": peaks["huggel"], "arrival": arrival, "depthM": depth_m})
+        vols, peaks = {}, {}
+        for name, a in areas.items():
+            vols[name], peaks[name] = volume_and_peaks(a, depth)
+        # The likely range: the lower of Popov and Costa at the lowest area, to the higher of the two at the highest area
+        q_lo = min(peaks["low"]["popov"], peaks["low"]["costa"])
+        q_hi = max(peaks["high"]["popov"], peaks["high"]["costa"])
+        fast = travel(secs, q_hi, N_RANGE[0])   # highest flow, smoothest channel
+        slow = travel(secs, q_lo, N_RANGE[1])   # lowest flow, roughest channel
+        shallow = [section_flow(sec, q_lo, N_RANGE[0])["h"] for sec in secs]
+        deep = [section_flow(sec, q_hi, N_RANGE[1])["h"] for sec in secs]
+        table += section_rows(depth, secs, fast, slow)
+        arrival = [[round(sec["km"], 1), round(f["cumS"] / 60), round(w["cumS"] / 60)] for sec, f, w in zip(secs, fast, slow)]
+        kinematic = [[round(sec["km"], 1), round(f["cumS"] / KINEMATIC / 60), round(w["cumS"] / KINEMATIC / 60)] for sec, f, w in zip(secs, fast, slow)]
+        depth_m = [[round(sec["km"], 1), round(h1, 1), round(h2, 1)] for sec, h1, h2 in zip(secs, shallow, deep)]
+        rnd = lambda d: {k: round(v) for k, v in d.items()}  # noqa: E731
+        scenarios.append({"breachM": depth, "volumeM3": round(vols["mean"]), "volumeRangeM3": [round(vols["low"]), round(vols["high"])],
+                          "peakM3s": rnd(peaks["mean"]), "peaksByArea": {k: rnd(v) for k, v in peaks.items()},
+                          "peakRange": [round(q_lo), round(q_hi)], "worstM3s": round(peaks["high"]["huggel"]),
+                          "arrival": arrival, "arrivalKinematic": kinematic, "depthM": depth_m,
+                          "floors": {"sections": len(secs), "slope": sum(1 for s_ in secs if s_["slopeFloor"]),
+                                     "speedFast": sum(1 for f in fast if f["speedFloor"]), "speedSlow": sum(1 for w in slow if w["speedFloor"])}})
         if depth == 20:  # the middle scenario draws the flooded area: the highest flow, smoothest channel, so the widest
             left, right = [], []
-            for sec, (a, b2) in zip(secs, spans):
+            for sec, f in zip(secs, fast):
+                a, b2 = f["span"]
                 left.append(lng_lat(sec["rr"][a], sec["cc"][a]))
                 right.append(lng_lat(sec["rr"][b2], sec["cc"][b2]))
             extent = [left + right[::-1] + [left[0]]]
+    if sections_csv:
+        import csv
+        sections_csv.parent.mkdir(parents=True, exist_ok=True)
+        with sections_csv.open("w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh)
+            w.writerow(SECTION_COLUMNS)
+            w.writerows(table)
     line = [lng_lat(r, c) for r, c in zip(rows[::2], cols[::2])]
     vec = public / f"vectors/{case}-scenario-route.geojson"
     vec.write_text(json.dumps({"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"kind": "route"}, "geometry": {"type": "LineString", "coordinates": line}}]}), encoding="utf-8")
@@ -229,7 +291,8 @@ def run(dem: pathlib.Path, lake_geojson: dict, area_km2: float, centre_lnglat, p
     ext.write_text(json.dumps({"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"kind": "extent", "breachM": 20}, "geometry": {"type": "Polygon", "coordinates": extent}}] if extent else []}), encoding="utf-8")
     profile = [[round(float(km[i]), 2), round(float(z[rows[i], cols[i]]))] for i in range(0, len(rows), 4)]
     marks = [{"km": round(float(km[i]), 1), "lngLat": lng_lat(rows[i], cols[i])} for i in range(0, len(rows), max(1, len(rows) // 12))]
-    return {"routeKm": round(float(km[-1]), 1), "routeEnd": lng_lat(rows[-1], cols[-1]), "lakeAreaKm2": area_km2, "profile": profile, "marks": marks,
+    return {"routeKm": round(float(km[-1]), 1), "routeEnd": lng_lat(rows[-1], cols[-1]), "lakeAreaKm2": area_km2, "areaRangeKm2": [a_lo, area_km2, a_hi],
+            "profile": profile, "marks": marks, "gammaNm3": GAMMA, "slopeFloor": SLOPE_FLOOR, "speedFloorMs": SPEED_FLOOR, "kinematicFactor": round(KINEMATIC, 4),
             "scenarios": scenarios, "routeVector": vec.relative_to(public.parent).as_posix(), "extentVector": ext.relative_to(public.parent).as_posix(),
             "formulas": {k: n for k, (n, _) in FORMULAS.items()}, "roughness": list(N_RANGE), "sectionEveryM": SECTION_EVERY_M,
             "bounds": [round(float(v), 4) for v in (t.c, t.f + t.e * z.shape[0], t.c + t.a * z.shape[1], t.f)], "_shade": str(shade_tif) if shade_tif else None}
