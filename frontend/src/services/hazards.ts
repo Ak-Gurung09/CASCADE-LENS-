@@ -35,6 +35,8 @@ export interface RoadSegment {
   radarUnreliablePct?: number; radarNoValidPct?: number; radarOutsidePct?: number; radarNotAssessedPct?: number
   // a second viewing direction (prepare_hazards.py --other-view): its own usable share, and the share usable from either view
   radarOtherView?: string; radarOtherUsablePct?: number; radarEitherUsablePct?: number; radarWatchEither?: string
+  // the stretch's own line from the shipped GeoJSON, kept so a field-check record can export the real geometry
+  coordinates?: [number, number][]
 }
 
 type Seg = { geometry: { coordinates: [number, number][] }; properties: Omit<RoadSegment, 'distanceM'> }
@@ -62,7 +64,7 @@ export async function nearestRoad(m: Manifest, p: [number, number], withinM = 15
   let best: RoadSegment | null = null
   for (const s of await cache.get(url)!) {
     const d = distanceM(p, s.geometry.coordinates)
-    if (d <= withinM && (!best || d < best.distanceM)) best = { ...s.properties, distanceM: Math.round(d) }
+    if (d <= withinM && (!best || d < best.distanceM)) best = { ...s.properties, distanceM: Math.round(d), coordinates: s.geometry.coordinates }
   }
   return best
 }

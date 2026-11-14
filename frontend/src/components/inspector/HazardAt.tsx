@@ -4,9 +4,10 @@ import { samplePoint } from '../../services/sampler'
 import { nearestRoad, terrainClass, terrainFactors, terrainLayer, type RoadSegment } from '../../services/hazards'
 import { roadEvidence } from '../../services/roadEvidence'
 import { RoadEvidencePanel } from './RoadEvidencePanel'
+import { AddCheckButton } from '../fieldchecks/FieldChecksPanel'
 
 // Terrain screen and the nearest screened road, for the clicked spot. Both experimental, and labelled so.
-export function HazardAt({ manifest, point }: { manifest: Manifest; point: [number, number] }) {
+export function HazardAt({ manifest, point, onOpenCheck }: { manifest: Manifest; point: [number, number]; onOpenCheck?: (id: string) => void }) {
   const layer = terrainLayer(manifest)
   const [flags, setFlags] = useState<number | null | undefined>(undefined)
   const [road, setRoad] = useState<RoadSegment | null | undefined>(undefined)
@@ -38,6 +39,7 @@ export function HazardAt({ manifest, point }: { manifest: Manifest; point: [numb
             <li>{road.radarWatch}: the event pair could see a change on {road.radarUsablePct}% of this stretch{road.radarUnseenPct >= 50 ? ', and most of it lies beyond the frame checked' : road.radarHiddenPct >= 20 ? `, ${road.radarHiddenPct}% is hidden by terrain` : ''}.</li>
           </ul>
           <RoadEvidencePanel ev={roadEvidence(manifest, road)} />
+          <AddCheckButton manifest={manifest} road={road} onOpen={onOpenCheck} />
         </div>
       )}
       <p className="muted small">Screens of terrain and position only, not forecasts. They leave out geology, soil and rainfall.</p>
