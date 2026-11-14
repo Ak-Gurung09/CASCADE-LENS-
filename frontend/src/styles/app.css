@@ -718,9 +718,9 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .hyp-against li::marker { content: '–  '; color: var(--coral); }
 .hyp-missing li::marker { content: '?  '; color: var(--amber); }
 .standing { font-size: 10.5px; font-weight: 700; letter-spacing: .03em; white-space: nowrap; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; align-self: flex-start; }
-.st-best { color: #fff; }
-.st-possible { color: var(--amber); }
-.st-weak { color: var(--muted); }
+.st-fits { color: #fff; }
+.st-partly { color: var(--amber); }
+.st-little { color: var(--muted); }
 .st-cannot { color: #d9b3ff; }
 .hyp-measured { margin-top: 8px; }
 .report-btns { margin: 14px 0 4px; }
@@ -792,3 +792,10 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .intro-hint { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 14px; color: #8c92a6; text-align: center; }
 .intro-hint span { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #6d7183; }
 @media (prefers-reduced-motion: reduce) { .intro, .intro-count { transition: none; } .intro-line { animation: none; opacity: 1; } }
+
+/* Shown by ErrorBoundary when a view fails, so the page is never left blank */
+.app-error { max-width: 560px; margin: 12vh auto 0; padding: 28px; background: var(--panel-solid); border: 1px solid var(--bad-line); border-radius: var(--radius); color: var(--text); font-family: var(--sans); display: grid; gap: 12px; }
+.app-error h1 { font-family: var(--serif); font-weight: 400; font-size: 32px; margin: 0; }
+.app-error p { margin: 0; color: var(--soft); line-height: 1.5; }
+.app-error .app-error-detail { font-size: 13px; color: var(--bad); word-break: break-word; }
+.app-error button { justify-self: start; }

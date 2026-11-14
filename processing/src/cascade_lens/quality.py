@@ -6,6 +6,21 @@ import csv
 import numpy as np
 
 NODATA, VALID, MASKED = 0, 1, 2  # validity raster classes, shared with the frontend inspector
+GUNW_CC_FILL_SPEC = 65535  # connectedComponents fill in GUNW Rev E; used only when a file lacks the _FillValue attribute
+
+
+def zero_filled_phase(phase: np.ndarray) -> np.ndarray:
+    """Unwrapped phase stored as exactly 0.0. The product writes 0 where unwrapping failed, so an exact zero is treated as
+    "no measurement" (masked, value kept). A component's own reference pixel can legitimately be 0, so this may also
+    mask at most one real pixel per component; that loss is accepted to stop zero-fill being read as a measurement."""
+    phase = np.asarray(phase)
+    return np.isfinite(phase) & (phase == 0)
+
+
+def unreliable_component(cc: np.ndarray, fill=GUNW_CC_FILL_SPEC) -> np.ndarray:
+    """ATBD 5.9.1.7: label 0 was not reliably unwrapped. The fill value holds no component. Non-finite holds no label."""
+    cc = np.asarray(cc)
+    return ~np.isfinite(cc) | (cc == 0) | (cc == fill)
 
 
 def clean(a: np.ndarray, fill=None) -> np.ndarray:
@@ -35,14 +50,27 @@ def _mask_classes(shape, mask: np.ndarray | None) -> np.ndarray:
     return v
 
 
-def gunw_validity(values: np.ndarray, mask: np.ndarray | None, cc: np.ndarray | None = None, cc_fill=65535) -> np.ndarray:
-    """Pass `cc` for phase only. ATBD 5.9.1.7: label 0 could not be reliably unwrapped and belongs to no component."""
+def gunw_validity(values: np.ndarray, mask: np.ndarray | None, cc: np.ndarray | None = None, cc_fill=GUNW_CC_FILL_SPEC,
+                  zero_is_fill: bool = False, undefined: np.ndarray | None = None) -> np.ndarray:
+    """Validity of one GUNW layer.
+
+    cc:           pass the component labels for phase only. ATBD 5.9.1.7: label 0 could not be reliably unwrapped (masked);
+                  the fill value holds no component (no data).
+    zero_is_fill: for unwrapped phase, an exact 0.0 is the product's fill in unwrapping gaps (masked, value kept).
+    undefined:    pixels where this layer has no meaning, e.g. the component map where the product holds no phase (no data).
+    """
     v = _mask_classes(values.shape, mask)
+    nodata = v == NODATA  # mask fill: kept as no data whatever the other rules say
+    if zero_is_fill:
+        v[zero_filled_phase(values)] = MASKED
     if cc is not None:
         cc = np.asarray(cc)
         v[cc == 0] = MASKED
-        v[cc == cc_fill] = NODATA
-    v[~np.isfinite(values)] = NODATA
+        nodata |= cc == cc_fill
+    if undefined is not None:
+        nodata |= np.asarray(undefined, bool)
+    nodata |= ~np.isfinite(values)
+    v[nodata] = NODATA  # no data always wins over masked
     return v
 
 

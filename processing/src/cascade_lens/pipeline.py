@@ -79,9 +79,16 @@ def extract(h5, mid: str, paths: dict, cfg: dict, window, cache: dict) -> tuple[
     if mask_path in h5 and nisar.find_grid(h5, mask_path).same_as(nisar.find_grid(h5, paths[mid])):
         mask = _once(cache, "mask", lambda: h5[mask_path][window])
     if product == "GUNW":
-        # Label 0 condemns the phase, not coherence or the component map itself
-        cc = _once(cache, "cc", lambda: h5[paths["gunw-cc"]][window]) if mid == "gunw-phase" else None
-        return values, quality.gunw_validity(values, mask, cc)
+        cc_fill = nisar.fill_value(h5[paths["gunw-cc"]], quality.GUNW_CC_FILL_SPEC)
+        if mid == "gunw-phase":
+            # Label 0 condemns the phase, not coherence or the component map itself; an exact 0.0 is unwrapping fill
+            cc = _once(cache, "cc", lambda: h5[paths["gunw-cc"]][window])
+            return values, quality.gunw_validity(values, mask, cc, cc_fill, zero_is_fill=True)
+        if mid == "gunw-cc":
+            # Components label unwrapped phase, so where the product holds no phase the label means nothing
+            phase = _once(cache, "phase", lambda: quality.clean(*_read_clip(h5, paths["gunw-phase"], window)))
+            return values, quality.gunw_validity(values, mask, undefined=~np.isfinite(phase))
+        return values, quality.gunw_validity(values, mask)
     if product == "GOFF":
         offset = mid in ("goff-range", "goff-azimuth")
         snr = None

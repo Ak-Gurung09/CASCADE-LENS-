@@ -339,3 +339,43 @@ def test_manifest_validate_catches_missing_assets(tmp_path):
                     {"id": "c", "status": "prepared", "sources": [], "vector": {"url": "data/z.geojson"}}]}
     errs = manifest.validate(m, tmp_path)
     assert errs == ["a: missing data/x.tif", "b: status catalogued but has sources", "b: missing y", "c: missing data/z.geojson"]
+
+
+def test_zero_filled_phase_is_masked_and_no_data_always_wins():
+    phase = np.array([[0.0, 1.0, 0.0, 2.0]], np.float32)
+    mask = np.array([[11, 11, 255, 255]], np.uint8)
+    cc = np.array([[1, 1, 1, 0]], np.uint16)
+    out = quality.gunw_validity(phase, mask, cc, zero_is_fill=True)
+    assert out.tolist() == [[quality.MASKED, quality.VALID, quality.NODATA, quality.NODATA]], "mask fill stays no data even with label 0 or zero phase"
+    und = quality.gunw_validity(np.ones((1, 2), np.float32), None, undefined=np.array([[True, False]]))
+    assert und.tolist() == [[quality.NODATA, quality.VALID]]
+    assert quality.unreliable_component(np.array([0, 1, 65535, np.nan])).tolist() == [True, False, True, True]
+
+
+def test_pipeline_masks_zero_phase_and_gives_components_a_no_data_class(tmp_path, cfg):
+    p = tmp_path / "gunw.h5"
+    make_gunw(p)
+    with h5py.File(p, "a") as f:
+        ph = f[nisar.dataset_path("gunw-phase", "HH")]
+        a = ph[()]
+        a[20, 20] = 0.0  # zero-fill inside a labelled component
+        a[30, 30] = np.nan  # the product holds no phase here
+        ph[...] = a
+        cc = f[nisar.dataset_path("gunw-cc", "HH")]
+        c = cc[()]
+        c[30, 30] = 0
+        c[7, 7] = 9
+        cc[...] = c
+        cc.attrs["_FillValue"] = 9  # the file's own fill value must be used, not a hard-coded one
+    _, recs = pipeline.process_granule(granule(), p, cfg, tmp_path / "w", tmp_path / "qa")
+    by = {r["measurement"]: r for r in recs}
+    with rasterio.open(by["gunw-phase"]["validity"]) as v:
+        cls = v.read(1)
+    assert cls[20, 20] == quality.MASKED, "exact zero phase is unwrapping fill, not a measurement"
+    assert cls[7, 7] == quality.NODATA, "component fill read from _FillValue"
+    with rasterio.open(by["gunw-cc"]["validity"]) as v:
+        ccls = v.read(1)
+    assert ccls[30, 30] == quality.NODATA and ccls[0, 0] == quality.NODATA, "no phase, so the label means nothing"
+    assert ccls[3, 3] == quality.VALID and ccls[10, 10] == quality.VALID, "in the component map, label 0 is itself the information"
+    with rasterio.open(by["gunw-phase-iono"]["validity"]) as v:
+        assert v.read(1)[20, 20] == quality.MASKED, "the derived layer inherits the stricter class"

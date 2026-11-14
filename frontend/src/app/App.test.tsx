@@ -178,10 +178,12 @@ describe('story', () => {
     m.analysis = { 'pair-a': { frames: { f074: { ionosphere: { pearsonR: 0.9, stdPhase: 8, stdPhaseMinusIono: 4 }, zones } } } }
     const text = buildStory(m).flatMap((s) => s.paragraphs).join(' ')
     expect(text).toContain('0.11 against 0.77 in frame 74')
-    expect(text).toContain('phase was not unwrapped there')
+    expect(text).toContain('holds no value over the detachment zone')
     expect(text).toContain('from 8 to 4 radians in frame 74')
-    zones['gunw-coherence']['detachment zone'].validPct = 40
-    expect(buildStory(m).flatMap((s) => s.paragraphs).join(' ')).not.toContain('phase was not unwrapped there')
+    zones['gunw-coherence']['detachment zone'] = { pixels: 5, validPct: 0, maskedPct: 100 } as typeof zones['gunw-coherence']['detachment zone']
+    expect(buildStory(m).flatMap((s) => s.paragraphs).join(' ')).toContain('quality mask flags it there')
+    zones['gunw-coherence']['detachment zone'] = { pixels: 5, validPct: 40, maskedPct: 0 } as typeof zones['gunw-coherence']['detachment zone']
+    expect(buildStory(m).flatMap((s) => s.paragraphs).join(' ')).not.toContain('detachment zone:')
   })
 
   it('does not claim a displacement anywhere', () => {

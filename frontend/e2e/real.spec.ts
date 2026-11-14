@@ -92,7 +92,7 @@ test('completes the story with the outside world blocked', async ({ page }) => {
   page.on('request', (r) => { if (new URL(r.url()).hostname !== 'localhost') external.push(r.url()) })
   await open(page)
   await page.getByRole('button', { name: 'Start the guided story' }).click()
-  await expect(page.locator('.story')).toContainText('phase was not unwrapped there')
+  await expect(page.locator('.story')).toContainText('quality mask flags it there')
   await expect(page.locator('.story')).toContainText('at the detachment zone against')
   await page.getByRole('button', { name: 'Next' }).click()
   await expect(page.locator('.story')).toContainText('much lower than on the terrain beside it')

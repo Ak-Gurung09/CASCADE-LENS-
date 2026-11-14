@@ -23,6 +23,21 @@ describe('first-minute finding', () => {
     m.controlSeries!.pairs.forEach((p) => { p.inside = 0.111 })
     expect(finding(m)!.points[0].text).toContain('0.11')
   })
+  it('reports an observation, not a cause, and says why the pairs are not like for like', () => {
+    const text = finding(shipped())!.points.map((p) => p.text).join(' ')
+    expect(text).not.toMatch(/specific to the mudflow|not the season/)
+    expect(text).toContain('consistent with surface change')
+    expect(text).toContain('does not establish the cause')
+    expect(text).toMatch(/24 days and the event pair 12/)
+    expect(text).toContain('different radar modes (4000 and 2000')
+  })
+  it('withholds observability figures from the earlier method, and shows them once recomputed', () => {
+    const m = shipped()
+    m.observability!.methodVersion = undefined
+    expect(finding(m)!.points.map((p) => p.text).join(' ')).toContain('withheld until the corrected run')
+    m.observability!.methodVersion = 2
+    expect(finding(m)!.points.map((p) => p.text).join(' ')).toContain('could be judged on')
+  })
   it('stays away when the case has no control comparison', () => {
     const m = shipped()
     m.controlSeries = undefined

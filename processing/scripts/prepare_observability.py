@@ -43,8 +43,9 @@ def main(argv: list[str]) -> None:
     flags, tr, epsg = r["flags"], r["transform"], r["epsg"]
     rel = lambda p: "data/" + p.relative_to(out).as_posix()  # noqa: E731  (paths as the app loads them)
 
-    flag_tif = export.write_geotiff(out / f"_work/{case}-flags.tif", flags, tr, epsg, nodata=255,
-                                    tags={"SOURCE_FILE": gunw.name, "BASELINE_FILE": baseline.name if baseline else "", "METHOD": "cascade_lens.observability"})
+    flag_tif = export.write_geotiff(out / f"_work/{case}-flags.tif", flags, tr, epsg, nodata=ob.FLAG_NODATA,
+                                    tags={"SOURCE_FILE": gunw.name, "BASELINE_FILE": baseline.name if baseline else "", "METHOD": "cascade_lens.observability",
+                                          "METHOD_VERSION": ob.METHOD_VERSION})
     flag_cog = export.to_cog(flag_tif, out / f"sampling/{case}/observability-flags.tif")
     with rasterio.open(flag_cog) as d:
         flag_bounds = [round(v, 9) for v in transform_bounds(d.crs, "EPSG:4326", *d.bounds)]
@@ -53,7 +54,7 @@ def main(argv: list[str]) -> None:
     layers, summaries = [], {}
     tasks = ["disturbance", "movement"] if baseline else ["movement"]
     for task in tasks:
-        cls = ob.classify(flags, task)
+        cls = ob.classify(flags, task, baseline_assessed=baseline is not None)
         tif = export.write_geotiff(out / f"_work/{case}-{task}.tif", cls.astype(np.float32), tr, epsg)
         warped, tx, ty = export.warp_to_tile_grid(tif, ZOOM[1])
         table = ["#00000000"] + [c[2] for c in ob.CLASSES[task]]
@@ -77,7 +78,7 @@ def main(argv: list[str]) -> None:
             "attribution": "Derived by CascadeLens from NISAR GUNW (NASA/ISRO) and Copernicus DEM GLO-30",
             "legend": {"type": "categorical", "stops": [c[2] for c in ob.CLASSES[task]], "keys": [{"color": c[2], "label": c[1]} for c in ob.CLASSES[task]]},
             "explanation": {"what": question,
-                            "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality.",
+                            "measures": "Each spot gets its reasons kept separate: inside the frame or not, data present and unflagged by the product's own mask or not, hidden by terrain (layover or shadow, from the radar's own viewing angles and the elevation model), and signal quality. Missing inputs are marked Not assessed, never Usable.",
                             "inspect": "Click any spot to see which reasons apply there. Grey and dark areas are not 'no change': they are places the radar could not judge.",
                             "establishes": "Where a NISAR result can be trusted for this task. It does not say whether anything changed."},
             "limitations": ob.LIMITS,
@@ -86,11 +87,13 @@ def main(argv: list[str]) -> None:
         "pair": r["pair"], "baselinePair": r["baselinePair"], "granule": gunw.stem, "baselineGranule": baseline.stem if baseline else None,
         "track": r["meta"]["trackNumber"], "frame": r["meta"]["frameNumber"], "orbit": r["meta"]["orbitPassDirection"], "look": r["meta"]["lookDirection"],
         "compositeReleaseId": r["meta"]["compositeReleaseId"], "productVersion": r["meta"]["productVersion"],
+        "methodVersion": r["methodVersion"], "datasets": r["datasets"], "ccFillValue": r["ccFillValue"], "geometryNotAssessedPct": r["geometryNotAssessedPct"],
         "incidenceDeg5to95": r["incidenceDeg"], "losToSensorEastNorth": [round(r["losEast"], 3), round(r["losNorth"], 3)], "geometryHeightM": r["geometryHeightM"],
         "postingM": 40, "flags": {"outside": ob.OUTSIDE, "noData": ob.NODATA, "layover": ob.LAYOVER, "shadow": ob.SHADOW, "lowCoherence": ob.LOWCOH,
-                                  "noConnectedComponent": ob.NOCC, "lowBaselineCoherence": ob.LOWBASE},
+                                  "noConnectedComponent": ob.NOCC, "lowBaselineCoherence": ob.LOWBASE, "productMasked": ob.MASKED,
+                                  "geometryNotAssessed": ob.GEOM_UNKNOWN, "baselineNoData": ob.BASE_NODATA},
         "classes": {t: [{"code": c[0], "label": c[1], "color": c[2], "meaning": c[3]} for c in ob.CLASSES[t]] for t in tasks},
-        "thresholds": ob.THRESHOLDS, "sensitivityUsableMovementPct": r["sensitivityUsableMovementPct"], "limitations": ob.LIMITS, "zones": summaries}}
+        "thresholds": ob.THRESHOLDS, "sensitivity": r["sensitivity"], "limitations": ob.LIMITS, "zones": summaries}}
     (out / f"observability-{case}.json").write_text(json.dumps(frag, indent=1), encoding="utf-8")
     print(json.dumps({t: summaries[t]["_case"] for t in tasks}), "| look", r["meta"]["lookDirection"], "| los E,N", round(r["losEast"], 3), round(r["losNorth"], 3), "| inc", r["incidenceDeg"])
 

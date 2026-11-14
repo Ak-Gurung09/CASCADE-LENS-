@@ -24,12 +24,6 @@ export async function loadSimulation(path: string): Promise<SimData> {
 // that can be earlier than a moment already recorded with performance.now(). Unclamped, the first step of an animation then runs backwards.
 export const elapsedMs = (now: number, before: number) => Math.max(0, now - before)
 
-// Where the flow replay stands after one frame, in kilometres along the path. It never leaves the path: a position below zero has no
-// point to draw, and looking one up used to take the whole app down.
-export function replayStep(pos: number, now: number, before: number, last: number, seconds: number): number {
-  return Math.min(last, Math.max(0, pos + (elapsedMs(now, before) / 1000) * (last / seconds)))
-}
-
 export interface SimCount { buildings: number; roadKm: number; places: string[] }
 
 // A feature counts once the flow has passed its kilometre. Without a rise, that is everything mapped so far.
@@ -60,4 +54,12 @@ export function coherence(change: number) {
     im += Math.sin(shift(i, change))
   }
   return Math.hypot(re, im) / SIM_CELLS
+}
+
+// One animation frame of the flow replay: whole kilometres along the path, never outside it.
+// A frame's timestamp can come before the moment the replay started, so a negative elapsed time counts as no time.
+export function replayAdvance(pos: number, elapsedMs: number, last: number, seconds: number): { pos: number; km: number; done: boolean } {
+  const next = Math.max(0, pos) + (Math.max(0, elapsedMs) / 1000) * (last / seconds)
+  if (!(next < last)) return { pos: last, km: Math.max(0, last), done: true }
+  return { pos: next, km: Math.min(last, Math.max(0, Math.floor(next))), done: false }
 }

@@ -373,7 +373,7 @@ export function Terrain3D({ lake, onExit }: { lake: LakeSeries; onExit: () => vo
         {drape === 'rgb'
           ? <ul className="colour-key">{COLOUR_KEY.map((k) => <li key={k.label}><i style={{ background: k.color }} />{k.label}</li>)}</ul>
           : drape === 'coh'
-            ? <p className="muted small">Ground stability between {lake.motion?.pair ? `${formatDate(lake.motion.pair[0])} and ${formatDate(lake.motion.pair[1])}` : 'two passes'}. Bright: the ground stayed the same. Dark: it changed, or it is water or radar shadow. The same for every date.</p>
+            ? <p className="muted small">Ground stability between {(lake.coherence?.pair ?? lake.motion?.pair) ? `${formatDate((lake.coherence?.pair ?? lake.motion!.pair!)[0])} and ${formatDate((lake.coherence?.pair ?? lake.motion!.pair!)[1])}` : 'two passes'}. Bright: the ground stayed the same. Dark: it changed, or it is water or radar shadow. The same for every date.</p>
             : <p className="muted small">Dark: calm water or radar shadow. Bright: rough ground or slopes facing the radar.</p>}
         <dl className="facts">
           <div><dt>Lowest point</dt><dd><CountUp value={t.minM} format={m} /></dd></div>

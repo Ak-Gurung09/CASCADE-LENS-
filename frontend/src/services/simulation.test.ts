@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coherence, count, elapsedMs, replayStep, type SimData, type SimProps } from './simulation'
+import { coherence, count, elapsedMs, replayAdvance, type SimData, type SimProps } from './simulation'
 
 const feature = (properties: SimProps) => ({ type: 'Feature' as const, properties, geometry: { type: 'Point' as const, coordinates: [0, 0] } })
 const data = { features: { type: 'FeatureCollection', features: [
@@ -23,16 +23,10 @@ describe('count', () => {
   })
 })
 
-describe('replay step', () => {
-  it('moves along the path with time and stops at its end', () => {
-    expect(replayStep(0, 3000, 0, 198, 24)).toBeCloseTo(24.75)
-    expect(replayStep(190, 5000, 0, 198, 24)).toBe(198)
-  })
-  it('never goes below zero when a frame is stamped earlier than the moment Play was pressed', () => {
-    // Seen on a busy computer: the frame began 180 ms before the recorded start, and position -1 has no point on the path.
+describe('elapsed time between frames', () => {
+  it('is never negative when a frame is stamped earlier than a recorded moment', () => {
+    expect(elapsedMs(1180, 1000)).toBe(180)
     expect(elapsedMs(1000, 1180)).toBe(0)
-    expect(replayStep(0, 1000, 1180, 198, 24)).toBe(0)
-    expect(Math.floor(replayStep(0, 1000, 1180, 198, 24))).toBeGreaterThanOrEqual(0)
   })
 })
 
@@ -41,5 +35,18 @@ describe('coherence', () => {
     expect(coherence(0)).toBeCloseTo(1)
     expect(coherence(0.5)).toBeLessThan(coherence(0.2))
     expect(coherence(1)).toBeLessThan(0.15)
+  })
+})
+
+describe('replayAdvance', () => {
+  it('never steps before the start, even when a frame timestamp precedes the start time', () => {
+    const s = replayAdvance(0, -5, 198, 24)
+    expect(s.km).toBe(0)
+    expect(s.pos).toBe(0)
+    expect(s.done).toBe(false)
+  })
+  it('moves in whole kilometres and stops exactly at the end', () => {
+    expect(replayAdvance(0, 1000, 198, 24).km).toBe(8)
+    expect(replayAdvance(197.5, 1000, 198, 24)).toEqual({ pos: 198, km: 198, done: true })
   })
 })

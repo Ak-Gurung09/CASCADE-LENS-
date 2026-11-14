@@ -21,14 +21,16 @@ export interface Clues {
   control: { inside: number; outside: number; pair: string } | null
 }
 
-export type Standing = 'Best supported' | 'Possible' | 'Weak' | 'Cannot judge here'
+// The standing describes how the counted checks fall. It is a count, not a probability or a verdict.
+export type Standing = 'Fits the checks' | 'Partly fits' | 'Little support' | 'Cannot judge here'
 
 export interface Hypothesis {
   id: string
   title: string
   standing: Standing
-  for: string[]
-  against: string[]
+  for: string[] // counted: a radar value at this spot, or independent mapping of this spot
+  against: string[] // counted
+  context: string[] // not counted: what the place is like (slope, height, area-wide figures), which cannot show that anything happened here
   missing: string[]
 }
 
@@ -38,80 +40,95 @@ export const STEEP_DEG = 25
 export const HIGH_ICE_M = 4800
 
 const f2 = (v: number) => v.toFixed(2)
+const NEEDS_VALUE = 'A valid radar value at this spot (coherence or pixel offset). Without one, the radar cannot speak for or against this.'
 
 function standing(forN: number, againstN: number): Standing {
   const s = forN - againstN
-  return s >= 2 ? 'Best supported' : s >= 1 ? 'Possible' : 'Weak'
+  return s >= 2 ? 'Fits the checks' : s >= 1 ? 'Partly fits' : 'Little support'
 }
 
 export function explain(c: Clues): Hypothesis[] {
   const fl = c.flags ?? 0
-  const unseen = c.flags === null || Boolean(fl & (FLAG.outside | FLAG.noData))
+  const unseen = c.flags === null || Boolean(fl & (FLAG.outside | FLAG.noData | FLAG.productMasked))
   const hidden = Boolean(fl & (FLAG.layover | FLAG.shadow))
+  const geometryUnknown = Boolean(fl & FLAG.geometryNotAssessed)
   const lowBase = Boolean(fl & FLAG.lowBaseline)
+  const baseKnown = c.hasBaseline && c.flags !== undefined && !(fl & FLAG.baselineNoData)
   const coh = c.coherence
   const dropped = coh !== null && coh < COH_LOW
   const stable = coh !== null && coh >= COH_HIGH
-  const shifted = c.offset !== null && c.offsetUsual !== null && c.offset > c.offsetUsual && (c.snr === null || c.snrMedian === null || c.snr >= c.snrMedian)
+  const offsetKnown = c.offset !== null && c.offsetUsual !== null
+  const shifted = offsetKnown && c.offset! > c.offsetUsual! && (c.snr === null || c.snrMedian === null || c.snr >= c.snrMedian)
+  const measured = coh !== null || offsetKnown
   const steep = c.slopeDeg !== null && c.slopeDeg >= STEEP_DEG
   const field = 'A field report or a cloud-free before-and-after optical image of this spot.'
 
   if (unseen) {
-    const why = c.flags === null ? 'This spot lies outside the area the radar check covers.' : fl & FLAG.outside ? 'This spot is outside the radar frame checked here. A neighbouring frame may cover it, but it is not assessed yet.' : 'The radar product holds no value at this spot.'
-    return [{ id: 'unseen', title: 'No NISAR explanation from the frame checked', standing: 'Cannot judge here', for: [why], against: [],
-      missing: ['A radar pair that covers this spot (the next frame along the track, or the other track in the download list).', field] }]
+    const why = c.flags === null ? 'This spot lies outside the area the radar check covers.'
+      : fl & FLAG.outside ? 'This spot is outside the radar frame checked here. A neighbouring frame may cover it, but it is not assessed yet.'
+        : fl & FLAG.productMasked ? 'The radar product’s own quality mask flags this spot (water or an invalid subswath), so its values cannot be used.'
+          : 'The radar product holds no value at this spot.'
+    return [{ id: 'unseen', title: 'No NISAR explanation from the frame checked', standing: 'Cannot judge here', for: [why], against: [], context: [],
+      missing: ['A radar pair that covers this spot with valid data (the next frame along the track, or the other track in the download list).', field] }]
   }
 
   const out: Hypothesis[] = []
+  const judge = (f: string[], a: string[], needs: boolean): Standing => (needs ? standing(f.length, a.length) : 'Cannot judge here')
 
   // 1. Real surface disturbance
   {
-    const f: string[] = [], a: string[] = [], m: string[] = []
-    if (dropped && !lowBase) f.push(`Coherence fell to ${f2(coh!)} in the ${c.cohPair} pair while the ground was stable before the event.`)
+    const f: string[] = [], a: string[] = [], x: string[] = [], m: string[] = []
+    if (dropped && baseKnown && !lowBase) f.push(`Coherence fell to ${f2(coh!)} in the ${c.cohPair} pair while the ground was coherent before the event.`)
     if (dropped && lowBase) m.push('The spot was already noisy before the event, so this drop cannot be told apart from normal noise.')
+    if (dropped && !baseKnown) m.push('A valid value from the pair before the event, to show the spot was coherent beforehand.')
     if (stable) a.push(`Coherence stayed high (${f2(coh!)}): the radar echo barely changed.`)
     if (c.inside.mapped.length) f.push(`Inside an independently mapped area: ${c.inside.mapped.join(', ')}.`)
-    else a.push('Not inside any independently mapped damage or change area.')
+    else x.push('Not inside any independently mapped change area. That is not evidence that nothing changed: mapping is incomplete.')
     if (shifted) f.push(`The image features moved ${f2(c.offset!)} m from the scene's usual shift, more than its normal spread (${f2(c.offsetUsual!)} m), with a clear match.`)
-    if (steep) f.push(`Steep ground (${Math.round(c.slopeDeg!)}°), where slides and debris flows start or run.`)
+    if (steep) x.push(`Steep ground (${Math.round(c.slopeDeg!)}°). Slope makes failure more likely in general; it does not show that anything moved here.`)
+    if (c.control && c.inside.mapped.length) x.push(`Across the whole mapped mudflow, median coherence was ${f2(c.control.inside)} against ${f2(c.control.outside)} on ground nearby in the same pair (${c.control.pair}). That is an area-wide figure, not a reading at this spot.`)
     if (coh === null) m.push('Coherence for the event pair at this spot.')
     if (!c.hasBaseline) m.push('A radar pair from before the event, to show the spot was stable beforehand.')
-    if (c.control && c.inside.mapped.length) f.push(`Across the whole mapped mudflow, coherence was ${f2(c.control.inside)} inside against ${f2(c.control.outside)} on untouched ground nearby in the same pair (${c.control.pair}).`)
+    if (!measured) m.unshift(NEEDS_VALUE)
     m.push(field)
-    out.push({ id: 'disturbance', title: 'The ground surface was disturbed (debris flow, landslide, erosion or new deposits)', standing: standing(f.length, a.length), for: f, against: a, missing: m })
+    out.push({ id: 'disturbance', title: 'The ground surface was disturbed (debris flow, landslide, erosion or new deposits)', standing: judge(f, a, measured), for: f, against: a, context: x, missing: m })
   }
 
   // 2. Ordinary seasonal or natural change
   {
-    const f: string[] = [], a: string[] = [], m: string[] = []
+    const f: string[] = [], a: string[] = [], x: string[] = [], m: string[] = []
     if (lowBase) f.push('The spot was already incoherent in the pair before the event, as vegetation, snow or wet soil often make it.')
-    else if (c.hasBaseline && c.flags !== undefined) a.push('The spot was coherent in the pair before the event, so it is not always noisy.')
-    if (c.elevation !== null && c.elevation >= HIGH_ICE_M) f.push(`High ground (${Math.round(c.elevation)} m): snow and ice change between passes.`)
-    if (c.control && dropped) a.push(`Untouched ground near the mudflow kept its coherence in the same pair (${f2(c.control.outside)}), so the season alone did not cause a general drop.`)
+    else if (baseKnown) a.push('The spot was coherent in the pair before the event, so it is not always noisy.')
     if (stable) a.push('Coherence stayed high, so there was little change of any kind.')
+    if (c.elevation !== null && c.elevation >= HIGH_ICE_M) x.push(`High ground (${Math.round(c.elevation)} m), where snow and ice often change between passes.`)
+    if (c.control && dropped) x.push(`Ground near the mudflow kept its coherence in the same pair (median ${f2(c.control.outside)}), so the season did not lower coherence everywhere. That is an area-wide figure, not a reading at this spot.`)
+    const judged = measured || baseKnown
+    if (!judged) m.push(NEEDS_VALUE)
     m.push('The same pair of dates from a previous year, to see the normal seasonal drop.')
-    out.push({ id: 'seasonal', title: 'Ordinary seasonal change (vegetation, snow, ice or wet soil)', standing: standing(f.length, a.length), for: f, against: a, missing: m })
+    out.push({ id: 'seasonal', title: 'Ordinary seasonal change (vegetation, snow, ice or wet soil)', standing: judge(f, a, judged), for: f, against: a, context: x, missing: m })
   }
 
   // 3. Water surface
   if (c.inside.water.length || (coh !== null && coh < 0.15)) {
-    const f: string[] = [], a: string[] = []
+    const f: string[] = [], x: string[] = []
     if (c.inside.water.length) f.push(`Inside a mapped water body: ${c.inside.water.join(', ')}.`)
     if (coh !== null && coh < 0.15) f.push(`Very low coherence (${f2(coh)}), typical of moving water.`)
-    if (!c.inside.water.length) a.push('Not inside any mapped lake.')
-    out.push({ id: 'water', title: 'Open water (river channel or lake), which never stays coherent', standing: standing(f.length, a.length), for: f, against: a,
+    if (!c.inside.water.length) x.push('Not inside any mapped lake. Rivers and new ponds may be unmapped.')
+    out.push({ id: 'water', title: 'Open water (river channel or lake), which never stays coherent', standing: standing(f.length, 0), for: f, against: [], context: x,
       missing: ['A water mask from the same dates (for example a NISAR backscatter snapshot).'] })
   }
 
   // 4. Viewing artefact
   {
-    const f: string[] = [], a: string[] = []
+    const f: string[] = [], a: string[] = [], m: string[] = []
     if (fl & FLAG.layover) f.push('Layover here: echoes from different heights land on the same pixel.')
     if (fl & FLAG.shadow) f.push('Radar shadow here: the radar cannot reach this slope.')
-    if (fl & FLAG.noUnwrapped) f.push('No unwrapped phase at this spot, so the processing dropped it.')
-    if (!hidden && c.flags !== undefined) a.push('Not hidden by terrain from this viewing angle.')
-    out.push({ id: 'artefact', title: 'A radar viewing artefact, not a real change', standing: hidden ? 'Best supported' : standing(f.length, a.length), for: f, against: a,
-      missing: ['The same spot seen from the opposite direction (an ascending pass).'] })
+    if (fl & FLAG.noUnwrapped) f.push('No reliably unwrapped phase at this spot, so the processing dropped it.')
+    if (!hidden && !geometryUnknown && c.flags !== undefined) a.push('Not hidden by terrain from this viewing angle.')
+    if (geometryUnknown) m.push('Elevation and viewing angles at this spot, to check for layover and shadow.')
+    m.push('The same spot seen from the opposite direction (an ascending pass).')
+    out.push({ id: 'artefact', title: 'A radar viewing artefact, not a real change', standing: hidden ? 'Fits the checks' : geometryUnknown && !f.length ? 'Cannot judge here' : standing(f.length, a.length),
+      for: f, against: a, context: [], missing: m })
   }
 
   // 5. No change
@@ -119,13 +136,13 @@ export function explain(c: Clues): Hypothesis[] {
     const f: string[] = [], a: string[] = []
     if (stable) f.push(`Coherence stayed high (${f2(coh!)}).`)
     if (dropped) a.push(`Coherence dropped to ${f2(coh!)}.`)
-    if (c.offset !== null && c.offsetUsual !== null && !shifted) f.push('Image features did not shift beyond the scene\'s normal spread.')
+    if (offsetKnown && !shifted) f.push('Image features did not shift beyond the scene\'s normal spread.')
     if (shifted) a.push('Image features shifted more than the scene\'s normal spread.')
     if (c.inside.mapped.length) a.push(`Inside an independently mapped area: ${c.inside.mapped.join(', ')}.`)
-    out.push({ id: 'nochange', title: 'Nothing changed here', standing: standing(f.length, a.length), for: f, against: a, missing: [field] })
+    out.push({ id: 'nochange', title: 'Nothing changed here', standing: judge(f, a, measured), for: f, against: a, context: [], missing: measured ? [field] : [NEEDS_VALUE, field] })
   }
 
-  const order: Standing[] = ['Best supported', 'Possible', 'Weak', 'Cannot judge here']
+  const order: Standing[] = ['Fits the checks', 'Partly fits', 'Little support', 'Cannot judge here']
   return out.sort((x, y) => order.indexOf(x.standing) - order.indexOf(y.standing) || (y.for.length - y.against.length) - (x.for.length - x.against.length))
 }
 
