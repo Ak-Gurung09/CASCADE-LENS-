@@ -8,6 +8,7 @@ No scientific figure changed in this entry.
 
 - **Loading message on the web.** While the app was still downloading on GitHub Pages, the note meant for someone who opened `index.html` straight from the folder ("has not started… Start CascadeLens.bat") appeared after 2 seconds. A few lines of script inside `index.html` (allowed by its hash in the offline CSP of `serve.py`, `serve.ps1` and the preview) now replace it with a plain loading message on any web address, and keeps the original note only for `file:` pages. The packaged start with `Start CascadeLens.bat` is unchanged.
 - **Icon.** The page has a real icon (`favicon.svg`) instead of an empty one.
+- **The map moves freely again.** Drag, wheel and pinch zoom, double-click and the keyboard move the flat map once more; it stays north-up with no tilt. Zooming out stops at about the whole study area and the map cannot be dragged away from it. The View sliders and *Whole area* still work, and a click still opens the Inspector.
 - **Project & NASA data** (top bar, and a link by the signature at the foot of the map): the problem, every data source with its evidence class, how CascadeLens works in three steps, its use, and how AI was used to build it.
 
 ## 14 November 2026: field-check list and "what to try next"

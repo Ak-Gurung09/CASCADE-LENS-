@@ -419,7 +419,7 @@ test('hazard screens explain a road stretch and say whether the radar could watc
 })
 
 // The flat map is locked: only the View controls move it, and they never leave the study envelope.
-const camera = (page: Page) => page.evaluate(() => { const m = window.__clMap; const c = m.getCenter(); return { lng: c.lng, lat: c.lat, zoom: m.getZoom() } })
+const camera = (page: Page) => page.evaluate(() => { const m = window.__clMap; const c = m.getCenter(); return { lng: c.lng, lat: c.lat, zoom: m.getZoom(), bearing: m.getBearing() } })
 const viewBox = (page: Page) => page.evaluate(() => {
   const m = window.__clMap
   const b = m.getBounds()
@@ -429,7 +429,7 @@ const viewBox = (page: Page) => page.evaluate(() => {
 const settle = (page: Page) => page.evaluate(() => new Promise<void>((r) => { const m = window.__clMap; if (!m.isMoving()) r(); else m.once('moveend', () => r()) }))
 
 for (const [name, path] of [['Rasuwa', '/'], ['Tsho Rolpa', TSHO]] as const) {
-  test(`${name}: the flat map ignores drag and wheel, and moves only with the View controls`, async ({ page }) => {
+  test(`${name}: the map drags and zooms freely, stops zooming out past the study area, and the View controls still work`, async ({ page }) => {
     await open(page, path)
     await page.waitForFunction(() => window.__clMap?.isStyleLoaded())
     await page.getByRole('button', { name: 'Explore', exact: true }).click() // Tsho Rolpa opens in its story, which moves the map itself
@@ -442,19 +442,33 @@ for (const [name, path] of [['Rasuwa', '/'], ['Tsho Rolpa', TSHO]] as const) {
     await expect(controls).toBeVisible()
     await expect(controls).toContainText('Whole study area')
     const start = await camera(page)
-    // A drag and a wheel over open map, clear of the side panels
+    // The wheel zooms in, over open map clear of the side panels
+    await page.mouse.move(720, 470)
+    await page.mouse.wheel(0, -600)
+    await page.waitForTimeout(600)
+    await settle(page)
+    const zoomed = await camera(page)
+    expect(zoomed.zoom).toBeGreaterThan(start.zoom + 0.2)
+    // A drag moves it, and it stays north-up
     await page.mouse.move(720, 470)
     await page.mouse.down()
     await page.mouse.move(820, 560, { steps: 8 })
     await page.mouse.up()
-    await page.mouse.wheel(0, -600)
-    await page.mouse.dblclick(720, 470)
-    await page.keyboard.press('Equal')
-    await page.waitForTimeout(400)
-    const after = await camera(page)
-    expect(after.lng).toBeCloseTo(start.lng, 9)
-    expect(after.lat).toBeCloseTo(start.lat, 9)
-    expect(after.zoom).toBeCloseTo(start.zoom, 9)
+    await settle(page)
+    const dragged = await camera(page)
+    expect(Math.abs(dragged.lng - zoomed.lng) + Math.abs(dragged.lat - zoomed.lat)).toBeGreaterThan(1e-4)
+    expect(dragged.bearing).toBeCloseTo(0, 6)
+    // Zooming far out stops a little beyond the whole study area
+    for (let i = 0; i < 12; i++) await page.mouse.wheel(0, 1200)
+    await page.waitForTimeout(800)
+    await settle(page)
+    const out = await camera(page)
+    expect(out.zoom).toBeGreaterThanOrEqual(start.zoom - 0.76)
+    expect(out.zoom).toBeLessThanOrEqual(start.zoom + 1e-6)
+    // Back to the whole area with the View controls
+    await controls.getByRole('button', { name: 'Whole area' }).click()
+    await settle(page)
+    await expect(controls).toContainText('Whole study area')
     // At the whole-area view there is nothing to pan
     await expect(controls.getByLabel('Move the view west or east')).toBeDisabled()
     await expect(controls.getByLabel('Move the view south or north')).toBeDisabled()
@@ -476,8 +490,7 @@ for (const [name, path] of [['Rasuwa', '/'], ['Tsho Rolpa', TSHO]] as const) {
       expect(view[2]).toBeLessThanOrEqual(env[2] + eps)
       expect(view[3]).toBeLessThanOrEqual(env[3] + eps)
     }
-    if (name === 'Rasuwa') await page.screenshot({ path: `${SHOTS}/locked-map-rasuwa.png` })
-    else await page.screenshot({ path: `${SHOTS}/locked-map-tsho-rolpa.png` })
+    await page.screenshot({ path: `${SHOTS}/map-${name === 'Rasuwa' ? 'rasuwa' : 'tsho-rolpa'}.png` })
     await controls.getByRole('button', { name: 'Whole area' }).click()
     await settle(page)
     await expect(controls).toContainText('Whole study area')

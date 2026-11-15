@@ -8,6 +8,9 @@ import { IMPACT_COLOURS, type SimView } from '../../services/simulation'
 // MapLibre derives the worker path from its own module URL, which Vite's bundling moves.
 setWorkerUrl(new URL(workerUrl, document.baseURI).href)
 
+// How far, in zoom levels, a reader may zoom out past the opening view of the whole study area
+const MIN_ZOOM_SLACK = 0.75
+
 export interface MapStatus { state: 'loading' | 'ready' | 'error'; message?: string }
 
 interface Props {
@@ -115,11 +118,16 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       last = s
       onStatusRef.current(s)
     }
-    // The map is locked: no drag, wheel, pinch, double-click, box or keyboard moves. The reader moves it only with the View controls
-    // (ViewControls.tsx), and the story, bookmarks and Simulate still move it in code. A click still inspects a spot.
+    // The map moves freely by drag, wheel, pinch, double-click and keyboard, and the View controls (ViewControls.tsx) still work.
+    // It stays flat and north-up: no rotation or tilt. A click still inspects a spot. maxBounds and minZoom below keep the study
+    // area from being lost or shrunk to a speck.
     const map = new MlMap({ container: host.current, style: STYLE, bounds: envelope as LngLatBoundsLike, fitBoundsOptions: { padding: 30 }, attributionControl: false, renderWorldCopies: false,
-      dragRotate: false, pitchWithRotate: false, dragPan: false, scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false, touchPitch: false, keyboard: false })
+      dragRotate: false, pitchWithRotate: false, touchPitch: false, boxZoom: false, maxZoom: 18 })
     mapRef.current = map
+    map.touchZoomRotate.disableRotation()
+    map.keyboard.disableRotation()
+    // Zooming out stops a little beyond the whole study area, so the map can never be made tiny
+    map.setMinZoom(Math.max(0, map.getZoom() - MIN_ZOOM_SLACK))
     // maxBounds is the opening view (which holds the whole envelope at its fit zoom, plus the slack from the screen's shape), widened by a quarter
     // on each side so a story or Simulate frame padded for the side panels is not cut short. The View sliders keep to the envelope itself.
     const opening = map.getBounds()

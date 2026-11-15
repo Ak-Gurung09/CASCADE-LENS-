@@ -3,8 +3,8 @@ import type { Map as MlMap } from 'maplibre-gl'
 import type { Bounds, Layer } from '../../types/manifest'
 import { canPan, centreToSlider, clampCentre, latOf, lngOf, mercX, mercY, sliderToCentre, zoomCeiling } from '../../services/viewMath'
 
-// The flat map stays put: dragging, scrolling, pinching and the keyboard do nothing to it. These controls are the only way
-// a reader moves it, so every move is deliberate and the view can never wander off the study area.
+// Sliders for moving the flat map, beside dragging, scrolling, pinching and the keyboard. They keep to the study area, so
+// "Whole area" always brings the view back.
 // Story steps, bookmarks and Simulate still move the map themselves, and the sliders follow them on `moveend`.
 
 export const FIT_PADDING = 30
