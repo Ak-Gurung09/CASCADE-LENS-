@@ -5842,9 +5842,9 @@
      "sourceDataset": "/science/LSAR/GCOV/grids/frequencyA/HHHH",
      "bounds": [
       84.380541,
-      27.712953,
-      85.352546,
-      28.366874
+      27.713314,
+      85.352947,
+      28.366879
      ],
      "validFraction": 0.6301019636319627,
      "sampling": "data/sampling/gcov-0823/gcov-backscatter_f074.tif",
@@ -6032,8 +6032,8 @@
      "sourceDataset": "/science/LSAR/GCOV/grids/frequencyA/HHHH",
      "bounds": [
       84.380541,
-      27.712953,
-      85.561464,
+      27.713314,
+      85.561459,
       28.369267
      ],
      "validFraction": 0.9969415625674135,
@@ -6221,8 +6221,8 @@
      "sourceFilename": "NISAR_L2_PR_GCOV_028_048_D_074_4005_DHDH_A_20260816T125812_20260816T125846_P05023_N_F_J_001.h5, NISAR_L2_PR_GCOV_029_048_D_074_2005_QPDH_A_20260828T125812_20260828T125846_P05023_N_F_J_001.h5",
      "sourceDataset": "/science/LSAR/GCOV/grids/frequencyA/HHHH",
      "bounds": [
-      84.716156,
-      27.824551,
+      84.715748,
+      27.824544,
       85.560071,
       28.369267
      ],
@@ -8448,8 +8448,8 @@
      "sourceDataset": "VV gamma-0 (with the product's layover/shadow mask)",
      "bounds": [
       84.380541,
-      27.712953,
-      85.561464,
+      27.713314,
+      85.561459,
       28.369267
      ],
      "validFraction": 0.9113135661651591,
@@ -8649,8 +8649,8 @@
      "sourceDataset": "VV gamma-0 (with the product's layover/shadow mask)",
      "bounds": [
       84.380541,
-      27.712953,
-      85.561464,
+      27.713314,
+      85.561459,
       28.369267
      ],
      "validFraction": 0.9083056213400227,
@@ -8850,8 +8850,8 @@
      "sourceDataset": "VV gamma-0 (with the product's layover/shadow mask)",
      "bounds": [
       84.380541,
-      27.712953,
-      85.561464,
+      27.713314,
+      85.561459,
       28.369267
      ],
      "validFraction": 0.8871201413635833,

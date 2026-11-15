@@ -90,6 +90,7 @@ def tiles(arr, tf, epsg, folder, stops, lo, hi):
 
 
 def bounds4326(arr, tf, epsg):
+    """The area with data, from the grid that is shipped for sampling (80 m, trimmed to whole cells), so it matches that file."""
     from rasterio.warp import transform_bounds
     rows, cols = np.where(np.isfinite(arr))
     if not rows.size:
@@ -173,7 +174,7 @@ def gcov():
                        "unitsNote": "Displayed in dB (10·log10) from the linear gamma-0 term; the inspector reports both.",
                        "acquisition": {"reference": mt["date"], "secondary": None}, "orbitDirection": mt["orbit"], "track": mt["track"], "frames": [mt["frame"]],
                        "postingM": [80.0, 80.0], "crs": f"EPSG:{epsg}", "qualityLayerIds": [], "status": "sampleable", "statusReason": None,
-                       "sources": [{"frame": mt["frame"], "granule": mt["granule"], "sourceFilename": mt["sourceFilename"], "sourceDataset": mt["dataset"], "bounds": bounds4326(a, tf, epsg),
+                       "sources": [{"frame": mt["frame"], "granule": mt["granule"], "sourceFilename": mt["sourceFilename"], "sourceDataset": mt["dataset"], "bounds": bounds4326(s, stf, epsg),
                                     "validFraction": mt["validFraction"], "sampling": rel(c), "tiles": t}],
                        "stats": export.statistics(db(s), fixed=(GREY["min"], GREY["max"])), "polarization": ["HH"], "displayDb": True, "displayRelative": False, "goffLayer": None,
                        "legend": GREY, "productMaturity": f"Provisional ({mt['release']})", "sourceGranules": [mt["granule"]], "attribution": NISAR_ATTR, "limitations": limits,
@@ -195,7 +196,7 @@ def gcov():
                    "acquisition": {"reference": m0["date"], "secondary": m1["date"]}, "orbitDirection": "DESCENDING", "track": 48, "frames": [74],
                    "postingM": [80.0, 80.0], "crs": f"EPSG:{epsg}", "qualityLayerIds": [], "status": "sampleable", "statusReason": None,
                    "sources": [{"frame": 74, "granule": f"{m0['granule']} and {m1['granule']}", "sourceFilename": f"{m0['sourceFilename']}, {m1['sourceFilename']}", "sourceDataset": m0["dataset"],
-                                "bounds": bounds4326(d, tf, epsg), "validFraction": float(np.isfinite(d).mean()), "sampling": rel(c), "tiles": t}],
+                                "bounds": bounds4326(sd, stf, epsg), "validFraction": float(np.isfinite(d).mean()), "sampling": rel(c), "tiles": t}],
                    "stats": export.statistics(sd, fixed=(CHANGE["min"], CHANGE["max"])), "polarization": ["HH"], "displayDb": False, "displayRelative": False, "goffLayer": None,
                    "legend": CHANGE, "productMaturity": "Derived from provisional data (P05023)", "sourceGranules": [m0["granule"], m1["granule"]], "attribution": f"Derived by CascadeLens from {NISAR_ATTR}",
                    "explanation": {"what": "How much brighter or darker the radar saw each spot on 28 August than on 16 August, from the same NISAR track.",
@@ -233,7 +234,7 @@ def opera(src_names):
                        "acquisition": {"reference": d0, "secondary": d1}, "orbitDirection": orbit, "track": int(rel_orbit), "frames": [],
                        "postingM": [80.0, 80.0], "crs": f"EPSG:{epsg}", "qualityLayerIds": [], "status": "sampleable", "statusReason": None,
                        "sources": [{"frame": None, "granule": f"OPERA_L2_RTC-S1 T{rel_orbit}, {len(files)} bursts", "sourceFilename": ", ".join(files), "sourceDataset": "VV gamma-0 (with the product's layover/shadow mask)",
-                                    "bounds": bounds4326(d, tf, epsg), "validFraction": float(np.isfinite(d).mean()), "sampling": rel(c), "tiles": t}],
+                                    "bounds": bounds4326(sd, stf, epsg), "validFraction": float(np.isfinite(d).mean()), "sampling": rel(c), "tiles": t}],
                        "stats": export.statistics(sd, fixed=(CHANGE["min"], CHANGE["max"])), "legend": CHANGE, "displayDb": False,
                        "productMaturity": "Derived from OPERA RTC-S1 v1.0 (provisional validation)", "sourceGranules": files, "attribution": f"Derived by CascadeLens from {OPERA_ATTR}",
                        "explanation": {"what": f"How much brighter or darker Sentinel-1 saw each spot on {day(d1)} than on {day(d0)}, from NASA's OPERA terrain-corrected images of one orbit track.",

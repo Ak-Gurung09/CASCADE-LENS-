@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import sys
 
+import numpy as np
 import pytest
 import rasterio
 import rasterio.warp
@@ -131,4 +132,13 @@ def test_raster_metadata_matches_manifest(key):
             with rasterio.open(PUBLIC / s[key]) as d:
                 assert f"EPSG:{d.crs.to_epsg()}" == l["crs"]
                 b = rasterio.warp.transform_bounds(d.crs, "EPSG:4326", *d.bounds)
-                assert all(abs(x - y) < 1e-6 for x, y in zip(b, s["bounds"]))
+                if all(abs(x - y) < 1e-6 for x, y in zip(b, s["bounds"])):
+                    continue
+                # Layers that cover only part of their grid (the NASA Rasuwa layers) record the area that has data instead
+                a = d.read(1, masked=True)
+                ok = ~np.ma.getmaskarray(a) & np.isfinite(a.filled(np.nan))
+                rows, cols = np.where(ok)
+                x0, y1 = d.transform * (cols.min(), rows.min())
+                x1, y0 = d.transform * (cols.max() + 1, rows.max() + 1)
+                fp = rasterio.warp.transform_bounds(d.crs, "EPSG:4326", x0, y0, x1, y1)
+                assert all(abs(x - y) < 1e-6 for x, y in zip(fp, s["bounds"])), (l["id"], fp, s["bounds"])
