@@ -597,6 +597,8 @@ test('the cliff-impact tab is a labelled hypothesis with candidate sites on the 
   await expect(page.locator('.sim-head')).toHaveCount(0)
   await page.waitForTimeout(800)
   await page.screenshot({ path: `${SHOTS}/cliff-impact.png` })
+})
+
 test('a road stretch becomes a field-check record, keeps the satellite record apart from the field report, and exports', async ({ page }) => {
   // Clear the list once per test, not on the reload below
   await page.addInitScript(() => { if (!sessionStorage.getItem('fc-cleared')) { localStorage.removeItem('cascadelens.fieldChecks.v1'); sessionStorage.setItem('fc-cleared', '1') } })

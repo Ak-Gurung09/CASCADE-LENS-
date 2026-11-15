@@ -74,7 +74,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Sentinel-1 proxy and screening | Implemented and tested | Browser | Real, preliminary | |
 | LANDMET test case | Retired from the app (team decision, 6 Nov); data no longer shipped (13 Nov) | Pipeline tests only, with the file present | Real, test only | `prepare_landmet.py` can rebuild it |
 | Offline operation | Implemented and tested | CSP-enforced browser test | Real | |
-| One-click package | Implemented and tested | Fresh unzip, via the `.bat`; `start.sh` run on Linux only | Real | Needs Python 3 |
+| One-click package | Implemented and tested | Fresh unzip, via the `.bat`; `start.sh` run on Linux only; the no-Python path (`serve.ps1`) is checked on a Windows runner in CI, with a small stand-in app, not the full package | Real | macOS and Linux need Python 3. Windows needs nothing installed |
 | Accessibility | Implemented and tested | axe, keyboard | n/a | No serious findings |
 | Responsive layout | Implemented and tested | 375 px emulation, with the story's place checked to be in view | n/a | Not on a physical phone |
 | Evidence classes on every layer | Implemented and tested | Unit, browser | Real | Observed, Derived, Forecast, Hypothesis, Reference, Scenario, Unknown |

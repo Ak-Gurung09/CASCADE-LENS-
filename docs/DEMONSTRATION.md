@@ -4,7 +4,7 @@
 
 ## Launch
 
-Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.bat**. Do not open `index.html` directly: it cannot start that way. It needs Python 3 and no internet connection. The browser refuses all external requests, so the demo cannot depend on the network.
+Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.bat**. Do not open `index.html` directly: it cannot start that way. It needs no internet connection, and on Windows nothing installed: without Python 3, the launcher uses Windows' own PowerShell. The browser refuses all external requests, so the demo cannot depend on the network.
 
 ## Script (about 2 minutes 45 seconds)
 

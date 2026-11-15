@@ -78,3 +78,13 @@ jobs:
         run: |
           export CL_BROWSER_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
           npx playwright test --trace off
+
+  windows-launcher:
+    name: Windows launcher with no Python
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      # Windows PowerShell 5.1, the one every Windows has, not the newer one the runner also carries.
+      - name: Start the package the way a double-click does, and check what it serves
+        shell: powershell
+        run: .\tests\windows\launcher.test.ps1

@@ -1,8 +1,8 @@
 name: Publish to GitHub Pages
 
-# Builds the app with its real data and publishes it at https://ak-gurung09.github.io/cascade-lens/
+# Builds the app with its real data and publishes it at https://ak-gurung09.github.io/CASCADE-LENS-/
 # Runs on every change to main, or by hand from the Actions tab ("Run workflow").
-# The app already loads every file by a relative address, so it works under the /cascade-lens/ subpath unchanged.
+# The app already loads every file by a relative address, so it works under the /CASCADE-LENS-/ subpath unchanged.
 on:
   push:
     branches: [main]
