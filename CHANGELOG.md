@@ -2,6 +2,14 @@
 
 What changed, and when. Scientific corrections are listed first in each entry, because they change what the app is allowed to say.
 
+## 14 November 2026: field-check list and "what to try next"
+
+No scientific figure changed in this entry.
+
+- **Baseline recorded** in `docs/TRANSFORMATION_BASELINE.md`: 173 Python tests pass and 35 skip for missing raw data; 103 unit tests, the type check, the build and 33 browser tests pass.
+- **Field-check list** (new *Field checks* tab, and *Add to field-check list* under a road stretch's evidence). A record is made from a real shipped stretch and keeps a frozen copy of its satellite evidence: why it was flagged, what the evidence says, what remains unknown, and what to check. People add dated field reports with a source. Verified and Not confirmed can only come from such a report, and a report never changes the satellite copy. Records are kept in this browser only, and export as a printable brief, CSV, GeoJSON (the stretch's real line) or JSON, which can be imported again. The project has received no field reports; none is shipped.
+- **What to try next** under each viewing direction in *Can the radar see here?*. A fixed rule table (`services/nextEvidence.ts`) turns each reason into a next step and labels it *Already in CascadeLens*, *Listed in the catalogue, not downloaded*, *Not found in the data here* or *Needs a person to collect it*. Each step names its rule. A usable spot gets only the reminder that a pair spanning the event cannot date the change or establish its cause.
+
 ## 13 November 2026: the first model run on real data (P2, L2)
 
 - **Result.** A rainfall event-duration threshold missed its criterion, which was stated before scoring. It was fitted on 2016–2022, calibrated on 2023–2024 and scored on held-out 2025–2026 data with the rainfall's real publication delay. In the corridor it scored CSI 0.20 against a chance 95th percentile of 0.21 (p = 0.12); POD 0.35, FAR 0.67. Daily IMERG Late rainfall, used this way, adds little to knowing which months are wet. No landslide warning is offered, and claim C30 guards that wording.

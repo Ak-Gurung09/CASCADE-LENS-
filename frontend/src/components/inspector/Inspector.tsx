@@ -66,7 +66,7 @@ function DayChart({ layer, point }: { layer: Layer; point: [number, number] }) {
   )
 }
 
-export const Inspector = memo(function Inspector({ layer, layers, point, bookmarks, manifest }: { layer: Layer | undefined; layers: Layer[]; point: [number, number] | null; bookmarks: Bookmark[]; manifest?: Manifest }) {
+export const Inspector = memo(function Inspector({ layer, layers, point, bookmarks, manifest, onOpenCheck }: { layer: Layer | undefined; layers: Layer[]; point: [number, number] | null; bookmarks: Bookmark[]; manifest?: Manifest; onOpenCheck?: (id: string) => void }) {
   const [main, setMain] = useState<SampleResult | null>(null)
   const [quality, setQuality] = useState<Sample[]>([])
   const [busy, setBusy] = useState(false)
@@ -94,7 +94,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
         <div><dt>Location</dt><dd>{coordinates(point[0], point[1])}</dd></div>
         <div><dt>Context</dt><dd>{placeOf(point, bookmarks)}</dd></div>
       </dl>
-      <ObservabilityAt layers={layers} point={point} current={observabilityCurrent(manifest)} />
+      <ObservabilityAt layers={layers} point={point} current={observabilityCurrent(manifest)} manifest={manifest} />
       {!layer ? <p className="muted">Select a layer to read a value here.</p> : busy ? <p className="muted">Loading sample…</p> : main && (
         <>
           <p className={`sample sample-${main.state}`}>{main.message}</p>
@@ -118,7 +118,7 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
           ))}
         </>
       )}
-      {manifest?.hazards && <HazardAt manifest={manifest} point={point} />}
+      {manifest?.hazards && <HazardAt manifest={manifest} point={point} onOpenCheck={onOpenCheck} />}
       {manifest && <Hypotheses manifest={manifest} point={point} />}
       {manifest && <ReportButtons manifest={manifest} point={point} />}
     </div>

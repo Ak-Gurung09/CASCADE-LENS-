@@ -19,6 +19,9 @@ import { SimPanel } from '../components/sim/SimPanel'
 import { ComparePanel } from '../components/compare/ComparePanel'
 import { ScenarioPanel } from '../components/scenario/ScenarioPanel'
 import { Intro, introWanted } from '../components/intro/Intro'
+import { FieldChecksPanel } from '../components/fieldchecks/FieldChecksPanel'
+import { useChecks } from '../services/fieldCheckStore'
+import type { FieldCheck } from '../services/fieldChecks'
 import { useAutoHidePanels } from './useAutoHidePanels'
 import type { SimData, SimView } from '../services/simulation'
 
@@ -108,7 +111,17 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   // The guided story is a headline over the map, so the controls panel waits at the screen edge while it runs
   const edges = useAutoHidePanels(`${storyStep !== null}-${simOn}-${compareOn}-${threeOn}-${scenarioOn}`, storyStep !== null)
   useEffect(() => { if (mapStatus.state !== 'loading') onMapReady?.() }, [mapStatus.state, onMapReady])
-  const [tab, setTab] = useState<'inspect' | 'about'>('about')
+  const [tab, setTab] = useState<'inspect' | 'about' | 'checks'>('about')
+  const [checkId, setCheckId] = useState<string | null>(null)
+  const { checks } = useChecks()
+  const caseChecks = checks.filter((c) => c.caseId === m.caseStudy.id).length
+  const openCheck = (id: string | null) => { setCheckId(id); setTab('checks'); setAboutId(null); setPanel('right') }
+  const showCheck = (c: FieldCheck) => {
+    if (!c.geometry?.length) return
+    const xs = c.geometry.map((q) => q[0]), ys = c.geometry.map((q) => q[1])
+    setFocus({ bounds: [Math.min(...xs) - 0.004, Math.min(...ys) - 0.004, Math.max(...xs) + 0.004, Math.max(...ys) + 0.004], nonce: Date.now() })
+    setPoint(c.geometry[Math.floor(c.geometry.length / 2)])
+  }
   const [aboutId, setAboutId] = useState<string | null>(null)
 
   const byId = useCallback((id: string) => m.layers.find((l) => l.id === id), [m])
@@ -336,9 +349,11 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
               <div className="tabs underline" role="tablist">
                 <button role="tab" aria-selected={tab === 'about'} className={tab === 'about' ? 'on' : ''} onClick={() => setTab('about')}>Interpretation</button>
                 <button role="tab" aria-selected={tab === 'inspect'} className={tab === 'inspect' ? 'on' : ''} onClick={() => setTab('inspect')}>Inspector</button>
+                {m.hazards && <button role="tab" aria-selected={tab === 'checks'} className={tab === 'checks' ? 'on' : ''} onClick={() => setTab('checks')}>Field checks{caseChecks ? ` (${caseChecks})` : ''}</button>}
               </div>
             )}
-            {tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} manifest={m} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
+            {tab === 'checks' && !aboutId ? <FieldChecksPanel manifest={m} openId={checkId} onOpen={(id) => setCheckId(id)} onShow={showCheck} />
+              : tab === 'inspect' && !aboutId ? <Inspector layer={active} layers={m.layers} point={point} bookmarks={m.bookmarks} manifest={m} onOpenCheck={openCheck} /> : detail && <Interpretation layer={detail} layers={m.layers} />}
           </div>}
         </aside>
       )}
