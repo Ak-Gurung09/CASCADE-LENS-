@@ -204,6 +204,11 @@ export interface LakeScenarioCase {
   worstM3s: number
   arrival: [number, number, number][] // km, fastest minutes, slowest minutes
   depthM: [number, number, number][] // km, shallowest m, deepest m
+  // Newer builds: the lake-area range carried through, the kinematic-wave sensitivity line and the floors counted
+  volumeRangeM3?: [number, number]
+  peaksByArea?: Record<'low' | 'mean' | 'high', Record<string, number>>
+  arrivalKinematic?: [number, number, number][]
+  floors?: { sections: number; slope: number; speedFast: number; speedSlow: number }
 }
 export interface LakeScenario {
   routeKm: number
@@ -219,6 +224,12 @@ export interface LakeScenario {
   sectionEveryM: number
   bounds: [number, number, number, number]
   dem: string
+  areaRangeKm2?: [number, number, number] // low, mean, high
+  gammaNm3?: number
+  slopeFloor?: number
+  speedFloorMs?: number
+  kinematicFactor?: number
+  sectionsCsv?: string
 }
 
 // Older builds wrote movement bounds into the manifest. They are now research only (data/qa) and the app never shows them.

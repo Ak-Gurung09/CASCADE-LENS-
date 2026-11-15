@@ -36,17 +36,38 @@ function disposeAll(group: THREE.Object3D) {
 
 // ---------- Downhill route: the path water would take from the lake's lowest shore (real DEM, no flood physics) ----------
 
+// ---------- Water colour: one colour for the lake and for the steepest-slope line ----------
+// The drape paints the lake in LAKE_WATER at LAKE_WATER_ALPHA over the radar image. Calm water is near black in radar,
+// so on screen the lake reads as that blue laid over black. The line uses the same blend as its own colour, and the same
+// matte material as the terrain, so under the same lights the two read as one water colour. The teal lake edge is not water and stays apart.
+export const LAKE_WATER: [number, number, number] = [40, 140, 255]
+export const LAKE_WATER_ALPHA = 0.55
+export const LAKE_WATER_FILL = `rgba(${LAKE_WATER.join(', ')}, ${LAKE_WATER_ALPHA})`
+// The mean Colour radar value inside the lake edge over the four dates (14, 30, 35): calm water sends most of the pulse away
+const RADAR_CALM: [number, number, number] = [14, 30, 35]
+const hex = (c: number[]) => `#${c.map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('')}`
+/** The lake's blue as it shows over calm water: LAKE_WATER blended over the dark radar, as the canvas does it. */
+export const LAKE_ON_RADAR = hex(LAKE_WATER.map((v, i) => v * LAKE_WATER_ALPHA + RADAR_CALM[i] * (1 - LAKE_WATER_ALPHA)))
+/** A lighter tint of the same water, for the marker that travels along the line. */
+export const LAKE_WATER_LIGHT = hex(LAKE_WATER.map((v) => v + (255 - v) * 0.55))
+
 export interface Route { group: THREE.Group; setProgress: (p: number) => void; dispose: () => void }
 
 export function buildRoute(g: Grid): Route | null {
   const path = g.t.flowPath
   if (!path || path.length < 2) return null
-  const pts = path.map(([c, r, m]) => g.at(c, r, m).add(new THREE.Vector3(0, 0.025, 0)))
+  // Lifted by the tube radius so it rests on the ground. Half buried, the terrain showed through it and tinted the water.
+  const pts = path.map(([c, r, m]) => g.at(c, r, m).add(new THREE.Vector3(0, 0.06, 0)))
   const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal')
   const segments = Math.max(64, pts.length * 4)
   const radial = 10
-  const line = new THREE.Mesh(new THREE.TubeGeometry(curve, segments, 0.05, radial, false), new THREE.MeshStandardMaterial({ color: '#2f8cff', emissive: '#1a5dff', emissiveIntensity: 0.5, roughness: 0.3 }))
-  const marker = new THREE.Mesh(new THREE.SphereGeometry(0.08, 20, 14), new THREE.MeshBasicMaterial({ color: '#ffffff' }))
+  // Every normal of the tube points up, so the lights shade it like the flat lake surface. A round tube would turn half its face
+  // away from the sun and read darker than the same water in the lake.
+  const tube = new THREE.TubeGeometry(curve, segments, 0.05, radial, false)
+  const nrm = tube.attributes.normal as THREE.BufferAttribute
+  for (let i = 0; i < nrm.count; i++) nrm.setXYZ(i, 0, 1, 0)
+  const line = new THREE.Mesh(tube, new THREE.MeshStandardMaterial({ color: LAKE_ON_RADAR, roughness: 0.9, metalness: 0 })) // No glow: the same matte water as the lake
+  const marker = new THREE.Mesh(new THREE.SphereGeometry(0.08, 20, 14), new THREE.MeshBasicMaterial({ color: LAKE_WATER_LIGHT }))
   const group = new THREE.Group()
   group.add(line, marker)
   const total = segments * radial * 6

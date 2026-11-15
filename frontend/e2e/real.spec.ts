@@ -9,6 +9,7 @@ import { expect, test, type ConsoleMessage, type Page } from '@playwright/test'
 // CL_SCREENSHOTS_DIR=../docs/screenshots, look at them, and commit them as a change of their own.
 const SHOTS = process.env.CL_SCREENSHOTS_DIR ?? 'test-results/screenshots'
 const TSHO = '/?case=tsho-rolpa-2026'
+declare global { interface Window { __clMap: import('maplibre-gl').Map } }
 
 async function open(page: Page, path = '/') {
   await page.goto(path)
@@ -384,4 +385,216 @@ test('hazard screens explain a road stretch and say whether the radar could watc
   const [json] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'JSON', exact: true }).click()])
   const saved = JSON.parse(readFileSync((await json.path())!, 'utf8'))
   expect(saved.hazards.road.id).toBe(id)
+})
+
+// The flat map is locked: only the View controls move it, and they never leave the study envelope.
+const camera = (page: Page) => page.evaluate(() => { const m = window.__clMap; const c = m.getCenter(); return { lng: c.lng, lat: c.lat, zoom: m.getZoom() } })
+const viewBox = (page: Page) => page.evaluate(() => {
+  const m = window.__clMap
+  const b = m.getBounds()
+  const env = (m.getStyle().sources['study-envelope'] as unknown as { data: { geometry: { coordinates: number[][][] } } }).data.geometry.coordinates[0]
+  return { view: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], env: [env[0][0], env[0][1], env[2][0], env[2][1]] }
+})
+const settle = (page: Page) => page.evaluate(() => new Promise<void>((r) => { const m = window.__clMap; if (!m.isMoving()) r(); else m.once('moveend', () => r()) }))
+
+for (const [name, path] of [['Rasuwa', '/'], ['Tsho Rolpa', TSHO]] as const) {
+  test(`${name}: the flat map ignores drag and wheel, and moves only with the View controls`, async ({ page }) => {
+    await open(page, path)
+    await page.waitForFunction(() => window.__clMap?.isStyleLoaded())
+    await page.getByRole('button', { name: 'Explore', exact: true }).click() // Tsho Rolpa opens in its story, which moves the map itself
+    const finding = page.getByRole('button', { name: 'Explore the map' }) // Rasuwa opens with its key-finding card over the map
+    if (await finding.isVisible()) await finding.click()
+    await settle(page)
+    await page.waitForTimeout(1000)
+    await settle(page)
+    const controls = page.getByTestId('view-controls')
+    await expect(controls).toBeVisible()
+    await expect(controls).toContainText('Whole study area')
+    const start = await camera(page)
+    // A drag and a wheel over open map, clear of the side panels
+    await page.mouse.move(720, 470)
+    await page.mouse.down()
+    await page.mouse.move(820, 560, { steps: 8 })
+    await page.mouse.up()
+    await page.mouse.wheel(0, -600)
+    await page.mouse.dblclick(720, 470)
+    await page.keyboard.press('Equal')
+    await page.waitForTimeout(400)
+    const after = await camera(page)
+    expect(after.lng).toBeCloseTo(start.lng, 9)
+    expect(after.lat).toBeCloseTo(start.lat, 9)
+    expect(after.zoom).toBeCloseTo(start.zoom, 9)
+    // At the whole-area view there is nothing to pan
+    await expect(controls.getByLabel('Move the view west or east')).toBeDisabled()
+    await expect(controls.getByLabel('Move the view south or north')).toBeDisabled()
+    // The zoom slider zooms
+    const zoom = controls.getByLabel(/^Zoom/)
+    const max = Number(await zoom.getAttribute('max'))
+    await zoom.fill(String(max))
+    await settle(page)
+    expect((await camera(page)).zoom).toBeCloseTo(max, 1)
+    // The pan sliders reach both ends and never show ground outside the envelope
+    for (const [label, value] of [['Move the view west or east', '0'], ['Move the view west or east', '1000'], ['Move the view south or north', '0'], ['Move the view south or north', '1000']] as const) {
+      await expect(controls.getByLabel(label)).toBeEnabled()
+      await controls.getByLabel(label).fill(value)
+      await settle(page)
+      const { view, env } = await viewBox(page)
+      const eps = 1e-6
+      expect(view[0]).toBeGreaterThanOrEqual(env[0] - eps)
+      expect(view[1]).toBeGreaterThanOrEqual(env[1] - eps)
+      expect(view[2]).toBeLessThanOrEqual(env[2] + eps)
+      expect(view[3]).toBeLessThanOrEqual(env[3] + eps)
+    }
+    if (name === 'Rasuwa') await page.screenshot({ path: `${SHOTS}/locked-map-rasuwa.png` })
+    else await page.screenshot({ path: `${SHOTS}/locked-map-tsho-rolpa.png` })
+    await controls.getByRole('button', { name: 'Whole area' }).click()
+    await settle(page)
+    await expect(controls).toContainText('Whole study area')
+    await expect(controls.getByLabel('Move the view west or east')).toBeDisabled()
+    // A click still inspects a spot
+    await page.mouse.click(720, 470)
+    await expect(inspector(page)).toBeVisible()
+    await expect(inspector(page)).not.toHaveAttribute('data-state', 'loading')
+    // A story step still moves the map, and the sliders follow it
+    const before = await camera(page)
+    await page.getByRole('button', { name: 'Guided story', exact: true }).click()
+    await page.getByRole('button', { name: 'Next' }).click()
+    await expect.poll(async () => { const c = await camera(page); return Math.abs(c.lng - before.lng) + Math.abs(c.lat - before.lat) + Math.abs(c.zoom - before.zoom) }, { timeout: 8000 }).toBeGreaterThan(1e-4)
+  })
+}
+
+test('Compare zoom keeps the before and after pictures aligned', async ({ page }) => {
+  await open(page, TSHO)
+  await page.getByRole('button', { name: 'Compare', exact: true }).click()
+  const panel = page.locator('.compare-panel')
+  const wrap = panel.getByTestId('swipe-zoom')
+  await expect(wrap.locator('img')).toHaveCount(2)
+  await expect(panel.getByLabel('Move both pictures west or east')).toBeDisabled()
+  await panel.getByLabel('Zoom into both pictures together').fill('2')
+  await panel.getByLabel('Move both pictures west or east').fill('900')
+  await panel.getByLabel('Move both pictures south or north').fill('200')
+  // Both pictures and the edge drawing sit inside one transformed wrapper: they share one transform, and none has its own
+  expect(await wrap.evaluate((e) => getComputedStyle(e).transform)).not.toBe('none')
+  const own = await wrap.evaluate((e) => [...e.querySelectorAll('img, svg')].map((c) => getComputedStyle(c).transform))
+  expect(own.every((t) => t === 'none')).toBe(true)
+  const boxes = await wrap.evaluate((e) => [...e.querySelectorAll('img')].map((c) => { const r = c.getBoundingClientRect(); return [r.x, r.y, r.width, r.height] }))
+  expect(boxes[0]).toEqual(boxes[1])
+  // The divider and the date tags stay fixed to the frame
+  expect(await panel.locator('.swipe-line').evaluate((e) => e.parentElement?.classList.contains('swipe-frame'))).toBe(true)
+  await page.waitForTimeout(400)
+  await panel.locator('.swipe').screenshot({ path: `${SHOTS}/compare-zoom.png` })
+  await panel.getByRole('button', { name: 'Whole picture' }).click()
+  await expect(panel.getByLabel('Move both pictures west or east')).toBeDisabled()
+})
+
+// The steepest-slope line must read as the same water as the lake. Pixels are found by difference: the line by drawing it
+// and not, the lake fill by showing it and not. Teal edge pixels (green above blue) are the measured outline, not water.
+test('in 3D the steepest-slope line is the same colour as the lake', async ({ page, context }) => {
+  test.setTimeout(120_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await open(page, TSHO)
+  await page.getByRole('button', { name: '3D', exact: true }).click()
+  const panel = page.locator('.terrain-panel')
+  let k = 0
+  // The camera eases to rest after it opens, so each picture waits for it to settle
+  const shot = async () => {
+    await page.waitForTimeout(5000)
+    return (await page.locator('.terrain-canvas').screenshot({ path: `${SHOTS}/3d-colour-step${k++}.png` })).toString('base64')
+  }
+  // The lake toggle lives on the Look tab. The camera does not move between tabs.
+  const lakeBox = panel.getByLabel(/Show the lake in blue/)
+  await expect(lakeBox).toBeChecked()
+  const withLake = await shot()
+  await lakeBox.uncheck()
+  const noLake = await shot()
+  await lakeBox.check()
+  await panel.getByRole('tab', { name: 'Steepest slope' }).click()
+  const distance = panel.getByLabel(/Distance from the lake/)
+  await distance.fill('0')
+  const noLine = await shot()
+  await distance.fill('1')
+  const withLine = await shot()
+  await page.screenshot({ path: `${SHOTS}/3d-water-colour.png` })
+  const scratch = await context.newPage() // The app's offline policy blocks data: URLs, so the pixels are read on a blank page
+  const averages = await scratch.evaluate(async ([l1, l0, r0, r1]) => {
+    const pixels = async (b64: string) => {
+      const bmp = await createImageBitmap(await (await fetch(`data:image/png;base64,${b64}`)).blob())
+      const cv = new OffscreenCanvas(bmp.width, bmp.height)
+      const g = cv.getContext('2d')!
+      g.drawImage(bmp, 0, 0)
+      return g.getImageData(0, 0, bmp.width, bmp.height).data
+    }
+    const [L1, L0, R0, R1] = await Promise.all([pixels(l1), pixels(l0), pixels(r0), pixels(r1)])
+    const W = (await createImageBitmap(await (await fetch(`data:image/png;base64,${l1}`)).blob())).width
+    // Only pixels whose four neighbours also qualify: edge pixels are blended with the terrain beside them and would say nothing about the water
+    const mean = (on: (i: number) => boolean, src: Uint8ClampedArray) => {
+      const s = [0, 0, 0]; let n = 0
+      // The canvas fills the screen: keep to the model, clear of the top bar and the side panel, whose buttons change on hover
+      const scene = (i: number) => { const x = (i / 4) % W, y = Math.floor(i / 4 / W); return y > 100 && x < W - 400 }
+      const core = (i: number) => scene(i) && on(i) && on(i - 4) && on(i + 4) && on(i - 4 * W) && on(i + 4 * W)
+      for (let i = 4 * W; i < src.length - 4 * W; i += 4) if (core(i)) { s[0] += src[i]; s[1] += src[i + 1]; s[2] += src[i + 2]; n++ }
+      return { rgb: s.map((v) => Math.round(v / Math.max(1, n))), n }
+    }
+    const diff = (x: Uint8ClampedArray, y: Uint8ClampedArray, i: number) => Math.abs(x[i] - y[i]) + Math.abs(x[i + 1] - y[i + 1]) + Math.abs(x[i + 2] - y[i + 2]) > 30
+    // The lake: changed when the fill is shown, and not the teal edge (green at or above blue)
+    const lake = mean((i) => diff(L1, L0, i) && L1[i + 2] > L1[i + 1], L1)
+    // The line: changed when it is drawn, and not the pale marker
+    const line = mean((i) => diff(R0, R1, i) && R1[i] + R1[i + 1] + R1[i + 2] < 450, R1)
+    return { line, lake }
+  }, [withLake, noLake, noLine, withLine])
+  await scratch.close()
+  console.log(`3D water colour: lake ${averages.lake.rgb.join(', ')} (${averages.lake.n} px); line ${averages.line.rgb.join(', ')} (${averages.line.n} px)`)
+  expect(averages.lake.n).toBeGreaterThan(200)
+  expect(averages.line.n).toBeGreaterThan(100)
+  for (let k = 0; k < 3; k++) expect(Math.abs(averages.lake.rgb[k] - averages.line.rgb[k])).toBeLessThanOrEqual(10)
+  await expect(panel).toContainText('Not a flood model.')
+})
+
+test('the scenario and the What-if flood show their working, with the tables to check them', async ({ page }) => {
+  await open(page, TSHO)
+  await page.getByRole('button', { name: 'What if', exact: true }).click()
+  const panel = page.locator('.scenario-panel')
+  await panel.getByRole('tab', { name: '20 m breach' }).click()
+  await panel.getByText('Show the working').click()
+  const working = panel.locator('details.working')
+  await expect(working).toContainText('32,120,000 m³')
+  await expect(working).toContainText('25,545 m³/s')
+  await expect(working).toContainText('2,794 m³/s')
+  await expect(working).toContainText('33,180 m³/s')
+  await expect(working).toContainText('1.495')
+  await expect(working.getByRole('link', { name: /Every cross-section/ })).toHaveAttribute('href', /tsho-rolpa-2026-scenario-sections\.csv$/)
+  const csv = await page.request.get(await working.getByRole('link', { name: /Every cross-section/ }).getAttribute('href') ?? '')
+  expect(csv.status()).toBe(200)
+  await expect(panel).toContainText('Sensitivity, not the default')
+  await working.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(500)
+  await page.screenshot({ path: `${SHOTS}/show-the-working.png` })
+  await open(page)
+  await page.getByRole('button', { name: 'Simulate' }).click()
+  const sim = page.locator('.sim-panel')
+  await sim.getByRole('tab', { name: 'What-if flood' }).click()
+  await sim.getByText('Show the working').click()
+  await expect(sim.locator('details.working')).toContainText('km ≤ 198')
+  await expect(sim.locator('details.working')).toContainText('3,274')
+  const xlsx = await page.request.get(await sim.getByRole('link', { name: /Spreadsheet/ }).getAttribute('href') ?? '')
+  expect(xlsx.status()).toBe(200)
+})
+
+test('the cliff-impact tab is a labelled hypothesis with candidate sites on the map', async ({ page }) => {
+  await open(page)
+  await page.getByRole('button', { name: 'Simulate' }).click()
+  const sim = page.locator('.sim-panel')
+  await sim.getByRole('tab', { name: 'Cliff impact (hypothesis)' }).click()
+  await expect(sim).toContainText("A mentor's account with no location or figures. CascadeLens tests where it could have happened. It does not confirm that it did.")
+  await expect(sim.locator('.evidence').first()).toHaveText('Hypothesis')
+  await expect(sim).toContainText('2.0×10⁸ N')
+  await expect(sim).toContainText('no site stands out clearly')
+  await page.waitForFunction(() => Boolean(window.__clMap.getLayer('impact-dots')))
+  const n = await page.evaluate(() => window.__clMap.querySourceFeatures('impact-sites').length)
+  expect(n).toBeGreaterThan(0)
+  await sim.getByLabel('Candidate site').selectOption('S1')
+  await expect(sim).toContainText('Data do not show it')
+  await expect(page.locator('.sim-head')).toHaveCount(0)
+  await page.waitForTimeout(800)
+  await page.screenshot({ path: `${SHOTS}/cliff-impact.png` })
 })

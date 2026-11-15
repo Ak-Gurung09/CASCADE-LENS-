@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Layer, Manifest } from '../../types/manifest'
-import { coherence, count, firstPass, loadSimulation, replayAdvance, shift, SIM_CELLS, type SimData, type SimView } from '../../services/simulation'
+import { coherence, count, firstPass, IMPACT_COLOURS, loadImpactSites, loadSimulation, replayAdvance, shift, SIM_CELLS, type ImpactSites, type SimData, type SimView } from '../../services/simulation'
 import { Bars } from '../charts/Charts'
 import { coherenceGroups } from '../story/StoryPanel'
+import { assetUrl } from '../../services/manifest'
+import { EvidenceTag } from '../explanations/EvidenceTag'
 
 interface Props {
   manifest: Manifest
@@ -20,9 +22,9 @@ interface Props {
   onExit: () => void
 }
 
-type Tab = 'replay' | 'whatif' | 'time' | 'radar'
+type Tab = 'replay' | 'whatif' | 'impact' | 'time' | 'radar'
 
-const TAB_LABELS: Record<Tab, string> = { replay: 'Flow replay', whatif: 'What-if flood', time: 'Time replay', radar: 'Radar explainer' }
+const TAB_LABELS: Record<Tab, string> = { replay: 'Flow replay', whatif: 'What-if flood', impact: 'Cliff impact (hypothesis)', time: 'Time replay', radar: 'Radar explainer' }
 const STEP_MS = 900
 const REPLAY_SECONDS = 24
 const n = (x: number) => Math.round(x).toLocaleString('en-GB')
@@ -81,7 +83,34 @@ function Replay({ data, km, setKm }: { data: SimData; km: number; setKm: (k: num
   )
 }
 
-function WhatIf({ data, reach, setReach, rise, setRise }: { data: SimData; reach: number; setReach: (k: number) => void; rise: number; setRise: (r: number) => void }) {
+// "Show the working" for the What-if flood: the rule, and how the current setting's numbers come out of it.
+function WhatIfWorking({ data, reach, rise, table }: { data: SimData; reach: number; rise: number; table?: string }) {
+  const steps = useMemo(() => {
+    const kinds = { b: [0, 0, 0], r: [0, 0, 0] } as Record<'b' | 'r', number[]>
+    for (const { properties: p } of data.features.features) {
+      if (p.k !== 'b' && p.k !== 'r') continue
+      const add = p.k === 'b' ? 1 : (p.len ?? 0)
+      kinds[p.k][0] += add
+      if (p.km <= reach) { kinds[p.k][1] += add; if (p.h <= rise) kinds[p.k][2] += add }
+    }
+    return kinds
+  }, [data, reach, rise])
+  return (
+    <details className="compare-more working">
+      <summary>Show the working</summary>
+      <p><EvidenceTag kind="simulation" /> The rule: a building, road piece or place counts when <strong>km ≤ {reach}</strong> (how far the water travels) <strong>and h ≤ {rise} m</strong> (its ground height above the river level at the nearest point of the path).</p>
+      <ol className="working-steps">
+        <li>km: the nearest of the path's points, one every kilometre from the source, along the mapped rivers.</li>
+        <li>h: Copernicus 30 m terrain height at the feature, minus the lowest terrain within about 120 m of that path point (never rising downstream), never below 0.</li>
+        <li>Buildings: {n(steps.b[0])} mapped as affected, {n(steps.b[1])} within {reach} km, <strong>{n(steps.b[2])}</strong> of those at most {rise} m above the river.</li>
+        <li>Roads: {n(steps.r[0])} km mapped, {n(steps.r[1])} km within {reach} km, <strong>{n(steps.r[2])} km</strong> at most {rise} m above the river.</li>
+      </ol>
+      {table && <p className="small"><a href={assetUrl(table)} download>Every feature with its km and h (CSV)</a> · <a href={assetUrl('data/working/scenario-check.xlsx')} download>Spreadsheet with a live count (XLSX)</a></p>}
+    </details>
+  )
+}
+
+function WhatIf({ data, reach, setReach, rise, setRise, table }: { data: SimData; reach: number; setReach: (k: number) => void; rise: number; setRise: (r: number) => void; table?: string }) {
   const hit = useMemo(() => count(data, reach, rise), [data, reach, rise])
   const last = data.path.length - 1
   return (
@@ -100,7 +129,64 @@ function WhatIf({ data, reach, setReach, rise, setRise }: { data: SimData; reach
         {data.totals.roadKm > 0 && <div><dt>Roads below the water</dt><dd>{n(hit.roadKm)} of {n(data.totals.roadKm)} km</dd></div>}
         <div className="wide"><dt>Places below the water: {hit.places.length} of {data.places.length}</dt><dd>{hit.places.join(', ') || 'None'}</dd></div>
       </dl>
+      <WhatIfWorking data={data} reach={reach} rise={rise} table={table} />
       <p className="notice small">Rough what-if, not a forecast and never a safety guide. It compares ground height with the river and ignores water volume, speed and valley shape, and it has not been checked against real floods. Only buildings in the loaded data are counted, so others are missing.</p>
+    </>
+  )
+}
+
+const OUTCOME_LABEL: Record<string, string> = { 'supports a hard outer-bank impact': 'Data support an outer-bank impact', 'does not show it': 'Data do not show it', 'cannot judge': 'Data cannot judge' }
+const val = (x: number | null, unit: string, digits = 0) => (x === null || x === undefined ? 'not resolved' : `${x.toFixed(digits)} ${unit}`)
+
+// A mentor said the water hit a cliff and "ricocheted at double the force and the other way". No place or figures were given,
+// so this tab shows where the data put candidate places, and what each one supports. Hypothesis only.
+function CliffImpact({ sites, selected, onSelect }: { sites: ImpactSites | null; selected: string | undefined; onSelect: (id: string) => void }) {
+  if (!sites) return <p className="muted">Loading the candidate sites…</p>
+  const list = [...sites.features.map((f) => f.properties)].sort((a, b) => a.km - b.km)
+  const site = list.find((p) => p.id === selected) ?? list[0]
+  const c = sites.control
+  const counts = (o: string) => list.filter((p) => p.outcome === o).length
+  return (
+    <>
+      <p className="evidence-line"><EvidenceTag kind="hypothesis" />A mentor's account with no location or figures. CascadeLens tests where it could have happened. It does not confirm that it did.</p>
+      <p className="muted small">Source: {sites.source}.</p>
+      <details className="compare-more working" open>
+        <summary>The physics</summary>
+        <ul className="working-steps">
+          <li>A flow stopped by a wall, or turned 90° along it, pushes on it with F = ρQv. Impact pressure is about ρv².</li>
+          <li>A flow turned fully back reverses its momentum: F = 2ρQv, pressure up to about 2ρv². So <strong>"double the force" is right about the push on the cliff</strong>, compared with water that simply stops.</li>
+          <li>It is <strong>wrong about the water</strong>: water leaving a wall cannot be faster or carry more energy than the water arriving. The bounce sends it across or back up the valley with <em>less</em> energy.</li>
+          <li>Debris flows are denser (1,800 to 2,200 kg/m³, against 1,000 for water), which raises F at the same speed.</li>
+          <li>Invented round numbers, not Rasuwa measurements: v = 10 m/s through 500 m² with ρ = 2,000 kg/m³ gives Q = 5,000 m³/s, F = 2,000 × 5,000 × 10 = 1.0×10⁸ N stopped, and 2.0×10⁸ N turned back.</li>
+        </ul>
+      </details>
+      <p className="small">{list.length} bends of at least {sites.thresholds.turnDeg}° against walls of at least {sites.thresholds.wallSlopeDeg}°. By the fixed rules: {counts('supports a hard outer-bank impact')} support an outer-bank impact, {counts('does not show it')} do not show it, {counts('cannot judge')} cannot be judged. On straight stretches the extent's edge already sits {c.leftMinusRightM} m higher on one side, scattering from {c.p25M} to {c.p75M} m, so <strong>no site stands out clearly</strong>.</p>
+      <ul className="impact-key" aria-label="Marker colours">
+        {Object.entries(IMPACT_COLOURS).map(([o, col]) => <li key={o}><i style={{ background: col }} />{OUTCOME_LABEL[o]}</li>)}
+      </ul>
+      <label className="select">Candidate site
+        <select value={site.id} onChange={(e) => onSelect(e.target.value)}>
+          {list.map((p) => <option key={p.id} value={p.id}>{p.id}, km {p.km.toFixed(0)}: {OUTCOME_LABEL[p.outcome]}</option>)}
+        </select>
+      </label>
+      <dl className="facts">
+        <div><dt>Bend</dt><dd>{Math.abs(site.turn_deg).toFixed(0)}° to the {site.turn_deg > 0 ? 'left' : 'right'}, outer bank on the {site.outer_side}</dd></div>
+        <div><dt>Outer wall</dt><dd>{site.wall_slope_deg.toFixed(0)}°, {site.wall_height_m.toFixed(0)} m above the river</dd></div>
+        <div><dt>Bend radius R_c</dt><dd>{val(site.rc_m, 'm')}</dd></div>
+        <div><dt>Channel width b</dt><dd>{val(site.b_m, 'm')}</dd></div>
+        <div><dt>Outer minus inner edge</dt><dd>{val(site.dh_raw_m, 'm', 1)}, {site.control_m >= 0 ? '−' : '+'} control {Math.abs(site.control_m).toFixed(1)} = {val(site.dh_m, 'm', 1)}</dd></div>
+        <div><dt>Coherence outer / inner</dt><dd>{site.coh_outer_median ?? '–'} / {site.coh_inner_median ?? '–'} (Pair B, descriptive)</dd></div>
+      </dl>
+      <ol className="working-steps">
+        {site.v_super_k1_ms !== null && site.dh_m !== null && site.rc_m !== null && site.b_m !== null
+          ? <li>Superelevation (Hungr et al. 1984): v = √(g·R_c·Δh / (k·b)) = √(9.81 × {site.rc_m.toFixed(0)} × {site.dh_m.toFixed(1)} / (k × {site.b_m.toFixed(0)})) = <strong>{site.v_super_k5_ms} to {site.v_super_k1_ms} m/s</strong> for k = 5 to 1.</li>
+          : <li>Superelevation: no speed, because Δh is not above zero after the control or an input cannot be resolved.</li>}
+        {site.v_runup_min_ms !== null && site.h_up_outer_m !== null
+          ? <li>Run-up: v ≥ √(2g·h_up) = √(2 × 9.81 × {site.h_up_outer_m.toFixed(1)}) = <strong>{site.v_runup_min_ms} m/s</strong>. Implausibly high this far downstream, which says the extent's edge on the wall is not a run-up line.</li>
+          : <li>Run-up: not given here.</li>}
+      </ol>
+      <p className={`verdict ${site.outcome === 'supports a hard outer-bank impact' ? 'coral' : 'teal'}`}><strong>{OUTCOME_LABEL[site.outcome]}.</strong> {site.reasons.charAt(0).toUpperCase() + site.reasons.slice(1)}.</p>
+      <p className="notice small">Hypothesis, not a finding. 30 m terrain from before the event smooths narrow gorges, and UNOSAT's extent is preliminary. The speeds are what the formulas give from these inputs, not measurements.</p>
     </>
   )
 }
@@ -180,13 +266,20 @@ function Radar({ manifest }: { manifest: Manifest }) {
 }
 
 export function SimPanel({ manifest, simulation, layer, step, canTime, timeLayers, onTimeLayer, onStep, onTimeTab, onView, onLoaded, onExit }: Props) {
-  const tabs: Tab[] = [...(simulation ? ['replay', 'whatif'] as const : []), ...(canTime ? ['time'] as const : []), ...(coherenceGroups(manifest).length ? ['radar'] as const : [])]
+  const hasImpact = Boolean(simulation) && manifest.caseStudy.id === 'rasuwa-2026'
+  const tabs: Tab[] = [...(simulation ? ['replay', 'whatif'] as const : []), ...(hasImpact ? ['impact'] as const : []), ...(canTime ? ['time'] as const : []), ...(coherenceGroups(manifest).length ? ['radar'] as const : [])]
   const [tab, setTab] = useState<Tab>(tabs[0])
   const [data, setData] = useState<SimData | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
   const [km, setKm] = useState(0)
   const [reach, setReach] = useState(0)
   const [rise, setRise] = useState(25)
+  const [impact, setImpact] = useState<ImpactSites | null>(null)
+  const [selected, setSelected] = useState<string | undefined>(undefined)
+  useEffect(() => {
+    if (tab !== 'impact' || impact) return
+    loadImpactSites().then((d) => { setImpact(d); setSelected((x) => x ?? d.features[0]?.properties.id) }).catch((e: Error) => setFailure(e.message))
+  }, [tab, impact])
   useEffect(() => {
     if (!simulation) return
     let live = true
@@ -196,9 +289,9 @@ export function SimPanel({ manifest, simulation, layer, step, canTime, timeLayer
   }, [])
   useEffect(() => {
     if (tab === 'time') onTimeTab()
-    onView(data && (tab === 'replay' || tab === 'whatif') ? { data, mode: tab, km: tab === 'replay' ? km : reach, rise } : null)
+    onView(data && (tab === 'replay' || tab === 'whatif' || tab === 'impact') ? { data, mode: tab, km: tab === 'replay' ? km : tab === 'impact' ? data.path.length - 1 : reach, rise, impact: impact ?? undefined, selected } : null)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onView is a state setter's wrapper
-  }, [data, tab, km, reach, rise])
+  }, [data, tab, km, reach, rise, impact, selected])
   return (
     <section className="story sim-panel" aria-label="Simulations">
       <div className="tabs segmented" role="tablist">
@@ -209,7 +302,8 @@ export function SimPanel({ manifest, simulation, layer, step, canTime, timeLayer
           : failure ? <p className="notice">The simulation could not start: {failure}</p>
           : !data ? <p className="muted">Loading the flow path…</p>
             : tab === 'replay' ? <Replay data={data} km={km} setKm={setKm} />
-              : <WhatIf data={data} reach={reach} setReach={setReach} rise={rise} setRise={setRise} />}
+              : tab === 'impact' ? <CliffImpact sites={impact} selected={selected} onSelect={setSelected} />
+              : <WhatIf data={data} reach={reach} setReach={setReach} rise={rise} setRise={setRise} table={manifest.caseStudy.id === 'rasuwa-2026' ? 'data/working/rasuwa-2026-simulation-features.csv' : undefined} />}
       <footer><button className="ghost" onClick={onExit}>Exit simulation</button></footer>
     </section>
   )

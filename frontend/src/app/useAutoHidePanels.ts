@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
-// Side panels get out of the way while the reader drags, zooms or turns the map or the 3D model,
+// Side panels get out of the way while the reader drags, zooms or turns the 3D model,
 // and slide back when the pointer reaches the left or right edge of the screen (or a panel gets keyboard focus).
 // Only on large screens with a mouse; phones keep their bottom sheets.
+// The flat map is locked (MapView.tsx): a drag or the wheel does nothing to it, so neither hides the panels there any more.
+// Hiding them on a wheel or drag that moved nothing would only make them vanish for no visible reason. The 3D model still turns and zooms.
 
 const EDGE_PX = 24
 const DRAG_PX = 6
@@ -20,7 +22,7 @@ export function useAutoHidePanels(resetKey: string, tuckLeft = false) {
   useEffect(() => { setHideLeft(tuckLeft && wide()); setHideRight(false) }, [resetKey, tuckLeft])
 
   useEffect(() => {
-    const onData = (t: EventTarget | null) => t instanceof HTMLCanvasElement && Boolean(t.closest('.center'))
+    const onData = (t: EventTarget | null) => t instanceof HTMLCanvasElement && Boolean(t.closest('.terrain-canvas'))
     const hide = () => { if (desktop()) { setHideLeft(true); setHideRight(true) } }
     const pointerDown = (e: PointerEvent) => { down.current = onData(e.target) ? { x: e.clientX, y: e.clientY } : null }
     const pointerMove = (e: PointerEvent) => {

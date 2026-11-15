@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Map as MlMap, Marker, NavigationControl, ScaleControl, setWorkerUrl, type GeoJSONSource, type LngLatBoundsLike, type StyleSpecification } from 'maplibre-gl'
+import { LngLatBounds, Map as MlMap, Marker, ScaleControl, setWorkerUrl, type GeoJSONSource, type LngLatBoundsLike, type StyleSpecification } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { Bounds, GranuleRecord, Layer } from '../../types/manifest'
 import { assetUrl } from '../../services/manifest'
-import type { SimView } from '../../services/simulation'
+import { IMPACT_COLOURS, type SimView } from '../../services/simulation'
 
 // MapLibre derives the worker path from its own module URL, which Vite's bundling moves.
 setWorkerUrl(new URL(workerUrl, document.baseURI).href)
@@ -26,6 +26,7 @@ interface Props {
   onPoint: (p: [number, number]) => void
   onStatus: (s: MapStatus) => void
   onCoverage: (covered: boolean) => void
+  onMap?: (map: MlMap | null) => void
 }
 
 // No glyphs and no remote sources: the map must work with the network off. Place names are DOM markers for the same reason.
@@ -79,7 +80,7 @@ function addReference(map: MlMap, l: Layer) {
   }
 }
 
-export function MapView({ envelope, terrain, showTerrain, active, overlay, showMask, opacity, references, footprints, point, focus, sim, onPoint, onStatus, onCoverage }: Props) {
+export function MapView({ envelope, terrain, showTerrain, active, overlay, showMask, opacity, references, footprints, point, focus, sim, onPoint, onStatus, onCoverage, onMap }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MlMap | null>(null)
   const pointMarker = useRef<Marker | null>(null)
@@ -90,6 +91,8 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
   const onPointRef = useRef(onPoint)
   const onStatusRef = useRef(onStatus)
   const onCoverageRef = useRef(onCoverage)
+  const onMapRef = useRef(onMap)
+  onMapRef.current = onMap
   onPointRef.current = onPoint
   onStatusRef.current = onStatus
   onCoverageRef.current = onCoverage
@@ -112,9 +115,17 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       last = s
       onStatusRef.current(s)
     }
-    const map = new MlMap({ container: host.current, style: STYLE, bounds: envelope as LngLatBoundsLike, fitBoundsOptions: { padding: 30 }, attributionControl: false, dragRotate: false, pitchWithRotate: false, renderWorldCopies: false })
+    // The map is locked: no drag, wheel, pinch, double-click, box or keyboard moves. The reader moves it only with the View controls
+    // (ViewControls.tsx), and the story, bookmarks and Simulate still move it in code. A click still inspects a spot.
+    const map = new MlMap({ container: host.current, style: STYLE, bounds: envelope as LngLatBoundsLike, fitBoundsOptions: { padding: 30 }, attributionControl: false, renderWorldCopies: false,
+      dragRotate: false, pitchWithRotate: false, dragPan: false, scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false, touchPitch: false, keyboard: false })
     mapRef.current = map
-    map.addControl(new NavigationControl({ showCompass: false }), 'top-right')
+    // maxBounds is the opening view (which holds the whole envelope at its fit zoom, plus the slack from the screen's shape), widened by a quarter
+    // on each side so a story or Simulate frame padded for the side panels is not cut short. The View sliders keep to the envelope itself.
+    const opening = map.getBounds()
+    const [ow, os, oe, on] = [opening.getWest(), opening.getSouth(), opening.getEast(), opening.getNorth()]
+    const [dx, dy] = [(oe - ow) / 4, (on - os) / 4]
+    map.setMaxBounds(new LngLatBounds([Math.min(ow, envelope[0]) - dx, Math.min(os, envelope[1]) - dy], [Math.max(oe, envelope[2]) + dx, Math.max(on, envelope[3]) + dy]))
     map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left')
     map.on('load', () => {
       const [w, s, e, n] = envelope
@@ -135,8 +146,10 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       if (source) failed = source
       report({ state: 'error', message: source ? `Could not load map source ${source}. ${err?.message ?? ''}` : (err?.message ?? 'Map error') })
     })
-    if (import.meta.env.DEV) (window as unknown as { __clMap: MlMap }).__clMap = map
-    return () => { map.remove(); mapRef.current = null; setReady(false) }
+    // Exposed in every build so the browser tests can check that the locked map really stays put. It changes nothing the reader sees.
+    ;(window as unknown as { __clMap: MlMap }).__clMap = map
+    onMapRef.current?.(map)
+    return () => { onMapRef.current?.(null); map.remove(); mapRef.current = null; setReady(false) }
   }, [])
 
   useEffect(() => {
@@ -208,6 +221,25 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     map.addLayer({ id: 'sim-points', type: 'circle', source, paint: { 'circle-color': '#ff7f66', 'circle-stroke-color': '#fff', 'circle-stroke-width': ['case', ['==', ['get', 'k'], 'p'], 1.5, 0], 'circle-radius': ['case', ['==', ['get', 'k'], 'p'], 5, 2.5] } })
   }, [ready, simData])
 
+  // Candidate cliff-impact sites (Hypothesis), coloured by outcome, the selected one ringed
+  const impact = sim?.mode === 'impact' ? sim.impact : undefined
+  const selected = sim?.selected
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    clear(map, 'impact-')
+    if (!impact) return
+    map.addSource('impact-sites', { type: 'geojson', data: impact as unknown as Parameters<GeoJSONSource['setData']>[0] })
+    const colour = ['match', ['get', 'outcome'], ...Object.entries(IMPACT_COLOURS).flat(), '#ffffff'] as never
+    map.addLayer({ id: 'impact-ring', type: 'circle', source: 'impact-sites', filter: ['==', ['get', 'id'], ''], paint: { 'circle-radius': 12, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': '#fff', 'circle-stroke-width': 2.5 } })
+    map.addLayer({ id: 'impact-dots', type: 'circle', source: 'impact-sites', paint: { 'circle-radius': 6, 'circle-color': colour, 'circle-stroke-color': '#1b1236', 'circle-stroke-width': 1.5 } })
+  }, [ready, impact])
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map?.getLayer('impact-ring')) return
+    map.setFilter('impact-ring', ['==', ['get', 'id'], selected ?? ''])
+  }, [ready, impact, selected])
+
   const simMode = sim?.mode
   const simKm = sim?.km
   const simRise = sim?.rise
@@ -217,7 +249,8 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
     const kinds = (list: string[]) => ['in', ['get', 'k'], ['literal', list]] as const
     const reached = ['<=', ['get', 'km'], simKm] as const
     const low = simMode === 'whatif' ? [['<=', ['get', 'h'], simRise]] : []
-    const filter = (list: string[]) => ['all', kinds(list), reached, ...low] as never
+    // The impact tab shows only the path: the sites carry their own markers
+    const filter = (list: string[]) => (simMode === 'impact' ? ['==', ['get', 'k'], 'none'] : ['all', kinds(list), reached, ...low]) as never
     map.setFilter('sim-done', ['all', kinds(['c']), reached] as never)
     map.setFilter('sim-lines', filter(simMode === 'whatif' ? ['r'] : ['a']))
     map.setFilter('sim-points', filter(['b', 'p']))
@@ -225,7 +258,7 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
 
   useEffect(() => {
     const map = mapRef.current
-    const at = simData && simKm !== undefined ? simData.path[simKm] : undefined
+    const at = simData && simKm !== undefined && simMode !== 'impact' ? simData.path[simKm] : undefined
     if (!ready || !map || !at) { simHead.current?.remove(); simHead.current = null; return }
     if (!simHead.current) {
       const el = document.createElement('div')
@@ -233,7 +266,7 @@ export function MapView({ envelope, terrain, showTerrain, active, overlay, showM
       simHead.current = new Marker({ element: el }).setLngLat([at[0], at[1]]).addTo(map)
     }
     simHead.current.setLngLat([at[0], at[1]])
-  }, [ready, simData, simKm])
+  }, [ready, simData, simKm, simMode])
 
   const places = references.find((r) => r.vector?.type === 'label')
   useEffect(() => {
