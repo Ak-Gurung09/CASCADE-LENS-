@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { assetUrl, formatDate } from '../../services/manifest'
 import { elapsedMs } from '../../services/simulation'
+import { drawRatio, lite } from '../../services/performance'
 import type { EvidenceClass } from '../../services/evidence'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 import { buildBlock, strataTexture, type Built } from './block3d'
@@ -184,12 +185,12 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
     const el = host.current!
     let renderer: THREE.WebGLRenderer
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+      renderer = new THREE.WebGLRenderer({ antialias: !lite.on, alpha: true, powerPreference: lite.on ? 'low-power' : 'default' })
     } catch {
       setFailure('This browser could not start 3D graphics (WebGL).')
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setPixelRatio(drawRatio())
     renderer.outputColorSpace = THREE.SRGBColorSpace
     el.appendChild(renderer.domElement)
     const s = new THREE.Scene()
@@ -206,9 +207,14 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
     sun.position.set(-60, 80, 40)
     s.add(sun)
     scene.current = { scene: s, camera, controls, strata: strataTexture() }
+    // Drawn when something moves. While nothing does, the picture is refreshed only a few times a second, which catches
+    // pictures that arrive later and saves a weak laptop from redrawing the same frame sixty times a second.
+    let dirty = true
+    let drawn = 0
     const resize = () => {
       const { clientWidth: w, clientHeight: h } = el
       renderer.setSize(w, h)
+      dirty = true // A resized canvas is blank until drawn again
       camera.aspect = w / Math.max(1, h)
       camera.updateProjectionMatrix()
     }
@@ -230,9 +236,14 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
         const { clientWidth: w, clientHeight: h } = el
         if (shift > 0) camera.setViewOffset(w, h, shift, 0, w, h)
         else camera.clearViewOffset()
+        dirty = true
       }
-      controls.update()
-      renderer.render(s, camera)
+      if (controls.update()) dirty = true
+      if (dirty || elapsedMs(now, drawn) > (lite.on ? 500 : 250)) {
+        renderer.render(s, camera)
+        dirty = false
+        drawn = now
+      }
       frame = requestAnimationFrame(loop)
     })
     return () => {
