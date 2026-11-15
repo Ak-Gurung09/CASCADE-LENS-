@@ -38,6 +38,37 @@ test('a normal start never shows that message', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'GAIA CascadeLens has not started' })).toHaveCount(0)
 })
 
+test('on a web address, a slow start says it is loading and never points to Start CascadeLens.bat', async ({ page }) => {
+  await page.route(/\/assets\/index-[^/]+\.js$/, (r) => r.abort()) // The app's script never arrives, as on a stalled connection
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Loading GAIA CascadeLens…' })).toBeVisible()
+  await page.waitForTimeout(2300)
+  await expect(page.getByText('Start CascadeLens.bat')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'GAIA CascadeLens has not started' })).toHaveCount(0)
+})
+
+test('the page has a real icon', async ({ page, request }) => {
+  await open(page)
+  const href = await page.locator('link[rel="icon"]').getAttribute('href')
+  expect(href).toBe('./favicon.svg')
+  expect((await request.get('/favicon.svg')).headers()['content-type']).toContain('svg')
+})
+
+test('About explains the project and names its NASA data with evidence classes', async ({ page }) => {
+  await open(page)
+  await page.getByRole('button', { name: 'Project & NASA data' }).first().click()
+  const about = page.getByRole('dialog', { name: 'About CascadeLens and its NASA data' })
+  await expect(about).toContainText('NISAR GUNW and GOFF')
+  await expect(about).toContainText('GPM IMERG')
+  await expect(about).toContainText('Claude, an AI assistant made by Anthropic')
+  await expect(about).toContainText('not a warning system')
+  await expect(about).not.toContainText(/early warning|proves/i)
+  await expect(about.locator('.evidence').first()).toHaveText('Observed')
+  expect((await new AxeBuilder({ page }).include('.about-project').analyze()).violations).toEqual([])
+  await page.keyboard.press('Escape')
+  await expect(about).toHaveCount(0)
+})
+
 test('opens on Rasuwa with real NISAR measurements', async ({ page }) => {
   const tiles: string[] = []
   page.on('response', (r) => { if (r.url().includes('/tiles/pair-a/')) tiles.push(`${r.status()}`) })

@@ -880,3 +880,12 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .avail.a-catalogued { color: var(--amber); }
 .avail.a-not-found { color: var(--muted); }
 .avail.a-human { color: var(--coral); }
+
+/* About CascadeLens: the same card as "What is real?", with a source list and numbered steps */
+.about-project h3 { font-size: 20px; }
+.about-project p.small { margin: 6px 0 0; }
+.about-source-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.about-source-head .badge { font-size: 9.5px; padding: 1px 8px; }
+.about-steps { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.signature button.link { font-size: inherit; font-weight: 700; letter-spacing: inherit; text-transform: inherit; color: var(--accent); }
+@media (max-width: 760px) { .about-project { top: 70px; max-height: calc(100% - 82px); padding: 18px 16px; z-index: 8; } }

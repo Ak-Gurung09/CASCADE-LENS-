@@ -14,6 +14,7 @@ import { Inspector } from '../components/inspector/Inspector'
 import { FindingCard, StatusPanel } from '../components/explanations/FirstMinute'
 import { Interpretation } from '../components/explanations/Interpretation'
 import { AboutSource } from '../components/explanations/AboutSource'
+import { AboutProject } from '../components/explanations/AboutProject'
 import { StoryPanel } from '../components/story/StoryPanel'
 import { SimPanel } from '../components/sim/SimPanel'
 import { ComparePanel } from '../components/compare/ComparePanel'
@@ -98,6 +99,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   const [focus, setFocus] = useState<{ bounds: Bookmark['bounds']; nonce: number } | null>(null)
   const [point, setPoint] = useState<[number, number] | null>(null)
   const [statusOpen, setStatusOpen] = useState(false)
+  const [projectOpen, setProjectOpen] = useState(false)
   const [exploring, setExploring] = useState(false) // The reader has started using the map, so the opening card is done
   const [storyStep, setStoryStep] = useState<number | null>(null)
   const [simOn, setSimOn] = useState(false)
@@ -268,7 +270,8 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
           </div>
         )}
         <div className="top-actions">
-          <button className="status-btn" onClick={() => setStatusOpen((v) => !v)} aria-pressed={statusOpen}>What is real?</button>
+          <button className="status-btn" onClick={() => { setProjectOpen(false); setStatusOpen((v) => !v) }} aria-pressed={statusOpen}>What is real?</button>
+          <button className="status-btn" onClick={() => { setStatusOpen(false); setProjectOpen((v) => !v) }} aria-pressed={projectOpen}>Project &amp; NASA data</button>
           {provisional && <span className="badge amber" title={active?.productMaturity}>Provisional data</span>}
           <button className="mobile-only" aria-expanded={panel === 'left'} onClick={() => setPanel(panel === 'left' ? null : 'left')}>Layers</button>
           <button className="mobile-only" aria-expanded={panel === 'right'} onClick={() => setPanel(panel === 'right' ? null : 'right')}>Details</button>
@@ -304,13 +307,14 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
         )}
         {storyStep === null && !simOn && !threeOn && panel === null && <FindingCard manifest={m} exploring={exploring} onStory={() => goStory(0)} onStatus={() => setStatusOpen(true)} />}
         {statusOpen && <StatusPanel onClose={() => setStatusOpen(false)} />}
+        {projectOpen && <AboutProject onClose={() => setProjectOpen(false)} />}
         {bookmark && <p className="place-chip">{bookmark.name}</p>}
         {mapStatus.state === 'error' && <p className="map-alert" role="alert">{mapStatus.message}</p>}
         {!covered && <p className="map-notice" role="status">No geographic coverage: {active?.name} has no data in this view.</p>}
         <Legend layer={shownLayer} references={references} />
         <div className="map-foot">
           <Credits layers={[terrain, shownLayer, ...references]} />
-          <p className="signature">Made by <strong>Team GAIA</strong></p>
+          <p className="signature">Made by <strong>Team GAIA</strong> · <button className="link" onClick={() => { setStatusOpen(false); setProjectOpen(true) }}>Project &amp; NASA data</button></p>
         </div>
       </main>
 
