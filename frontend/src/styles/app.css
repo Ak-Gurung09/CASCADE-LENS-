@@ -838,3 +838,7 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .app-error p { margin: 0; color: var(--soft); line-height: 1.5; }
 .app-error .app-error-detail { font-size: 13px; color: var(--bad); word-break: break-word; }
 .app-error button { justify-self: start; }
+
+/* Show the working */
+.working ol.working-steps { margin: 6px 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.5; }
+.working a { color: var(--accent); }

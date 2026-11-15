@@ -3,6 +3,8 @@ import type { Layer, Manifest } from '../../types/manifest'
 import { coherence, count, firstPass, loadSimulation, replayAdvance, shift, SIM_CELLS, type SimData, type SimView } from '../../services/simulation'
 import { Bars } from '../charts/Charts'
 import { coherenceGroups } from '../story/StoryPanel'
+import { assetUrl } from '../../services/manifest'
+import { EvidenceTag } from '../explanations/EvidenceTag'
 
 interface Props {
   manifest: Manifest
@@ -81,7 +83,34 @@ function Replay({ data, km, setKm }: { data: SimData; km: number; setKm: (k: num
   )
 }
 
-function WhatIf({ data, reach, setReach, rise, setRise }: { data: SimData; reach: number; setReach: (k: number) => void; rise: number; setRise: (r: number) => void }) {
+// "Show the working" for the What-if flood: the rule, and how the current setting's numbers come out of it.
+function WhatIfWorking({ data, reach, rise, table }: { data: SimData; reach: number; rise: number; table?: string }) {
+  const steps = useMemo(() => {
+    const kinds = { b: [0, 0, 0], r: [0, 0, 0] } as Record<'b' | 'r', number[]>
+    for (const { properties: p } of data.features.features) {
+      if (p.k !== 'b' && p.k !== 'r') continue
+      const add = p.k === 'b' ? 1 : (p.len ?? 0)
+      kinds[p.k][0] += add
+      if (p.km <= reach) { kinds[p.k][1] += add; if (p.h <= rise) kinds[p.k][2] += add }
+    }
+    return kinds
+  }, [data, reach, rise])
+  return (
+    <details className="compare-more working">
+      <summary>Show the working</summary>
+      <p><EvidenceTag kind="simulation" /> The rule: a building, road piece or place counts when <strong>km ≤ {reach}</strong> (how far the water travels) <strong>and h ≤ {rise} m</strong> (its ground height above the river level at the nearest point of the path).</p>
+      <ol className="working-steps">
+        <li>km: the nearest of the path's points, one every kilometre from the source, along the mapped rivers.</li>
+        <li>h: Copernicus 30 m terrain height at the feature, minus the lowest terrain within about 120 m of that path point (never rising downstream), never below 0.</li>
+        <li>Buildings: {n(steps.b[0])} mapped as affected, {n(steps.b[1])} within {reach} km, <strong>{n(steps.b[2])}</strong> of those at most {rise} m above the river.</li>
+        <li>Roads: {n(steps.r[0])} km mapped, {n(steps.r[1])} km within {reach} km, <strong>{n(steps.r[2])} km</strong> at most {rise} m above the river.</li>
+      </ol>
+      {table && <p className="small"><a href={assetUrl(table)} download>Every feature with its km and h (CSV)</a> · <a href={assetUrl('data/working/scenario-check.xlsx')} download>Spreadsheet with a live count (XLSX)</a></p>}
+    </details>
+  )
+}
+
+function WhatIf({ data, reach, setReach, rise, setRise, table }: { data: SimData; reach: number; setReach: (k: number) => void; rise: number; setRise: (r: number) => void; table?: string }) {
   const hit = useMemo(() => count(data, reach, rise), [data, reach, rise])
   const last = data.path.length - 1
   return (
@@ -100,6 +129,7 @@ function WhatIf({ data, reach, setReach, rise, setRise }: { data: SimData; reach
         {data.totals.roadKm > 0 && <div><dt>Roads below the water</dt><dd>{n(hit.roadKm)} of {n(data.totals.roadKm)} km</dd></div>}
         <div className="wide"><dt>Places below the water: {hit.places.length} of {data.places.length}</dt><dd>{hit.places.join(', ') || 'None'}</dd></div>
       </dl>
+      <WhatIfWorking data={data} reach={reach} rise={rise} table={table} />
       <p className="notice small">Rough what-if, not a forecast and never a safety guide. It compares ground height with the river and ignores water volume, speed and valley shape, and it has not been checked against real floods. Only buildings in the loaded data are counted, so others are missing.</p>
     </>
   )
@@ -209,7 +239,7 @@ export function SimPanel({ manifest, simulation, layer, step, canTime, timeLayer
           : failure ? <p className="notice">The simulation could not start: {failure}</p>
           : !data ? <p className="muted">Loading the flow path…</p>
             : tab === 'replay' ? <Replay data={data} km={km} setKm={setKm} />
-              : <WhatIf data={data} reach={reach} setReach={setReach} rise={rise} setRise={setRise} />}
+              : <WhatIf data={data} reach={reach} setReach={setReach} rise={rise} setRise={setRise} table={manifest.caseStudy.id === 'rasuwa-2026' ? 'data/working/rasuwa-2026-simulation-features.csv' : undefined} />}
       <footer><button className="ghost" onClick={onExit}>Exit simulation</button></footer>
     </section>
   )
