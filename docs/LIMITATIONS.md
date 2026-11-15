@@ -2,7 +2,7 @@
 
 ## Current build
 
-NISAR measurements of the event are loaded, but they are Provisional. Rasuwa GCOV snapshots are not downloaded; the Tsho Rolpa case uses GCOV. Nothing here calculates displacement.
+NISAR measurements of the event are loaded, but they are Provisional. Rasuwa GCOV backscatter is loaded on four dates (frame 74 of Track 48 and frame 16 of Track 98 only; the 31 August snapshot is catalogued, not retrieved), and the Tsho Rolpa case uses GCOV. Nothing here calculates displacement.
 
 ## Rebuilt with the corrected method
 

@@ -9,6 +9,7 @@ import { ReportButtons } from './ReportButtons'
 import { HazardAt } from './HazardAt'
 import { isTerrainScreen } from '../../services/hazards'
 import { stepKind, stepLabel } from '../../services/timeLabels'
+import { evidenceOf, EVIDENCE } from '../../services/evidence'
 
 const CAPTION = { dates: 'This location on each radar date', pairs: 'This location in each radar pair', hours: 'This location through the day (UTC)', steps: 'This location at each saved time' }
 import { isObservability } from '../../services/observability'
@@ -103,6 +104,8 @@ export const Inspector = memo(function Inspector({ layer, layers, point, bookmar
           <dl className="facts">
             <div><dt>Measurement</dt><dd>{layer.name}</dd></div>
             <div><dt>Product</dt><dd>{layer.mission} {layer.productType}</dd></div>
+            <div><dt>Maturity</dt><dd>{layer.productMaturity}</dd></div>
+            <div><dt>Evidence class</dt><dd>{EVIDENCE[evidenceOf(layer)].label}</dd></div>
             <div><dt>Observation</dt><dd>{acquisitionLabel(layer)}</dd></div>
             {layer.orbitDirection && <div><dt>Orbit</dt><dd>{layer.orbitDirection.toLowerCase()}, Track {layer.track}{main.frame ? `, frame ${main.frame}` : ''}</dd></div>}
             <div><dt>Native posting</dt><dd>{posting(layer)}</dd></div>

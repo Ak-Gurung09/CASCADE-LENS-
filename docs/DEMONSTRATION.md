@@ -31,7 +31,7 @@ Unzip `CascadeLens.zip` to a short path, then double-click **Start CascadeLens.b
 - The observability figures were rebuilt on 13 November 2026 with the product's quality mask, over frames 74 and 75. Do not quote figures from before that date: the first method ignored the mask and was withdrawn.
 - Present the before/after comparison as consistent with surface change, not as proof of cause. The two pairs differ in length and radar mode.
 - 14% of the mapped mudflow and 18% of the Trishuli corridor lie outside both frames, so the radar says nothing there.
-- Rasuwa GCOV snapshots are not downloaded, so that tab shows *Download required*.
+- Rasuwa GCOV snapshots are loaded for 16, 23 and 28 August and 12 September. The 31 August one is catalogued only, so it shows *Download required*. The 16 to 28 August change layer compares two radar modes and says so.
 - Keep the Illustrations group (What if, Simulate) out of the main script. They rest on assumed inputs: breach depths, an invented flow speed, a height-above-river rule. If a judge asks, open them as labelled illustrations, not results.
 - All NISAR products are Provisional.
 - Terrain stops at the search envelope.

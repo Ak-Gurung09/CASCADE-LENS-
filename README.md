@@ -6,7 +6,7 @@ GAIA: Seeing Earth Dance. A Team GAIA project for NASA Space Apps Challenge 2026
 
 CascadeLens is a retrospective evidence explorer for the 26 August 2026 Rasuwa–Bhote Koshi–Trishuli disaster in Nepal, with a second case on the Tsho Rolpa glacial lake. It is designed to put NISAR radar measurements on a map with their quality, provenance and limits in view. It is not a warning system.
 
-> **Data status: real NISAR measurements are loaded.** For Rasuwa, Pair A (GUNW and GOFF, Track 48 descending) and Pair B (GUNW and GOFF, Track 98 ascending, the opposite side) passed QA. Tsho Rolpa uses GCOV on four dates; Rasuwa GCOV is not downloaded. All products are Provisional. No displacement is calculated anywhere.
+> **Data status: real NISAR measurements are loaded.** For Rasuwa, Pair A (GUNW and GOFF, Track 48 descending) and Pair B (GUNW and GOFF, Track 98 ascending, the opposite side) passed QA. Tsho Rolpa uses GCOV on four dates. Rasuwa also has GCOV backscatter on four dates (Track 48 on 16 and 28 August, Track 149 on 23 August, Track 98 on 12 September), frame 74 or 16 only. All products are Provisional. No displacement is calculated anywhere.
 >
 > **Rebuilt on 13 November 2026** from the raw NISAR files, with the corrected method: the product's own quality mask is applied, frames 74 and 75 are both assessed, and the before/after comparison is reproducible from the repository. The first observability method, which ignored the mask, is withdrawn. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) and [docs/RADAR_OBSERVABILITY.md](docs/RADAR_OBSERVABILITY.md).
 
@@ -195,7 +195,7 @@ cd frontend && npm run dev:fixture
 
 ## Known limitations
 
-All NISAR products are Provisional, and Rasuwa GCOV is not downloaded. Phase is not converted to displacement. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+All NISAR products are Provisional. Rasuwa GCOV covers frame 74 (Track 48) and frame 16 (Track 98) only, and its one before-and-after change layer compares two radar modes. Phase is not converted to displacement. Offsets are radar components, not geographic vectors. UNOSAT and Sentinel-1 layers are preliminary and are not NISAR results. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
 ## Documentation
 

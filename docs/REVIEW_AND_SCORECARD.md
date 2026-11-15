@@ -49,7 +49,7 @@ Test totals on 2026-11-10: Python 72 passed, 35 skipped (need raw files); unit 5
 |---|---|---|---|---|
 | NASA relevance | 8 | Real NISAR L-band products answer a real disaster question | One event | Add a second event or region |
 | Scientific validity | 7 | Reasons kept separate, product masks honoured and decoded bit by bit, over-claims corrected, every shipped figure rebuilt reproducibly with intervals | The control comparison is not like for like; Provisional data, no field truth | A like-for-like control pair |
-| NISAR integration | 8 | GUNW, GOFF, GCOV read from HDF5 with metadata and QA gates | GCOV not loaded for Rasuwa | Rasuwa GCOV snapshots |
+| NISAR integration | 8 | GUNW, GOFF, GCOV read from HDF5 with metadata and QA gates | Rasuwa GCOV covers frames 74 and 16 only (loaded 15 Nov) | More Rasuwa GCOV frames |
 | Originality | 7 | Task-specific observability (change vs movement) with reasons, tied to roads | Layover/shadow maps exist elsewhere; novelty is the per-task, per-reason framing | Show a case where it changes a decision |
 | Observability intelligence | 8 | Per pixel, per task, inspectable, tested; version 2 honours the product's mask, marks missing inputs as not assessed, combines frames 74 and 75, and adds the opposite viewing direction as its own view, compared but never merged | Passive shadow (from a distant ridge) not modelled | Model passive shadow from the DEM |
 | Temporal analysis | 6 | 5-pair zone series with intervals from two directions, one of them in a single radar mode; per-pixel coherence through time for both, Track 48 over frames 74 and 75 | Coherence only; pre-event pairs are 24 days | A 12-day pre-event pair |

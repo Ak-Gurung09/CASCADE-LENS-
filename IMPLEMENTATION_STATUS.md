@@ -24,7 +24,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 
 ## What is not done
 
-- **Rasuwa GCOV snapshots** are not downloaded. They need 31 GB, and the tab says so. The Tsho Rolpa case does use GCOV.
+- **Rasuwa GCOV snapshots** are loaded since 15 November for 16, 23 and 28 August and 12 September, frame 74 or 16 only. The 31 August snapshot is catalogued, not retrieved. The Tsho Rolpa case also uses GCOV.
 - **GSLC** is deferred: no justified use yet.
 - **Displacement** is deliberately absent, because the phase sign convention is undocumented.
 - **Parts of the study area lie outside both Track 48 frames**: 14% of the mapped mudflow, 18% of the Trishuli corridor and 19% of the whole case area. Track 98 frame 16 covers all of it, from the other side.
@@ -32,10 +32,10 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 - **BIPAD's licence is not established.** Its landslide reports are used for the threshold run but not redistributed; NDRRMA has to confirm terms.
 - **Not built from the November master prompt** (need data or are out of scope): river-flow context (GloFAS), a rainfall map layer (IMERG Late is on disk for the threshold model, but not drawn in the app), live processing, hosting. Slope screening and road exposure were built on 10 November as experimental screens. Machine-learning landslide prediction and calibrated flood probabilities are deliberately not attempted.
 - **No field validation** exists, and the data is Provisional.
-- **Not tested** on another computer, a physical phone, or a hosted server. Browser tests ran in Microsoft Edge and Brave up to 2 November, and in Chromium from 10 November. They have not run in Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
+- **Not tested** on another computer or a physical phone. The hosted version on GitHub Pages was opened in a real browser on 15 November 2026 and starts the app. Browser tests ran in Microsoft Edge and Brave up to 2 November, and in Chromium from 10 November. They have not run in Chrome, Firefox or Safari. The code has been reviewed for Firefox and Safari problems, but never run in them.
 - **The app cannot run from `index.html` directly.** Browsers block that, and the page now explains what to do.
 - **The Space Apps rules have not been checked.** On 13 November 2026, spaceappschallenge.org answered 503 or could not be reached from the cloud environment, so the submission requirements and judging criteria were not read.
-- **Not created:** a public repository, submission links or a hosted deployment.
+- **Public repository and hosting:** the code is public at https://github.com/Ak-Gurung09/CASCADE-LENS- and the app is published at https://ak-gurung09.github.io/CASCADE-LENS-/ . Submission links are the team's to add.
 
 ## Feature status
 
@@ -47,7 +47,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | HDF5 inspection | Implemented and tested | Real files | Real | |
 | GUNW extraction | Implemented and tested | Real files | Real | Pair A |
 | GOFF extraction | Implemented and tested | Real files | Real | Pairs A and B |
-| GCOV extraction | Implemented and tested | NASA sample file, Tsho Rolpa files | Real for Tsho Rolpa | Rasuwa GCOV (31 GB) not downloaded |
+| GCOV extraction | Implemented and tested | NASA sample file, Tsho Rolpa files | Real for Tsho Rolpa and Rasuwa | Rasuwa: four dates, frames 74 and 16 only (15 Nov) |
 | Ionosphere-removed phase | Implemented and tested | Real files | Real, derived | Labelled as calculated here |
 | Analysis against UNOSAT polygons | Implemented and tested | Real files | Real | Descriptive only |
 | Browse-preview fallback | Implemented and tested | Real PNG and KML | Not needed now | Section 24 emergency mode |
@@ -96,7 +96,7 @@ Report date: 2026-11-10, updated 2026-11-13 for the scientific corrections of 12
 | Status registry (`frontend/public/data/status.json`) | Implemented and tested | Unit test checks every "complete" claim names a test that calls its computation | n/a | Shown in the app as "What is real?" |
 | Claim register (`frontend/public/data/claims.json`) | Implemented and tested | Unit test keeps the wording of RED claims off every live surface | n/a | 30 claims: 25 from the Stage 0 audit, one added at the rebuild, two with the Track 98 view and two with the rainfall-threshold run (C29, and C30 as a guard against claiming landslide warnings), with basis and status |
 | Image swipe comparison | Implemented | No automated test | Real, Tsho Rolpa GCOV dates | Tsho Rolpa compare mode |
-| Public repository, deployment | Not implemented | None | n/a | Team decision |
+| Public repository, deployment | Implemented (15 Nov) | `tests/integration/test_release_consistency.py` checks the Pages workflow; opened in a real browser | Real | GitHub Pages, rebuilt from `main` |
 
 ## Commands executed and results
 
@@ -206,14 +206,14 @@ These are medians of 3 localhost runs, not hosted or low-bandwidth measurements.
 
 | Group | Product | Frames | Status |
 |---|---|---|---|
-| Pair A, 16→28 Aug, Track 48 descending | GUNW | 74, 75 | Validated by the QA gates |
-| Pair A | GOFF | 74, 75 | Validated by the QA gates |
-| Pair B, 19→31 Aug, Track 98 ascending | GUNW | 16 | Validated by the QA gates (13 Nov) |
-| Pair B | GOFF | 15, 16 | Validated by the QA gates |
-| Series, before and after the event | GUNW | Track 48: 74 (and 75 before); Track 98: 16 | Validated by the QA gates (13 Nov) |
-| Snapshots 28 and 31 Aug | GCOV | 74, 75, 15, 16 | Not downloaded |
+| Pair A, 16→28 Aug, Track 48 descending | GUNW | 74, 75 | Passed the QA gates |
+| Pair A | GOFF | 74, 75 | Passed the QA gates |
+| Pair B, 19→31 Aug, Track 98 ascending | GUNW | 16 | Passed the QA gates (13 Nov) |
+| Pair B | GOFF | 15, 16 | Passed the QA gates |
+| Series, before and after the event | GUNW | Track 48: 74 (and 75 before); Track 98: 16 | Passed the QA gates (13 Nov) |
+| Snapshots 16, 23, 28 Aug and 12 Sep | GCOV | 74 (Track 48, 149), 16 (Track 98) | Prepared (15 Nov); 31 Aug catalogued only |
 
-"Validated" means these gates passed. The products themselves remain NASA Provisional. Pair B frame 15 does not reach the mapped extent, so its GUNW is not used.
+"Passed" means these automated gates passed; it is not a scientific validation. The products themselves remain NASA Provisional. Pair B frame 15 does not reach the mapped extent, so its GUNW is not used.
 
 ## Findings
 

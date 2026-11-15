@@ -18,6 +18,13 @@ describe('first-minute finding', () => {
     expect(f.points).toHaveLength(3)
     expect(text).toMatch(/beyond the radar frames checked \(74 and 75\)/)
   })
+  it('reports each viewing direction at the source on its own', () => {
+    const m = shipped()
+    const judge = finding(m)!.points.find((p) => p.label === 'What the radar could judge')!.text
+    const t98 = m.observabilityViews!.t98.zones.disturbance['vector:unosat_detachment_zone.geojson'].percent!
+    expect(judge).toContain('from Track 48, a surface change could be judged on 0%')
+    expect(judge).toContain(`From Track 98, the opposite side, those shares are ${Math.round(t98.Usable)}% and 0%`)
+  })
   it('follows the data rather than fixed numbers', () => {
     const m = shipped()
     m.controlSeries!.pairs.forEach((p) => { p.inside = 0.111 })

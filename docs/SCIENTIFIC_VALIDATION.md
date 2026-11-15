@@ -10,7 +10,7 @@
 | Pair B | GOFF | 98 ascending | 15, 16 | Downloaded, inspected, QA passed, prepared |
 | Track 98 series, 26 Jul → 6 Oct 2026 | GUNW | 98 ascending | 16 | Four more pairs (one before the event, three after), QA passed, coherence prepared |
 | Track 48 series, 23 Jul → 3 Oct 2026 | GUNW | 48 descending | 74, 75 | Four more pairs in each frame, QA passed, coherence prepared |
-| Snapshots, 28 and 31 Aug | GCOV | 48 and 98 | 74, 75, 15, 16 | Catalogued only. 31 GB needed |
+| Snapshots, 16, 23 and 28 Aug, 12 Sep | GCOV | 48, 149 and 98 | 74 (Track 48 and 149), 16 (Track 98) | Downloaded from NASA Earthdata on 15 Nov, prepared at 40 m (map) and 80 m (inspector). 31 Aug (Track 98) catalogued only |
 
 All granules are PROVISIONAL, CRID P05023. `tests/integration/test_rasuwa_data.py` checks them.
 

@@ -35,7 +35,12 @@ export function finding(m: Manifest): Finding | null {
   }
   if (observabilityCurrent(m)) {
     const d = zone('disturbance', det)?.percent, mv = zone('movement', det)?.percent
-    if (d && mv) points.push({ label: 'What the radar could judge', text: `At the source, a surface change could be judged on ${pct(d.Usable)} of the ground, and ground movement could be measured on ${pct(mv.Usable)}. The rest has a reason attached: outside the frame, no valid data, hidden by terrain or not assessed.` })
+    // Each viewing direction is reported on its own: one track's gap is never hidden behind the other's coverage, or the reverse.
+    const others = Object.values(m.observabilityViews ?? {}).flatMap((v) => {
+      const vd = v.zones?.disturbance?.[det]?.percent, vm = v.zones?.movement?.[det]?.percent
+      return vd && vm ? [`From Track ${v.track}${v.orbit !== o.orbit ? ', the opposite side,' : ''} those shares are ${pct(vd.Usable)} and ${pct(vm.Usable)}.`] : []
+    })
+    if (d && mv) points.push({ label: 'What the radar could judge', text: `At the source, from Track ${o.track}, a surface change could be judged on ${pct(d.Usable)} of the ground, and ground movement could be measured on ${pct(mv.Usable)}. ${others.join(' ')} The rest has a reason attached: outside the frame, no valid data, hidden by terrain or not assessed.`.replace(/\s+/g, ' ') })
   } else {
     points.push({ label: 'What the radar could judge', text: STALE_NOTE })
   }
