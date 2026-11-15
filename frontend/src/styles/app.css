@@ -842,3 +842,6 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 /* Show the working */
 .working ol.working-steps { margin: 6px 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.5; }
 .working a { color: var(--accent); }
+.sim-panel .tabs.segmented { flex-wrap: wrap; border-radius: 22px; }
+.impact-key { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--muted); }
+.impact-key i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }

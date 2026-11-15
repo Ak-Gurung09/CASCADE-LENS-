@@ -178,3 +178,54 @@ Of the 5,017 buildings in the table, 489 have km ≤ 74 and h ≤ 10.
 ### What this does not include
 
 Water volume, speed, valley shape, sediment and the fall of a flood downstream are all ignored. Only buildings UNOSAT mapped as affected are counted. The 30 m DEM smooths narrow gorges, and its vertical error is several metres. See [LIMITATIONS.md](LIMITATIONS.md).
+
+## 3. Rasuwa: a mentor's "cliff ricochet" (Hypothesis)
+
+**Source:** a mentor, oral communication, no location or figures given. The account: the water hit a cliff edge and "ricocheted at double the force and the other way". Nobody has said where, how fast the flow was, or what "double" was measured against. CascadeLens tests where it could have happened. It does not confirm that it did.
+
+### The physics first
+
+For a flow of density ρ (kg/m³), discharge Q (m³/s) and speed v (m/s):
+
+- **Stopped by a wall, or turned 90° along it:** the push on the wall is F = ρQv, in newtons. The impact pressure is about ρv², in pascals.
+- **Turned fully back:** the flow's momentum is reversed, so F = 2ρQv, with pressure up to about 2ρv². This is the textbook result for a jet striking a plate and turning back.
+- So **"double the force" is right about the push on the cliff**, compared with water that simply stops.
+- **It is wrong about the water itself.** Water leaving a wall cannot be faster, or carry more energy, than the water arriving. Real impacts lose energy to turbulence and to rock breaking up. The bounce sends the flow "the other way", across the valley or partly back up it, with *less* energy, not more.
+- **Debris flows are denser than water:** about 1,800 to 2,200 kg/m³, against 1,000 kg/m³ for clear water. That raises F for the same speed.
+
+**Worked example, with invented round numbers (not Rasuwa measurements):** v = 10 m/s, a flow cross-section of 500 m², ρ = 2,000 kg/m³.
+
+- Q = 500 × 10 = 5,000 m³/s
+- Stopped: F = ρQv = 2,000 × 5,000 × 10 = **1.0 × 10⁸ N**
+- Turned fully back: F = 2ρQv = **2.0 × 10⁸ N**
+- Impact pressure about ρv² = 2,000 × 10² = 2.0 × 10⁵ Pa, up to about 4.0 × 10⁵ Pa if turned back.
+
+### Finding candidate places from the data
+
+`processing/scripts/find_impact_sites.py`, with its logic in `processing/src/cascade_lens/impact.py`, uses only data already in the repository: the Simulate flow path, the Copernicus GLO-30 clip, the UNOSAT mudflow extent and OSM rivers. The thresholds were fixed before looking at the results:
+
+1. The path is densified to a point every 50 m. A **bend** turns by at least 45° between the 750 m before a point and the 750 m after it.
+2. The **outer bank** is the side the flow would hit going straight on. A bend is a **candidate** when the terrain slope there reaches at least 35° within 300 m of the channel.
+3. For each candidate: the bend angle; the **radius of curvature** R_c, the radius of the circle through the points 750 m before, at, and 750 m after the bend; the **channel width** b, where the mudflow extent crosses a line square to the flow; and the wall's slope and height above the river.
+
+### Testing each candidate
+
+- **Superelevation** (Hungr et al. 1984). Round a bend, a flow stands higher on the outer bank by Δh = k·v²·b / (g·R_c). On cross-sections every 50 m from 300 m before the bend to 300 m after, the DEM height of the extent's edge is read on each bank, and Δh is the median outer-minus-inner difference. Then v = √(g·R_c·Δh / (k·b)), given for k = 5 (slowest) to k = 1 (fastest), since debris flows often need k > 1.
+- **A control for one-sided offsets.** On straight stretches (turning less than 15°), the same edge heights are compared left against right. Any steady difference there would show at every bend too, so it is taken off each bend's Δh.
+- **Run-up.** If the extent reaches h_up above the river on the facing wall, the flow had at least v = √(2g·h_up) when it arrived.
+- **Radar,** reported, not judged: Pair B (Track 98) median coherence (valid pixels only) and the REACH Sentinel-1 change screening, within 300 m of the bend on each bank.
+- **The terrain's limits.** If b or R_c is under two terrain cells (60 m), or the bend is on a straight line joining mapped features rather than a mapped river, or fewer than 3 cross-sections reach both edges of the extent, the answer is "cannot judge here", with no number.
+- **Outcome.** Supports a hard outer-bank impact if Δh after the control is at least 5 m (more than the terrain's own height error); does not show it otherwise.
+
+**Worked example (site S16, km 138):** R_c = 530.9 m, b = 105.7 m, Δh = 30.4 m before the control and 21.6 m after it. With k = 1: v = √(9.81 × 530.9 × 21.6 / (1 × 105.7)) = √1,064 = 32.6 m/s. With k = 5: √(1,064 / 5) = 14.6 m/s. Run-up: h_up = 34.1 m, so v ≥ √(2 × 9.81 × 34.1) = 25.9 m/s. These are what the formulas give from a preliminary outline on 30 m terrain, not measured speeds: see below.
+
+### What the data say
+
+The full table and the reasons for each outcome are in [data/qa/rasuwa-2026-impact-sites.md](../data/qa/rasuwa-2026-impact-sites.md) and the CSV beside it. In short: 27 candidates, of which 12 meet the support rule, 14 do not and 1 cannot be judged. But on 318 straight cross-sections the extent's edge sits 8.8 m higher on the flow's left, and those differences scatter widely (middle half −3 to +21 m). Before that control, almost every right-hand bend looked like support. After it, the strongest bends differ by about 18 to 22 m, inside the range straight stretches show. **No site shows the marks clearly enough to point to one place.** Near km 13 (S1), the obvious bend against a 60° wall, the extent reaches about 105 m higher on the *inner* bank, the opposite of superelevation. Near km 6 the path does not turn enough, and it is a straight line far from any mapped river. The run-up bounds come out at 10 to 30 m/s even more than 100 km downstream, which is implausible and says the extent's edge on the walls is not a run-up line.
+
+### What to ask the mentor
+
+1. Where: the village, bridge, river bend or km along the Bhote Koshi or Trishuli.
+2. The source: a report (which one), a video or photo (where it can be seen), or a field visit (who, and when).
+3. What "double" meant: the push on the rock (which the physics allows), the damage seen, or how fast or far the water went (which the physics does not allow).
+4. When in the event it happened, and whether it was water, mud and boulders, or a landslide into the river.

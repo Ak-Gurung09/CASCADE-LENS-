@@ -12,7 +12,31 @@ export interface SimData {
   totals: { buildings: number; buildingsAll: number; mappedRoadKm: number; roadKm: number }
 }
 
-export interface SimView { data: SimData; mode: 'replay' | 'whatif'; km: number; rise: number }
+// Candidate cliff-impact sites, written by processing/scripts/find_impact_sites.py. Hypothesis only.
+export type ImpactOutcome = 'supports a hard outer-bank impact' | 'does not show it' | 'cannot judge'
+export interface ImpactSite {
+  id: string; km: number; lng: number; lat: number; turn_deg: number; outer_side: string; on_mapped_river: number
+  rc_m: number | null; b_m: number | null; river_m: number; wall_slope_deg: number; wall_height_m: number; inner_slope_deg: number; sections: number
+  dh_raw_m: number | null; control_m: number; dh_m: number | null; h_up_outer_m: number | null; h_up_inner_m: number | null
+  v_super_k5_ms: number | null; v_super_k1_ms: number | null; v_runup_min_ms: number | null
+  coh_outer_median: number | null; coh_inner_median: number | null; s1_change_outer_pct: number | null; s1_change_inner_pct: number | null
+  outcome: ImpactOutcome; reasons: string
+}
+export interface ImpactSites {
+  evidenceClass: 'Hypothesis'; source: string
+  thresholds: { turnDeg: number; withinKm: number; wallSlopeDeg: number; wallReachM: number; demNoiseM: number; minResolvedM: number; k: [number, number] }
+  control: { leftMinusRightM: number; sections: number; p25M: number; p75M: number }
+  features: { type: 'Feature'; geometry: { type: 'Point'; coordinates: [number, number] }; properties: ImpactSite }[]
+}
+export const IMPACT_COLOURS: Record<ImpactOutcome, string> = { 'supports a hard outer-bank impact': '#ff7f66', 'does not show it': '#7fd1c7', 'cannot judge': '#9a93b8' }
+
+export interface SimView { data: SimData; mode: 'replay' | 'whatif' | 'impact'; km: number; rise: number; impact?: ImpactSites; selected?: string }
+
+export async function loadImpactSites(path = 'data/vectors/impact_sites.json'): Promise<ImpactSites> {
+  const res = await fetch(assetUrl(path))
+  if (!res.ok) throw new Error(`Impact sites request failed with HTTP ${res.status}`)
+  return res.json()
+}
 
 export async function loadSimulation(path: string): Promise<SimData> {
   const res = await fetch(assetUrl(path))
