@@ -99,6 +99,7 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
   const [labelsOn, setLabelsOn] = useState(true)
   const [exag, setExag] = useState(1.5)
   const [spin, setSpin] = useState(false)
+  const [missing, setMissing] = useState<string[]>([])
 
   // The model description, its heights and every picture
   useEffect(() => {
@@ -111,8 +112,13 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
         setOn(Object.fromEntries(md.layers.filter((l) => l.group !== 'radar').map((l) => [l.id, l.on])))
         fetch(assetUrl(md.heights)).then((r) => { if (!r.ok) throw new Error(`Heights request failed with HTTP ${r.status}`); return r.arrayBuffer() })
           .then((b) => { if (live) setHeights(Float32Array.from(new Int16Array(b))) }).catch(fail)
-        Promise.all([['base', md.base], ...md.layers.map((l) => [l.id, l.file])].map(([id, f]) => loadImage(assetUrl(f)).then((i) => [id, i] as const)))
-          .then((all) => { if (live) setImages(Object.fromEntries(all)) }).catch(fail)
+        // Each picture arrives on its own and is tried twice, so one slow file never holds back the rest.
+        // Without the terrain picture there is no model; a missing map layer is only marked as not loaded.
+        ;[['base', md.base], ...md.layers.map((l) => [l.id, l.file])].forEach(([id, f]) => {
+          loadImage(assetUrl(f)).catch(() => loadImage(assetUrl(f)))
+            .then((i) => { if (live) setImages((all) => ({ ...all, [id]: i })) })
+            .catch((e: Error) => { if (!live) return; if (id === 'base') fail(e); else setMissing((m) => [...m, id]) })
+        })
       }).catch(fail)
     return () => { live = false }
   }, [url])
@@ -306,6 +312,7 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
               <li key={l.id}>
                 <label className="check"><input type="checkbox" checked={Boolean(on[l.id])} onChange={(e) => setOn((o) => ({ ...o, [l.id]: e.target.checked }))} /><i className="swatch" style={{ background: l.color }} />{l.name}</label>
                 <EvidenceTag kind={l.evidence} compact />
+                {missing.includes(l.id) && <p className="muted small" role="status">This picture did not load. Reopen 3D to try again.</p>}
                 {l.limitations[0] && <p className="muted small">{l.limitations[0]}</p>}
               </li>
             ))}
@@ -316,6 +323,7 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
             <button role="tab" aria-selected={radar === ''} className={radar === '' ? 'on' : ''} onClick={() => setRadar('')}>Off</button>
             {radars.map((l) => <button key={l.id} role="tab" aria-selected={radar === l.id} className={radar === l.id ? 'on' : ''} onClick={() => setRadar(l.id)}>{l.id.replace('coherence-t', 'Track ')}</button>)}
           </div>
+          {shownRadar && missing.includes(shownRadar.id) && <p className="muted small" role="status">This radar picture did not load. Reopen 3D to try again.</p>}
           {shownRadar && <div className="model-layers"><p className="small">{shownRadar.name} <EvidenceTag kind={shownRadar.evidence} compact /></p>
             <p className="muted small">Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there.</p>
             {shownRadar.maturity && <p className="muted small">Product maturity: {shownRadar.maturity}.</p>}
