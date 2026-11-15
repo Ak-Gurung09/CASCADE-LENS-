@@ -6,6 +6,7 @@ import { elapsedMs } from '../../services/simulation'
 import type { EvidenceClass } from '../../services/evidence'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 import { buildBlock, strataTexture, type Built } from './block3d'
+import { unpackHeights } from './heights'
 
 // A block model of the whole Rasuwa–Bhote Koshi–Trishuli corridor: NASADEM heights with UNOSAT maps, OSM rivers and NASA
 // radar layers (NISAR stability and backscatter, OPERA Sentinel-1 change) draped on top, and arrows for the way each NISAR
@@ -22,6 +23,8 @@ interface ModelSource { name: string; attribution?: string; limitations: string[
 export interface Model3D {
   name: string
   heights: string
+  heightsPacked?: string
+  startBytes?: number // what the model needs before it can show, with the packed heights
   width: number
   height: number
   spacingM: number
@@ -151,9 +154,11 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
         if (!live) return
         setModel(md)
         setOn(Object.fromEntries(md.layers.filter((l) => l.group !== 'radar').map((l) => [l.id, l.on])))
-        const heightsBytes = md.width * md.height * 2
-        twice(() => fetchBytes(assetUrl(md.heights), heightsBytes, track('heights')))
-          .then((b) => { if (live) setHeights(Float32Array.from(new Int16Array(b))) }).catch(fail)
+        // The packed heights are about a third of the plain file; browsers without DecompressionStream get the plain one
+        const packed = md.heightsPacked && typeof DecompressionStream !== 'undefined'
+        twice(() => fetchBytes(assetUrl(packed ? md.heightsPacked! : md.heights), packed ? 0 : md.width * md.height * 2, track('heights')))
+          .then((b) => (packed ? unpackHeights(b, md.width, md.height) : Float32Array.from(new Int16Array(b))))
+          .then((z) => { if (live) setHeights(z) }).catch(fail)
         ;[['base', md.base], ...md.layers.filter((l) => l.group !== 'radar').map((l) => [l.id, l.file])].forEach(([id, f]) => {
           twice(() => fetchImage(assetUrl(f), track(id)))
             .then((i) => { if (live) setImages((all) => ({ ...all, [id]: i })) })
@@ -342,7 +347,7 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
   // Progress counts only what the model needs before it can show: heights, terrain picture and the layers that start switched on
   const startIds = ['heights', 'base', ...(model?.layers.filter((l) => l.group !== 'radar' && l.on).map((l) => l.id) ?? [])]
   const loadedMb = startIds.reduce((t, id) => t + (got[id]?.[0] ?? 0), 0) / 1e6
-  const totalMb = Math.max(loadedMb, startIds.reduce((t, id) => t + (got[id]?.[1] ?? 0), 0) / 1e6, model ? (model.width * model.height * 2) / 1e6 : 0)
+  const totalMb = Math.max(loadedMb, startIds.reduce((t, id) => t + (got[id]?.[1] ?? 0), 0) / 1e6, (model?.startBytes ?? 0) / 1e6)
   const refs = model?.layers.filter((l) => l.group !== 'radar') ?? []
   const radars = model?.layers.filter((l) => l.group === 'radar') ?? []
   const shownRadar = radars.find((l) => l.id === radar)
