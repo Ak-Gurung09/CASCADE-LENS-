@@ -150,10 +150,19 @@ export function addReport(c: FieldCheck, r: ReportInput, now = new Date()): Fiel
 
 // ---------- storage ----------
 
+const isLngLat = (q: unknown) => Array.isArray(q) && q.length === 2 && q.every((v) => typeof v === 'number' && Number.isFinite(v)) && Math.abs(q[0]) <= 180 && Math.abs(q[1]) <= 90
+const isHumanReport = (r: HumanReport) => Boolean(r && typeof r.finding === 'string' && r.finding.trim() && typeof r.source === 'string' && r.source.trim()
+  && typeof r.observedOn === 'string' && isDate(r.observedOn) && STATUSES.includes(r.outcome))
+
+// A stored or imported record must hold together: real coordinates, complete field reports, and a ground outcome
+// (Verified, Not confirmed) only where a field report with that outcome stands behind it. A file cannot skip addReport's checks.
 function isRecord(x: unknown): x is FieldCheck {
   const c = x as FieldCheck
   return Boolean(c && c.schema === SCHEMA && typeof c.id === 'string' && STATUSES.includes(c.status) && c.feature?.type === 'road-stretch'
-    && c.satellite && Array.isArray(c.reports) && Array.isArray(c.history))
+    && c.satellite && Array.isArray(c.reports) && Array.isArray(c.history)
+    && (c.geometry === null || (Array.isArray(c.geometry) && c.geometry.length > 0 && c.geometry.every(isLngLat)))
+    && c.reports.every(isHumanReport)
+    && (!NEEDS_EVIDENCE.includes(c.status) || c.reports.some((r) => r.outcome === c.status)))
 }
 
 export function load(store: Pick<Storage, 'getItem'> | null = safeStorage()): FieldCheck[] {

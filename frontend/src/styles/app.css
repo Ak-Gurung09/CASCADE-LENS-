@@ -98,7 +98,8 @@ button.link:hover:not(:disabled) { background: none; color: #fff; }
 .logo svg circle, .logo svg path { stroke: var(--gold); }
 .brand-text { display: flex; flex-direction: column; gap: 3px; line-height: 1.1; }
 .brand-text strong { font: 700 13px var(--sans); letter-spacing: .3em; text-transform: uppercase; color: #fff; }
-.brand-text span { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.brand-text span { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; white-space: nowrap; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 1600px) { .brand-text span { white-space: normal; max-width: 158px; line-height: 1.25; } .modes-label { display: none; } }
 .case-pill { position: relative; display: flex; align-items: center; flex: 0 1 auto; min-width: 150px; border: 1px solid var(--outline); border-radius: 999px; padding-left: 16px; min-height: 44px; transition: border-color .3s ease-in-out; }
 .case-pill:hover { border-color: #fff; }
 .case-pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex: none; }

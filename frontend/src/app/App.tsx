@@ -251,7 +251,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
       <header className="topbar">
         <div className="brand">
           <span className="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="#fff" strokeWidth="2.2" /><path d="M15 15l5 5" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg></span>
-          <span className="brand-text"><strong>CascadeLens</strong><span>by Team GAIA</span></span>
+          <span className="brand-text"><strong>CascadeLens</strong><span>NISAR surface-change evidence explorer</span></span>
         </div>
         {CASES.length > 1 ? (
           <label className="case-pill"><i aria-hidden="true" /><span className="sr-only">Case study</span>

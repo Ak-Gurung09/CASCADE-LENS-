@@ -87,6 +87,28 @@ describe('field-check storage and import', () => {
     expect(() => parseImport('{"records": []}')).toThrow(/not a CascadeLens/)
     expect(() => parseImport('nope')).toThrow(/not JSON/)
   })
+
+  it('refuses a file that marks a record Verified without a field report, or carries broken coordinates or reports', () => {
+    const c = createFromRoad(shipped, stretch(high), NOW)
+    const file = (r: object) => JSON.stringify({ ...JSON.parse(toJson([c], NOW)), records: [{ ...c, ...r }] })
+    expect(() => parseImport(file({ status: 'verified' }))).toThrow(/incomplete/)
+    expect(() => parseImport(file({ status: 'not-confirmed', reports: [{ id: 'x', addedAt: NOW.toISOString(), observedOn: '2026-11-10', source: 'S', finding: 'F', outcome: 'unable', independentlyConfirmed: false }] }))).toThrow(/incomplete/)
+    expect(() => parseImport(file({ geometry: [[200, 28]] }))).toThrow(/incomplete/)
+    expect(() => parseImport(file({ geometry: [['85.3', 28.1]] }))).toThrow(/incomplete/)
+    expect(() => parseImport(file({ geometry: [] }))).toThrow(/incomplete/)
+    expect(() => parseImport(file({ reports: [{ id: 'x', addedAt: NOW.toISOString(), observedOn: 'yesterday', source: 'S', finding: 'F', outcome: 'unable', independentlyConfirmed: false }] }))).toThrow(/incomplete/)
+    expect(() => parseImport(file({ reports: [{ id: 'x', addedAt: NOW.toISOString(), observedOn: '2026-11-10', source: ' ', finding: 'F', outcome: 'unable', independentlyConfirmed: false }] }))).toThrow(/incomplete/)
+    // A record with no geometry stays importable: it is a gap, not an error
+    expect(parseImport(file({ geometry: null }))).toHaveLength(1)
+    const verified = addReport(c, { observedOn: '2026-11-10', source: 'Field team', finding: 'Road open', outcome: 'verified', independentlyConfirmed: false }, NOW)
+    expect(parseImport(toJson([verified], NOW))[0].status).toBe('verified')
+  })
+
+  it('drops stored records that do not hold together, and keeps the rest', () => {
+    const c = createFromRoad(shipped, stretch(high), NOW)
+    const store = { getItem: () => JSON.stringify([c, { ...c, id: 'bad', status: 'verified' }]) }
+    expect(load(store).map((x) => x.id)).toEqual([c.id])
+  })
 })
 
 describe('field-check exports', () => {
