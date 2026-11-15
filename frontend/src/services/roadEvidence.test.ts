@@ -19,7 +19,7 @@ const find = (test: (s: RoadSegment) => boolean) => {
 }
 
 const report = (road: ReturnType<typeof roadEvidence>): Report => ({
-  title: 'T', generatedAt: '2026-11-13T00:00:00.000Z', case: { id: 'rasuwa-2026', name: 'Rasuwa', eventDate: '2026-08-26' }, point: { lng: 85.3, lat: 28.1 },
+  title: 'T', evidenceId: 'CL-test', generatedAt: '2026-11-13T00:00:00.000Z', case: { id: 'rasuwa-2026', name: 'Rasuwa', eventDate: '2026-08-26' }, point: { lng: 85.3, lat: 28.1 },
   observability: null, readings: [], explanations: [], hazards: { terrain: null, road, maturity: 'Experimental screens, not forecasts' }, notes: [],
 })
 

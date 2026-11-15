@@ -19,6 +19,23 @@ export function currentCase(search = window.location.search) {
   return CASES.find((c) => c.id === id) ?? CASES[0]
 }
 
+// A spot in the address (?at=lat,lng), so a report's link, a bookmark or a reload reopens the same place. Nonsense is ignored.
+export function pointFromUrl(search = window.location.search): [number, number] | null {
+  const raw = new URLSearchParams(search).get('at')
+  const m = raw ? /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/.exec(raw) : null
+  if (!m) return null
+  const lat = Number(m[1]), lng = Number(m[2])
+  return Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? [lng, lat] : null
+}
+
+// The same address with the spot set (or removed), keeping every other parameter.
+export function urlWithPoint(href: string, p: [number, number] | null): string {
+  const u = new URL(href)
+  if (p) u.searchParams.set('at', `${p[1].toFixed(5)},${p[0].toFixed(5)}`)
+  else u.searchParams.delete('at')
+  return u.toString().replace(/([?&]at=[^&#]*?)%2C/, '$1,') // a readable comma, which URLSearchParams also accepts
+}
+
 export async function loadManifest(url = assetUrl(`data/manifests/${currentCase().file}`)): Promise<Manifest> {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Manifest request failed with HTTP ${res.status}`)

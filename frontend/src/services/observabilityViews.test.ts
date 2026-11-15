@@ -67,7 +67,7 @@ describe('observability from two viewing directions', () => {
   it('prints each view in the report, each with its own pair and answers', () => {
     const view = (frame: string, answer: string) => ({ pair: 'a to b', frame, methodVersion: 2, current: true, answers: [{ question: 'Q?', answer }], reasons: [] })
     const r: Report = {
-      title: 'T', generatedAt: '2026-11-13T00:00:00.000Z', case: { id: 'rasuwa-2026', name: 'Rasuwa', eventDate: '2026-08-26' }, point: { lng: 85.3, lat: 28.1 },
+      title: 'T', evidenceId: 'CL-test', generatedAt: '2026-11-13T00:00:00.000Z', case: { id: 'rasuwa-2026', name: 'Rasuwa', eventDate: '2026-08-26' }, point: { lng: 85.3, lat: 28.1 },
       observability: view('Track 48, descending, frames 74 and 75', 'No valid data in the product'), otherViews: [view('Track 98, ascending, frame 16', 'Usable')],
       readings: [], explanations: [], notes: [],
     }

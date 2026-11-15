@@ -2,7 +2,7 @@ import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState, t
 import type { Bookmark, Manifest } from '../types/manifest'
 import { EvidenceTag } from '../components/explanations/EvidenceTag'
 import { EVIDENCE, evidenceOf } from '../services/evidence'
-import { CASES, currentCase, isUsable, loadManifest, STATUS_LABEL } from '../services/manifest'
+import { CASES, currentCase, isUsable, loadManifest, pointFromUrl, STATUS_LABEL, urlWithPoint } from '../services/manifest'
 import { buildStory } from '../data/story'
 import { LeftPanel, type EvidenceView } from '../components/layout/LeftPanel'
 import type { MapStatus } from '../components/map/MapView'
@@ -97,11 +97,14 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   const [opacity, setOpacity] = useState(0.85)
   const [referenceIds, setReferenceIds] = useState<string[]>(['ref:unosat-extent', 'ref:rivers', 'ref:places', 'ref:lake-edge'])
   const [bookmarkId, setBookmarkId] = useState<string | null>(null)
-  const [focus, setFocus] = useState<{ bounds: Bookmark['bounds']; nonce: number } | null>(null)
-  const [point, setPoint] = useState<[number, number] | null>(null)
+  const [focus, setFocus] = useState<{ bounds: Bookmark['bounds']; nonce: number } | null>(() => {
+    const p = pointFromUrl()
+    return p ? { bounds: [p[0] - 0.02, p[1] - 0.02, p[0] + 0.02, p[1] + 0.02], nonce: 0 } : null
+  })
+  const [point, setPoint] = useState<[number, number] | null>(() => pointFromUrl())
   const [statusOpen, setStatusOpen] = useState(false)
   const [projectOpen, setProjectOpen] = useState(false)
-  const [exploring, setExploring] = useState(false) // The reader has started using the map, so the opening card is done
+  const [exploring, setExploring] = useState(() => pointFromUrl() !== null) // The reader has started using the map, so the opening card is done
   const [storyStep, setStoryStep] = useState<number | null>(null)
   const [simOn, setSimOn] = useState(false)
   const [compareOn, setCompareOn] = useState(false)
@@ -115,7 +118,9 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   // The guided story is a headline over the map, so the controls panel waits at the screen edge while it runs
   const edges = useAutoHidePanels(`${storyStep !== null}-${simOn}-${compareOn}-${threeOn}-${scenarioOn}`, storyStep !== null)
   useEffect(() => { if (mapStatus.state !== 'loading') onMapReady?.() }, [mapStatus.state, onMapReady])
-  const [tab, setTab] = useState<'inspect' | 'about' | 'checks'>('about')
+  const [tab, setTab] = useState<'inspect' | 'about' | 'checks'>(() => (pointFromUrl() ? 'inspect' : 'about'))
+  // The chosen spot lives in the address too, so a reload or a shared link reopens it. replaceState adds no history entries.
+  useEffect(() => { try { window.history.replaceState(window.history.state, '', urlWithPoint(window.location.href, point)) } catch { /* a file: page may refuse */ } }, [point])
   const [checkId, setCheckId] = useState<string | null>(null)
   const { checks } = useChecks()
   const caseChecks = checks.filter((c) => c.caseId === m.caseStudy.id).length

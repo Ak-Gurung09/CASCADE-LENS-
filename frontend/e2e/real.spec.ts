@@ -726,3 +726,32 @@ test('light mode draws more lightly and can be switched off again, with the same
   await expect(page.locator('html')).not.toHaveClass(/\blite\b/)
   expect(await page.evaluate(() => localStorage.getItem('cascadelens.lite'))).toBe('off')
 })
+
+test('a spot in the address reopens after a reload, and all four exports carry one evidence ID', async ({ page }) => {
+  await open(page, '/?at=28.17000,85.35000')
+  await expect(page).toHaveURL(/at=28\.17000,85\.35000/)
+  await page.reload()
+  await expect(page.locator('.map-state')).toHaveText('Map ready')
+  await page.getByRole('tab', { name: 'Inspector' }).click()
+  await expect(inspector(page)).toContainText('28.17000°N, 85.35000°E')
+  await expect(inspector(page)).toContainText('Maturity')
+  await expect(inspector(page)).toContainText('Provisional')
+  const grab = async (name: string) => {
+    const [d] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name, exact: true }).click()])
+    return readFileSync((await d.path())!, 'utf8')
+  }
+  const json = JSON.parse(await grab('JSON'))
+  const csv = await grab('CSV')
+  const geo = JSON.parse(await grab('GeoJSON'))
+  expect(json.evidenceId).toMatch(/^CL-rasuwa-2026-28\.17000N85\.35000E-\d{8}T\d{6}Z$/)
+  expect(geo.features[0].properties.evidenceId).toBe(json.evidenceId)
+  expect(geo.features[0].geometry).toEqual({ type: 'Point', coordinates: [85.35, 28.17] })
+  const rows = csv.trim().split('\r\n')
+  expect(rows.slice(1).every((r) => r.startsWith(json.evidenceId))).toBe(true)
+  // Same readings in every format, and a missing value stays missing
+  expect(geo.features[0].properties.readings.map((x: { layerId: string }) => x.layerId)).toEqual(json.readings.map((x: { layerId: string }) => x.layerId))
+  for (const x of json.readings) if (x.value === null) expect(x.state).not.toBe('valid')
+  expect(csv).toContain('limitation,Ground displacement')
+  expect(json.readings.every((x: { maturity: string }) => x.maturity)).toBe(true)
+  expect(json.reproduce[0]).toContain('?case=rasuwa-2026&at=28.17000,85.35000')
+})

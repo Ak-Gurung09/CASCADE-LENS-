@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Manifest } from '../../types/manifest'
 import { buildReport, save, toCsv, toGeoJson, toHtml, type Report } from '../../services/report'
 
@@ -7,13 +7,18 @@ type Kind = 'pdf' | 'csv' | 'geojson' | 'json'
 // Downloads one evidence report for the clicked spot. Everything is built in the browser from the data already shown.
 export function ReportButtons({ manifest, point }: { manifest: Manifest; point: [number, number] }) {
   const [busy, setBusy] = useState(false)
+  // One report per spot: every format downloaded for it carries the same evidence ID, time and values.
+  const built = useRef<{ key: string; report: Promise<Report> } | null>(null)
+  const key = `${manifest.caseStudy.id}:${point[0]},${point[1]}`
   const base = `cascadelens-${manifest.caseStudy.id}-${point[1].toFixed(4)}N-${point[0].toFixed(4)}E`
   async function run(kind: Kind) {
     // The print window must open inside the click, before any await, or browsers block it.
     const win = kind === 'pdf' ? window.open('', '_blank') : null
     setBusy(true)
     try {
-      const r: Report = await buildReport(manifest, point)
+      if (built.current?.key !== key) built.current = { key, report: buildReport(manifest, point) }
+      let r: Report
+      try { r = await built.current.report } catch (e) { built.current = null; throw e }
       if (kind === 'csv') save(`${base}.csv`, toCsv(r), 'text/csv')
       if (kind === 'geojson') save(`${base}.geojson`, toGeoJson(r), 'application/geo+json')
       if (kind === 'json') save(`${base}.json`, JSON.stringify(r, null, 1), 'application/json')

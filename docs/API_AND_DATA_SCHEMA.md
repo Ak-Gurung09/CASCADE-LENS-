@@ -106,3 +106,14 @@ UInt8 COG on the same grid as its measurement: 0 no data, 1 valid, 2 masked.
 ## Granule state
 
 `data/metadata/granules/<file_id>.json` records `status`, `reason`, `checks`, `sha256`, `identification` and `validFraction`.
+
+## Evidence report (exports)
+
+Built in the browser by `frontend/src/services/report.ts` from the clicked spot. One report is built per spot, so the printable page, CSV, GeoJSON and JSON made from it carry the same `evidenceId` (`CL-<case>-<lat>N<lng>E-<UTC time>`), time and values.
+
+- **JSON**: the whole record: `evidenceId`, `generatedAt`, `case`, `point`, `observability` and `otherViews` (one per viewing direction), `readings` (each with `layerId`, `state`, `value` or `null`, `units`, `observation`, `source` granule, `maturity`, `track`, `frame`, `direction`, `method`, `limitations`), `explanations`, `hazards`, `nextSteps`, `cannotEstablish`, `processing` (manifest time, schema, observability method, app version), `reproduce` and `notes`.
+- **GeoJSON** (RFC 7946, WGS 84 longitude and latitude): one Point feature whose properties hold the same record. Every reading is kept, with its `state`; a missing value stays `null`, never a number.
+- **CSV**: one header and the same 20 columns on every row. `row_type` is `reading`, `road`, `observability`, `next_step` or `limitation`, so the limits shown in the app are never dropped. Cells with commas, quotes or line breaks are quoted.
+- **Printable page / PDF**: an investigation summary first (evidence ID, observations, track and frame, maturity, valid readings, what the radar could see, hypotheses that fit, first next step), then each section, what the radar cannot establish, and provenance with the steps to reproduce.
+
+A spot can be reopened with `?case=<case id>&at=<lat>,<lng>`; the app keeps the chosen spot in the address, so a reload returns to it.
