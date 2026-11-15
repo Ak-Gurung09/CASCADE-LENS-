@@ -1,4 +1,5 @@
-"""Build the Rasuwa 3D model from files already in the app: Copernicus DEM heights, UNOSAT maps, NISAR coherence and OSM context.
+"""Build the Rasuwa 3D model from files already in the app: NASADEM heights, UNOSAT maps, NISAR coherence and backscatter,
+OPERA Sentinel-1 change and OSM context.
 
 usage: python prepare_rasuwa_3d.py
 Reads frontend/public/data (manifest, sampling GeoTIFFs, vectors) and writes frontend/public/data/terrain/rasuwa-2026/:
@@ -51,7 +52,7 @@ def warp(path, shape_, tf, resampling=Resampling.bilinear):
 
 
 # Heights: the mesh samples the DEM at the grid nodes, so the edges sit exactly on the picture edges
-dem_path = PUBLIC / "sampling/context/copdem_glo30.tif"
+dem_path = PUBLIC / "sampling/context/nasadem.tif"  # NASADEM, from prepare_nasa_rasuwa.py
 grid_tf = from_origin(x0 - GRID_M / 2, y1 + GRID_M / 2, GRID_M, GRID_M)
 z = warp(dem_path, (ny, nx), grid_tf, Resampling.average)
 z = np.where(np.isfinite(z), z, np.nanmin(z))
@@ -141,10 +142,50 @@ for folder, info, layer_id in [
         "id": f"coherence-t{info['track']}", "file": name, "evidence": "observed", "color": "#fc8961", "on": False, "group": "radar",
         "name": f"NISAR stability, Track {info['track']} ({info['orbit'].lower()}), {info['pair'][0]} to {info['pair'][1]}",
         "attribution": l.get("attribution"), "limitations": l.get("limitations", []), "maturity": l.get("productMaturity"),
-        "granule": info.get("granule"),
+        "granule": info.get("granule"), "short": f"Stability T{info['track']}", "kind": "coherence",
+        "note": "Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there.",
     })
     tracks.append({"track": info["track"], "orbit": info["orbit"], "look": info["look"], "losToSensorEastNorth": info["losToSensorEastNorth"],
                    "incidenceDeg5to95": info.get("incidenceDeg5to95"), "pair": info["pair"], "evidence": "derived"})
+
+def ramp_png(path, name, stops, lo, hi, transform=None):
+    """A picture from one sampling file (80 m), coloured on a fixed scale, at half the base picture's size."""
+    ch, cw = ih // 2, iw // 2
+    v = warp(path, (ch, cw), from_origin(x0, y1, span_x / cw, span_y / ch))
+    if transform:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            v = transform(v)
+    ok = np.isfinite(v)
+    t = np.clip((np.where(ok, v, lo) - lo) / (hi - lo), 0, 1)
+    cols = [[int(c[i:i + 2], 16) for i in (1, 3, 5)] for c in stops]
+    rgba = np.zeros((ch, cw, 4), "uint8")
+    for k in range(3):
+        rgba[..., k] = np.interp(t, np.linspace(0, 1, len(cols)), [c[k] for c in cols])
+    rgba[..., 3] = ok * 235
+    Image.fromarray(rgba, "RGBA").save(OUT / name, quality=80, method=6)
+    return name
+
+
+# NISAR GCOV snapshots and the change layers (prepare_nasa_rasuwa.py). Their evidence class follows the manifest's measurementClass.
+BACK = "Bright: rough rock, debris and slopes facing the radar. Dark: smooth or wet ground, water, or radar shadow. One date on its own: it does not show change."
+DIFF = "Orange: brighter on the second date. Blue: darker. White: little change. New debris, wet soil, snow and vegetation all change the radar return, so colour alone does not say what happened."
+for lid, short, kind in [("gcov-0816:gcov-backscatter", "GCOV 16 Aug", "backscatter"), ("gcov-0823:gcov-backscatter", "GCOV 23 Aug", "backscatter"),
+                         ("gcov-0828:gcov-backscatter", "GCOV 28 Aug", "backscatter"), ("gcov-0912:gcov-backscatter", "GCOV 12 Sep", "backscatter"),
+                         ("gcov-0828:gcov-change", "NISAR change", "change"), ("rasuwa-2026:rtc-change-t019-0812", "S1 before", "change"),
+                         ("rasuwa-2026:rtc-change-t019-0824", "S1 across", "change"), ("rasuwa-2026:rtc-change-t085-0816", "S1 across (asc)", "change")]:
+    if lid not in L:
+        continue
+    l = L[lid]
+    leg = l["legend"]
+    fname = lid.split(":")[0].replace("rasuwa-2026", "opera") + "-" + lid.split(":")[1] + ".webp"
+    fn = (lambda v: 10 * np.log10(v)) if l.get("displayDb") else None
+    ramp_png(ROOT / "frontend/public" / l["sources"][0]["sampling"], fname, leg["stops"], leg["min"], leg["max"], fn)
+    track = f"Track {l['track']}, {l['orbitDirection'].lower()}"
+    when = l["acquisition"]["reference"] if not l["acquisition"]["secondary"] else f"{l['acquisition']['reference']} to {l['acquisition']['secondary']}"
+    nm = (f"NISAR backscatter (HH), {track}, {when}" if kind == "backscatter" else l["name"] if l["mission"] == "OPERA" else f"NISAR backscatter change (HH), {track}, {when}")
+    layers.append({"id": lid.replace(":", "-"), "file": fname, "evidence": "observed" if l["measurementClass"] == "measurement" else "derived", "color": leg["stops"][-1], "on": False, "group": "radar",
+                   "name": nm, "short": short, "kind": kind, "note": BACK if kind == "backscatter" else DIFF, "legend": {"stops": leg["stops"], "min": leg["min"], "max": leg["max"], "unit": leg["unit"]},
+                   "attribution": l["attribution"], "limitations": l["limitations"], "maturity": l.get("productMaturity")})
 
 # Place names, in metres from the model's north-west corner
 gj = json.loads((PUBLIC / "vectors/osm_places.geojson").read_text(encoding="utf-8"))

@@ -11,6 +11,8 @@ export const MISSION_STYLE: Record<string, { short: string; color: string; about
   'Sentinel-1': { short: 'S1', color: '#ff7f66', about: 'Copernicus Sentinel-1 radar, analysed by partners' },
   OpenStreetMap: { short: 'OSM', color: '#7fd98c', about: 'Community-mapped geography' },
   'COD-AB': { short: 'COD', color: '#b9a4ff', about: 'Official administrative boundaries' },
+  NASADEM: { short: 'DEM', color: '#5fe0c9', about: 'NASA elevation model from the SRTM radar flight' },
+  OPERA: { short: 'OPR', color: '#5fe0c9', about: 'NASA JPL OPERA images made from Copernicus Sentinel-1 radar' },
 }
 export const missionStyle = (m: string) => MISSION_STYLE[m] ?? { short: m.slice(0, 3).toUpperCase(), color: '#c3ccff', about: m }
 

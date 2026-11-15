@@ -7,11 +7,15 @@ import type { EvidenceClass } from '../../services/evidence'
 import { EvidenceTag } from '../explanations/EvidenceTag'
 import { buildBlock, strataTexture, type Built } from './block3d'
 
-// A block model of the whole Rasuwa–Bhote Koshi–Trishuli corridor: Copernicus DEM heights with UNOSAT maps, OSM rivers and
-// NISAR stability draped on top, and arrows for the way each NISAR track looks at the ground.
+// A block model of the whole Rasuwa–Bhote Koshi–Trishuli corridor: NASADEM heights with UNOSAT maps, OSM rivers and NASA
+// radar layers (NISAR stability and backscatter, OPERA Sentinel-1 change) draped on top, and arrows for the way each NISAR
+// track looks at the ground.
 // Built by processing/scripts/prepare_rasuwa_3d.py. Units in the scene are kilometres; north is towards the back.
 
-interface ModelLayer { id: string; file: string; name: string; evidence: EvidenceClass; color: string; on: boolean; group?: 'radar'; attribution?: string; limitations: string[]; maturity?: string }
+interface ModelLayer {
+  id: string; file: string; name: string; evidence: EvidenceClass; color: string; on: boolean; group?: 'radar'; attribution?: string; limitations: string[]; maturity?: string
+  short?: string; kind?: 'coherence' | 'backscatter' | 'change'; note?: string; legend?: { stops: string[]; min: number; max: number; unit: string }
+}
 interface ModelTrack { track: number; orbit: string; look: string; losToSensorEastNorth: [number, number]; incidenceDeg5to95?: [number, number]; pair: [string, string]; evidence: EvidenceClass }
 interface ModelLabel { name: string; xM: number; yM: number; evidence?: EvidenceClass }
 interface ModelSource { name: string; attribution?: string; limitations: string[]; evidence: EvidenceClass }
@@ -344,7 +348,7 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
   const shownRadar = radars.find((l) => l.id === radar)
   return (
     <div className="terrain3d">
-      <div className="terrain-canvas" ref={host} role="img" aria-label={`3D model of the ${model?.name ?? 'Rasuwa corridor'}, with UNOSAT maps and NISAR radar layers draped over the terrain`} />
+      <div className="terrain-canvas" ref={host} role="img" aria-label={`3D model of the ${model?.name ?? 'Rasuwa corridor'}, with UNOSAT maps and NASA radar layers draped over the terrain`} />
       {(!heights || !images.base) && !failure && (
         <div className="terrain-status" role="status">
           <p>Loading the 3D model{loadedMb > 0 ? `: ${loadedMb.toFixed(1)} of about ${totalMb.toFixed(1)} MB` : '…'}</p>
@@ -374,15 +378,16 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
             ))}
           </ul>
 
-          <p className="label">NISAR radar: ground stability</p>
-          <div className="tabs segmented" role="tablist" aria-label="Radar layer">
+          <p className="label">NASA radar layers</p>
+          <div className="tabs segmented wrap" role="tablist" aria-label="Radar layer">
             <button role="tab" aria-selected={radar === ''} className={radar === '' ? 'on' : ''} onClick={() => setRadar('')}>Off</button>
-            {radars.map((l) => <button key={l.id} role="tab" aria-selected={radar === l.id} className={radar === l.id ? 'on' : ''} onClick={() => setRadar(l.id)}>{l.id.replace('coherence-t', 'Track ')}</button>)}
+            {radars.map((l) => <button key={l.id} role="tab" aria-selected={radar === l.id} className={radar === l.id ? 'on' : ''} onClick={() => setRadar(l.id)}>{l.short ?? l.id.replace('coherence-t', 'Track ')}</button>)}
           </div>
           {shownRadar && missing.includes(shownRadar.id) && <p className="muted small" role="status">This radar picture did not load. Reopen 3D to try again.</p>}
           {shownRadar && !images[shownRadar.id] && !missing.includes(shownRadar.id) && <p className="muted small" role="status">Loading the radar picture{got[shownRadar.id] ? ` (${Math.round((100 * got[shownRadar.id][0]) / Math.max(1, got[shownRadar.id][1]))}%)` : '…'}</p>}
           {shownRadar && <div className="model-layers"><p className="small">{shownRadar.name} <EvidenceTag kind={shownRadar.evidence} compact /></p>
-            <p className="muted small">Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there.</p>
+            <p className="muted small">{shownRadar.note ?? 'Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there.'}</p>
+            {shownRadar.legend && <div className="ramp-legend small"><span>{shownRadar.legend.min} {shownRadar.legend.unit}</span><i style={{ background: `linear-gradient(to right, ${shownRadar.legend.stops.join(', ')})` }} /><span>{shownRadar.legend.max > 0 && shownRadar.legend.min < 0 ? '+' : ''}{shownRadar.legend.max} {shownRadar.legend.unit}</span></div>}
             {shownRadar.maturity && <p className="muted small">Product maturity: {shownRadar.maturity}.</p>}
             {shownRadar.limitations.map((x) => <p key={x} className="muted small">{x}</p>)}
             <p className="muted small">{shownRadar.attribution}</p></div>}

@@ -54,8 +54,11 @@ export function nextSteps(task: Task, self: ViewFlags, views: ViewFlags[], layer
   }
   if (f & (FLAG.noData | FLAG.productMasked)) {
     steps.push(otherView(views, self, task, 'R-MASK', f & FLAG.productMasked ? 'The product’s own mask excludes this spot' : 'No value in the product here', 'Leave these values out and use another suitable observation'))
+    const loaded = sameTrack(layers, self.track, (l) => l.productType === 'GCOV' || l.measurementType === 'gcov-change')
     const gcov = catalogued(layers, self.track, 'GCOV')
-    if (task === 'disturbance' && gcov.length) steps.push({ rule: 'R-MASK-GCOV', gap: 'No interferometric value here', step: 'A backscatter (GCOV) image of the same pass could show surface change', availability: 'catalogued', detail: `${gcov.map((l) => l.name).join('; ')}: in the catalogue but not downloaded, so it has not been checked for this spot.` })
+    const step = 'A backscatter (GCOV) image of the same pass could show surface change'
+    if (task === 'disturbance' && loaded.length) steps.push({ rule: 'R-MASK-GCOV', gap: 'No interferometric value here', step, availability: 'available', detail: `Loaded for this track: ${loaded.map((l) => `${l.name}, ${l.acquisition.secondary ? `${l.acquisition.reference} to ${l.acquisition.secondary}` : l.acquisition.reference}`).join('; ')}. Under Radar evidence, Snapshots. Backscatter has its own gaps, so check that it holds a value at this spot.` })
+    else if (task === 'disturbance' && gcov.length) steps.push({ rule: 'R-MASK-GCOV', gap: 'No interferometric value here', step, availability: 'catalogued', detail: `${gcov.map((l) => l.name).join('; ')}: in the catalogue but not downloaded, so it has not been checked for this spot.` })
   }
   if (f & (FLAG.layover | FLAG.shadow)) {
     steps.push(otherView(views, self, task, 'R-TERRAIN', f & FLAG.shadow ? 'Radar shadow' : 'Layover', 'Check another viewing geometry'))

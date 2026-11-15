@@ -12,6 +12,10 @@ const model = url ? JSON.parse(readFileSync(join(PUBLIC, url), 'utf-8')) : null
 
 describe('Rasuwa 3D model', () => {
   it('is listed for a case', () => expect(model).not.toBeNull())
+  it('stands on NASA terrain: NASADEM heights', () => {
+    expect(model.baseLayer.attribution).toMatch(/NASADEM/)
+    expect(model.baseLayer.attribution).toMatch(/NASA/)
+  })
   it('has heights of the right size', () => {
     expect(statSync(join(PUBLIC, model.heights)).size).toBe(model.width * model.height * 2)
     expect(model.minM).toBeLessThan(model.maxM)
@@ -31,8 +35,12 @@ describe('Rasuwa 3D model', () => {
     }
     expect(model.layers.filter((l: { id: string }) => l.id.startsWith('unosat')).every((l: { limitations: string[] }) => l.limitations.some((x) => /Not yet field validated/.test(x)))).toBe(true)
   })
-  it('labels the NISAR stability layers as observed and the viewing directions as derived', () => {
-    expect(model.layers.filter((l: { group?: string }) => l.group === 'radar').map((l: { evidence: string }) => l.evidence)).toEqual(['observed', 'observed'])
+  it('labels measured radar layers as observed, change layers as derived, and the viewing directions as derived', () => {
+    const radar = model.layers.filter((l: { group?: string }) => l.group === 'radar')
+    for (const l of radar) expect(l.evidence, l.id).toBe(l.kind === 'change' ? 'derived' : 'observed')
+    expect(radar.filter((l: { kind: string }) => l.kind === 'coherence')).toHaveLength(2)
+    expect(radar.filter((l: { kind: string }) => l.kind === 'backscatter').length).toBeGreaterThan(0)
+    expect(radar.every((l: { note?: string; short?: string }) => l.note && l.short)).toBe(true)
     expect(model.tracks.map((t: { track: number; evidence: string }) => [t.track, t.evidence])).toEqual([[48, 'derived'], [98, 'derived']])
   })
 })

@@ -27,9 +27,13 @@ describe('evidence gap → next observation', () => {
     expect(s.detail).toMatch(/none has been found/)
   })
 
-  it('lists the Rasuwa GCOV snapshot as catalogued, not available', () => {
+  it('points to the loaded Track 48 GCOV snapshots and change, and lists a track with only catalogue records as catalogued', () => {
     const a = v48(FLAG.productMasked)
-    expect(nextSteps('disturbance', a, [a], layers).find((s) => s.rule === 'R-MASK-GCOV')).toMatchObject({ availability: 'catalogued' })
+    const s = nextSteps('disturbance', a, [a], layers).find((x) => x.rule === 'R-MASK-GCOV')!
+    expect(s.availability).toBe('available')
+    expect(s.detail).toMatch(/2026-08-16 to 2026-08-28/)
+    const onlyCatalogued = layers.map((l) => (l.productType === 'GCOV' || l.measurementType === 'gcov-change') && l.track === 48 ? { ...l, status: 'catalogued' as const } : l)
+    expect(nextSteps('disturbance', a, [a], onlyCatalogued).find((x) => x.rule === 'R-MASK-GCOV')).toMatchObject({ availability: 'catalogued' })
   })
 
   it('does not turn missing phase into movement, and points to the loaded offsets', () => {

@@ -6,8 +6,8 @@
  "width": 936,
  "height": 555,
  "spacingM": 120,
- "minM": 181.0966339111328,
- "maxM": 7186.1552734375,
+ "minM": 184.0,
+ "maxM": 7155.83447265625,
  "crs": "EPSG:32645",
  "originM": [
   244920.0,
@@ -20,9 +20,10 @@
  "base": "data/terrain/rasuwa-2026/base.jpg",
  "baseLayer": {
   "name": "Terrain elevation",
-  "attribution": "© DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA",
+  "attribution": "NASA JPL, NASADEM Merged DEM Global 1 arc second V001 (doi:10.5067/MEaSUREs/NASADEM/NASADEM_HGT.001); distributed by NASA LP DAAC",
   "limitations": [
-   "A pre-event surface model: it does not show changes from the 2026 event."
+   "A pre-event surface model from the February 2000 SRTM flight: it does not show changes from the 2026 event, or the 26 years before it.",
+   "Gaps in steep terrain and radar shadow were filled from other elevation models during NASA's reprocessing, so heights on the steepest walls are less certain."
   ],
   "evidence": "reference"
  },
@@ -105,7 +106,10 @@
     "Provisional data."
    ],
    "maturity": "Provisional (P05023)",
-   "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001"
+   "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001",
+   "short": "Stability T48",
+   "kind": "coherence",
+   "note": "Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there."
   },
   {
    "id": "coherence-t98",
@@ -122,7 +126,256 @@
     "Provisional data."
    ],
    "maturity": "Provisional (P05023)",
-   "granule": "NISAR_L2_PR_GUNW_028_098_A_016_029_4000_SH_20260819T233918_20260819T233953_20260831T233918_20260831T233952_P05023_N_F_J_001"
+   "granule": "NISAR_L2_PR_GUNW_028_098_A_016_029_4000_SH_20260819T233918_20260819T233953_20260831T233918_20260831T233952_P05023_N_F_J_001",
+   "short": "Stability T98",
+   "kind": "coherence",
+   "note": "Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there."
+  },
+  {
+   "id": "gcov-0816-gcov-backscatter",
+   "file": "data/terrain/rasuwa-2026/gcov-0816-gcov-backscatter.webp",
+   "evidence": "observed",
+   "color": "#f2f2f2",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR backscatter (HH), Track 48, descending, 2026-08-16",
+   "short": "GCOV 16 Aug",
+   "kind": "backscatter",
+   "note": "Bright: rough rock, debris and slopes facing the radar. Dark: smooth or wet ground, water, or radar shadow. One date on its own: it does not show change.",
+   "legend": {
+    "stops": [
+     "#0b0b0b",
+     "#f2f2f2"
+    ],
+    "min": -22,
+    "max": 2,
+    "unit": "dB"
+   },
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "A single-date snapshot, not a damage or flood classification.",
+    "Covers 44% of the case area: only frame 74 was downloaded, and the product's own mask removes samples that were not fully focused.",
+    "40 MHz radar mode, 10 m posting in the file; averaged here to 40 m for the map and 80 m for the inspector, in linear power.",
+    "Provisional data."
+   ],
+   "maturity": "Provisional (P05023)"
+  },
+  {
+   "id": "gcov-0823-gcov-backscatter",
+   "file": "data/terrain/rasuwa-2026/gcov-0823-gcov-backscatter.webp",
+   "evidence": "observed",
+   "color": "#f2f2f2",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR backscatter (HH), Track 149, descending, 2026-08-23",
+   "short": "GCOV 23 Aug",
+   "kind": "backscatter",
+   "note": "Bright: rough rock, debris and slopes facing the radar. Dark: smooth or wet ground, water, or radar shadow. One date on its own: it does not show change.",
+   "legend": {
+    "stops": [
+     "#0b0b0b",
+     "#f2f2f2"
+    ],
+    "min": -22,
+    "max": 2,
+    "unit": "dB"
+   },
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "A single-date snapshot, not a damage or flood classification.",
+    "Covers 63% of the case area: only frame 74 was downloaded, and the product's own mask removes samples that were not fully focused.",
+    "20 MHz radar mode, 20 m posting in the file; averaged here to 40 m for the map and 80 m for the inspector, in linear power.",
+    "Provisional data.",
+    "Track 149 is a different descending orbit from Track 48: do not difference it against Track 48 dates."
+   ],
+   "maturity": "Provisional (P05023)"
+  },
+  {
+   "id": "gcov-0828-gcov-backscatter",
+   "file": "data/terrain/rasuwa-2026/gcov-0828-gcov-backscatter.webp",
+   "evidence": "observed",
+   "color": "#f2f2f2",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR backscatter (HH), Track 48, descending, 2026-08-28",
+   "short": "GCOV 28 Aug",
+   "kind": "backscatter",
+   "note": "Bright: rough rock, debris and slopes facing the radar. Dark: smooth or wet ground, water, or radar shadow. One date on its own: it does not show change.",
+   "legend": {
+    "stops": [
+     "#0b0b0b",
+     "#f2f2f2"
+    ],
+    "min": -22,
+    "max": 2,
+    "unit": "dB"
+   },
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "A single-date snapshot, not a damage or flood classification.",
+    "Covers 39% of the case area: only frame 74 was downloaded, and the product's own mask removes samples that were not fully focused.",
+    "20 MHz radar mode, 20 m posting in the file; averaged here to 40 m for the map and 80 m for the inspector, in linear power.",
+    "Provisional data."
+   ],
+   "maturity": "Provisional (P05023)"
+  },
+  {
+   "id": "gcov-0912-gcov-backscatter",
+   "file": "data/terrain/rasuwa-2026/gcov-0912-gcov-backscatter.webp",
+   "evidence": "observed",
+   "color": "#f2f2f2",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR backscatter (HH), Track 98, ascending, 2026-09-12",
+   "short": "GCOV 12 Sep",
+   "kind": "backscatter",
+   "note": "Bright: rough rock, debris and slopes facing the radar. Dark: smooth or wet ground, water, or radar shadow. One date on its own: it does not show change.",
+   "legend": {
+    "stops": [
+     "#0b0b0b",
+     "#f2f2f2"
+    ],
+    "min": -22,
+    "max": 2,
+    "unit": "dB"
+   },
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "A single-date snapshot, not a damage or flood classification.",
+    "Covers 100% of the case area: only frame 16 was downloaded, and the product's own mask removes samples that were not fully focused.",
+    "40 MHz radar mode, 10 m posting in the file; averaged here to 40 m for the map and 80 m for the inspector, in linear power.",
+    "Provisional data.",
+    "Ascending pass: it views slopes from the opposite side to Tracks 48 and 149. Do not difference it against descending dates."
+   ],
+   "maturity": "Provisional (P05023)"
+  },
+  {
+   "id": "gcov-0828-gcov-change",
+   "file": "data/terrain/rasuwa-2026/gcov-0828-gcov-change.webp",
+   "evidence": "derived",
+   "color": "#b2182b",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR backscatter change (HH), Track 48, descending, 2026-08-16 to 2026-08-28",
+   "short": "NISAR change",
+   "kind": "change",
+   "note": "Orange: brighter on the second date. Blue: darker. White: little change. New debris, wet soil, snow and vegetation all change the radar return, so colour alone does not say what happened.",
+   "legend": {
+    "stops": [
+     "#2166ac",
+     "#67a9cf",
+     "#f7f7f7",
+     "#ef8a62",
+     "#b2182b"
+    ],
+    "min": -6,
+    "max": 6,
+    "unit": "dB"
+   },
+   "attribution": "Derived by CascadeLens from NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "Derived from two dates; the 26 August event falls between them, and so does 12 days of monsoon weather.",
+    "The two files use different radar modes (40 and 20 MHz, 10 and 20 m), averaged to the same 40 m grid first.",
+    "Only frame 74 was downloaded: 38% of the case area has both dates.",
+    "Provisional data."
+   ],
+   "maturity": "Derived from provisional data (P05023)"
+  },
+  {
+   "id": "rasuwa-2026-rtc-change-t019-0812",
+   "file": "data/terrain/rasuwa-2026/opera-rtc-change-t019-0812.webp",
+   "evidence": "derived",
+   "color": "#b2182b",
+   "on": false,
+   "group": "radar",
+   "name": "Sentinel-1 backscatter change before the event (control), 12 August to 24 August (OPERA, track 19)",
+   "short": "S1 before",
+   "kind": "change",
+   "note": "Orange: brighter on the second date. Blue: darker. White: little change. New debris, wet soil, snow and vegetation all change the radar return, so colour alone does not say what happened.",
+   "legend": {
+    "stops": [
+     "#2166ac",
+     "#67a9cf",
+     "#f7f7f7",
+     "#ef8a62",
+     "#b2182b"
+    ],
+    "min": -6,
+    "max": 6,
+    "unit": "dB"
+   },
+   "attribution": "Derived by CascadeLens from NASA/JPL OPERA RTC-S1 (from Copernicus Sentinel-1 data, ESA); distributed by ASF DAAC",
+   "limitations": [
+    "Sentinel-1 is an ESA mission; NASA's OPERA project made these terrain-corrected images from it. Not a NISAR result.",
+    "Both dates are before 26 August: this is the control for ordinary 12-day change.",
+    "Layover and shadow pixels flagged by OPERA are left out.",
+    "C-band reacts to soil moisture and vegetation more than NISAR's L-band."
+   ],
+   "maturity": "Derived from OPERA RTC-S1 v1.0 (provisional validation)"
+  },
+  {
+   "id": "rasuwa-2026-rtc-change-t019-0824",
+   "file": "data/terrain/rasuwa-2026/opera-rtc-change-t019-0824.webp",
+   "evidence": "derived",
+   "color": "#b2182b",
+   "on": false,
+   "group": "radar",
+   "name": "Sentinel-1 backscatter change across the event, 24 August to 5 September (OPERA, track 19)",
+   "short": "S1 across",
+   "kind": "change",
+   "note": "Orange: brighter on the second date. Blue: darker. White: little change. New debris, wet soil, snow and vegetation all change the radar return, so colour alone does not say what happened.",
+   "legend": {
+    "stops": [
+     "#2166ac",
+     "#67a9cf",
+     "#f7f7f7",
+     "#ef8a62",
+     "#b2182b"
+    ],
+    "min": -6,
+    "max": 6,
+    "unit": "dB"
+   },
+   "attribution": "Derived by CascadeLens from NASA/JPL OPERA RTC-S1 (from Copernicus Sentinel-1 data, ESA); distributed by ASF DAAC",
+   "limitations": [
+    "Sentinel-1 is an ESA mission; NASA's OPERA project made these terrain-corrected images from it. Not a NISAR result.",
+    "The 26 August event falls between the two dates, and so does 12 days of monsoon weather.",
+    "Layover and shadow pixels flagged by OPERA are left out.",
+    "C-band reacts to soil moisture and vegetation more than NISAR's L-band."
+   ],
+   "maturity": "Derived from OPERA RTC-S1 v1.0 (provisional validation)"
+  },
+  {
+   "id": "rasuwa-2026-rtc-change-t085-0816",
+   "file": "data/terrain/rasuwa-2026/opera-rtc-change-t085-0816.webp",
+   "evidence": "derived",
+   "color": "#b2182b",
+   "on": false,
+   "group": "radar",
+   "name": "Sentinel-1 backscatter change across the event, 16 August to 28 August (OPERA, track 85)",
+   "short": "S1 across (asc)",
+   "kind": "change",
+   "note": "Orange: brighter on the second date. Blue: darker. White: little change. New debris, wet soil, snow and vegetation all change the radar return, so colour alone does not say what happened.",
+   "legend": {
+    "stops": [
+     "#2166ac",
+     "#67a9cf",
+     "#f7f7f7",
+     "#ef8a62",
+     "#b2182b"
+    ],
+    "min": -6,
+    "max": 6,
+    "unit": "dB"
+   },
+   "attribution": "Derived by CascadeLens from NASA/JPL OPERA RTC-S1 (from Copernicus Sentinel-1 data, ESA); distributed by ASF DAAC",
+   "limitations": [
+    "Sentinel-1 is an ESA mission; NASA's OPERA project made these terrain-corrected images from it. Not a NISAR result.",
+    "The 26 August event falls between the two dates, and so does 12 days of monsoon weather.",
+    "Layover and shadow pixels flagged by OPERA are left out.",
+    "C-band reacts to soil moisture and vegetation more than NISAR's L-band."
+   ],
+   "maturity": "Derived from OPERA RTC-S1 v1.0 (provisional validation)"
   }
  ],
  "tracks": [
