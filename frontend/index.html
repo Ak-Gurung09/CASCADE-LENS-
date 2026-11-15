@@ -28,7 +28,23 @@
           <li>Keep the black window open. To use Brave or another browser, paste the address it shows, usually <code>http://localhost:8765</code>.</li>
         </ol>
       </main>
-      <script src="/boot.js"></script>
+      <script>
+      // The note above is for someone who opened this file straight from the folder (file:), where browsers refuse the
+      // app's modules. On a web address the app is only still downloading, so say that instead. Inline, so it works
+      // before anything else arrives; its hash is allowed in the CSPs of vite.config.ts, serve.py and serve.ps1.
+      (function () {
+        if (location.protocol === 'file:') return
+        var n = document.querySelector('.boot-note')
+        if (!n) return
+        n.className = 'boot-note boot-loading'
+        n.setAttribute('role', 'status')
+        n.innerHTML = '<h1>Loading GAIA CascadeLens…</h1><p>The map and its satellite data are downloading. On a slow connection this can take a little while.</p>'
+        setTimeout(function () {
+          var m = document.querySelector('.boot-loading')
+          if (m) m.innerHTML = '<h1>GAIA CascadeLens is taking longer than usual</h1><p>The app has not finished loading. Check the internet connection, then reload the page. It needs a recent browser with WebGL, such as Chrome, Edge, Firefox or Safari.</p>'
+        }, 30000)
+      })()
+    </script>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

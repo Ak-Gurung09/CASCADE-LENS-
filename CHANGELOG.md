@@ -6,7 +6,7 @@ What changed, and when. Scientific corrections are listed first in each entry, b
 
 No scientific figure changed in this entry.
 
-- **Loading message on the web.** While the app was still downloading on GitHub Pages, the note meant for someone who opened `index.html` straight from the folder ("has not started… Start CascadeLens.bat") appeared after 2 seconds. A small classic script (`public/boot.js`) now replaces it with a plain loading message on any web address, and keeps the original note only for `file:` pages. The packaged start with `Start CascadeLens.bat` is unchanged.
+- **Loading message on the web.** While the app was still downloading on GitHub Pages, the note meant for someone who opened `index.html` straight from the folder ("has not started… Start CascadeLens.bat") appeared after 2 seconds. A few lines of script inside `index.html` (allowed by its hash in the offline CSP of `serve.py`, `serve.ps1` and the preview) now replace it with a plain loading message on any web address, and keeps the original note only for `file:` pages. The packaged start with `Start CascadeLens.bat` is unchanged.
 - **Icon.** The page has a real icon (`favicon.svg`) instead of an empty one.
 - **Project & NASA data** (top bar, and a link by the signature at the foot of the map): the problem, every data source with its evidence class, how CascadeLens works in three steps, its use, and how AI was used to build it.
 
