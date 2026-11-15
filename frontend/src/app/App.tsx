@@ -36,6 +36,7 @@ const mapCode = import('../components/map/MapView')
 const MapView = lazy(() => mapCode.then((m) => ({ default: m.MapView })))
 // The 3D library is large and only lake cases use it, so it loads on first use.
 const Terrain3D = lazy(() => import('../components/terrain/Terrain3D').then((m) => ({ default: m.Terrain3D })))
+const Rasuwa3D = lazy(() => import('../components/terrain/Rasuwa3D').then((m) => ({ default: m.Rasuwa3D })))
 
 // WebGL can be unavailable or lost. The panels stay readable if the map cannot run.
 class MapBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
@@ -231,6 +232,8 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
   const timeLayers = m.layers.filter((l) => (l.timeSteps?.length ?? 0) > 1 && isUsable(l))
   const timeLayer = timeLayers[0]
   const canSimulate = Boolean(caseSimulation)
+  const model3d = m.lake?.terrain || m.fixture ? undefined : currentCase().model3d
+  const can3d = Boolean(m.lake?.terrain || model3d)
   const showTimeLayer = () => { if (!active?.timeSteps && timeLayer) selectLayer(timeLayer.id) }
 
   const showAbout = (id: string) => { setAboutId(id); setTab('about'); setPanel('right') }
@@ -249,12 +252,12 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
             </select>
           </label>
         ) : <p className="case-pill single"><i aria-hidden="true" /><span>{currentCase().label}</span></p>}
-        {(story.length > 0 || canSimulate || m.lake) && (
+        {(story.length > 0 || canSimulate || m.lake || can3d) && (
           <div className="modes" role="group" aria-label="Mode">
             {story.length > 0 && <button className={storyStep !== null ? 'on' : ''} aria-pressed={storyStep !== null} onClick={() => storyStep === null && goStory(0)}>Guided story</button>}
             <button className={storyStep === null && !simOn && !compareOn && !threeOn && !scenarioOn ? 'on' : ''} aria-pressed={storyStep === null && !simOn && !compareOn && !threeOn && !scenarioOn} onClick={goExplore}>Explore</button>
             {m.lake && <button className={compareOn ? 'on' : ''} aria-pressed={compareOn} onClick={() => !compareOn && startCompare()}>Compare</button>}
-            {m.lake?.terrain && <button className={threeOn ? 'on' : ''} aria-pressed={threeOn} onClick={() => !threeOn && start3d()}>3D</button>}
+            {can3d && <button className={threeOn ? 'on' : ''} aria-pressed={threeOn} onClick={() => !threeOn && start3d()}>3D</button>}
           </div>
         )}
         {(m.lake?.scenario || canSimulate) && (
@@ -277,7 +280,7 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
       <aside className="left" aria-label="Controls">
         <div className="sheet-handle" aria-hidden="true" />
         <LeftPanel manifest={m} group={group} view={view} activeId={activeId} step={step} onStep={setStep} hasStory={story.length > 0} storySteps={story.length} layerVisible={layerVisible} bookmarkId={bookmarkId} opacity={opacity} showTerrain={showTerrain} showMask={showMask} overlayId={overlayId}
-          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} canSimulate={canSimulate} onSimulate={startSim} canCompare={Boolean(m.lake)} compareActive={compareOn} onCompare={startCompare} can3d={Boolean(m.lake?.terrain)} on3d={start3d} canScenario={Boolean(m.lake?.scenario)} scenarioActive={scenarioOn && storyStep === null} onScenario={startScenario} onStatus={() => { setPanel(null); setStatusOpen(true) }} onBookmark={(b) => { setExploring(true); goToBookmark(b) }} onGroup={(id) => { setExploring(true); selectGroup(id) }} onView={(v) => { setExploring(true); selectView(v) }} onLayer={(id) => { setExploring(true); selectLayer(id) }} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
+          referenceIds={referenceIds} storyActive={storyStep !== null} simActive={simOn} canSimulate={canSimulate} onSimulate={startSim} canCompare={Boolean(m.lake)} compareActive={compareOn} onCompare={startCompare} can3d={can3d} on3d={start3d} canScenario={Boolean(m.lake?.scenario)} scenarioActive={scenarioOn && storyStep === null} onScenario={startScenario} onStatus={() => { setPanel(null); setStatusOpen(true) }} onBookmark={(b) => { setExploring(true); goToBookmark(b) }} onGroup={(id) => { setExploring(true); selectGroup(id) }} onView={(v) => { setExploring(true); selectView(v) }} onLayer={(id) => { setExploring(true); selectLayer(id) }} onLayerVisible={setLayerVisible} onOpacity={setOpacity} onTerrain={setShowTerrain}
           onMask={setShowMask} onOverlay={setOverlayId} onReference={(id, on) => setReferenceIds((r) => (on ? [...r, id] : r.filter((x) => x !== id)))} onAbout={showAbout} onStory={() => goStory(0)} />
       </aside>
 
@@ -294,7 +297,12 @@ function Explorer({ manifest: m, onMapReady }: { manifest: Manifest; onMapReady?
             <Terrain3D lake={m.lake} onExit={() => setThreeOn(false)} />
           </Suspense>
         )}
-        {storyStep === null && !simOn && panel === null && <FindingCard manifest={m} exploring={exploring} onStory={() => goStory(0)} onStatus={() => setStatusOpen(true)} />}
+        {threeOn && model3d && (
+          <Suspense fallback={<p className="terrain-status">Loading the 3D viewer…</p>}>
+            <Rasuwa3D url={model3d} onExit={() => setThreeOn(false)} />
+          </Suspense>
+        )}
+        {storyStep === null && !simOn && !threeOn && panel === null && <FindingCard manifest={m} exploring={exploring} onStory={() => goStory(0)} onStatus={() => setStatusOpen(true)} />}
         {statusOpen && <StatusPanel onClose={() => setStatusOpen(false)} />}
         {bookmark && <p className="place-chip">{bookmark.name}</p>}
         {mapStatus.state === 'error' && <p className="map-alert" role="alert">{mapStatus.message}</p>}

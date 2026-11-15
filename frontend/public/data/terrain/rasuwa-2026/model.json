@@ -1,0 +1,210 @@
+{
+ "case": "rasuwa-2026",
+ "name": "Rasuwa–Bhote Koshi–Trishuli corridor",
+ "heights": "data/terrain/rasuwa-2026/heights.bin",
+ "heightsType": "int16",
+ "width": 936,
+ "height": 555,
+ "spacingM": 120,
+ "minM": 181.0966339111328,
+ "maxM": 7186.1552734375,
+ "crs": "EPSG:32645",
+ "originM": [
+  244920.0,
+  3136800.0
+ ],
+ "drapeSize": [
+  2805,
+  1662
+ ],
+ "base": "data/terrain/rasuwa-2026/base.jpg",
+ "baseLayer": {
+  "name": "Terrain elevation",
+  "attribution": "© DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA",
+  "limitations": [
+   "A pre-event surface model: it does not show changes from the 2026 event."
+  ],
+  "evidence": "reference"
+ },
+ "layers": [
+  {
+   "id": "unosat-extent",
+   "file": "data/terrain/rasuwa-2026/unosat-extent.webp",
+   "evidence": "reference",
+   "color": "#e8590c",
+   "on": true,
+   "name": "UNOSAT mudflow/rockflow extent (64.91 km²)",
+   "attribution": "UNOSAT/UNITAR, event FL20260826NPL, CC BY-SA",
+   "limitations": [
+    "UNOSAT records this layer as 'Not yet field validated'. Preliminary satellite-based mapping, not ground truth.",
+    "Independent of NISAR. Area computed here in UTM 45N from the polygon, because the source's Area_ha attribute duplicates Area_m2."
+   ]
+  },
+  {
+   "id": "unosat-detachment",
+   "file": "data/terrain/rasuwa-2026/unosat-detachment.webp",
+   "evidence": "reference",
+   "color": "#fa5252",
+   "on": true,
+   "name": "UNOSAT detachment zone (1.96 km²)",
+   "attribution": "UNOSAT/UNITAR, event FL20260826NPL, CC BY-SA",
+   "limitations": [
+    "UNOSAT records this layer as 'Not yet field validated'. Preliminary satellite-based mapping, not ground truth.",
+    "Source inconsistency: layer name says 26 August 2026 but its SensorDate attribute says 26 September 2026. Treat the date as unresolved."
+   ]
+  },
+  {
+   "id": "unosat-lakes",
+   "file": "data/terrain/rasuwa-2026/unosat-lakes.webp",
+   "evidence": "reference",
+   "color": "#1c7ed6",
+   "on": true,
+   "name": "UNOSAT barrier lakes (0.31 km²)",
+   "attribution": "UNOSAT/UNITAR, event FL20260826NPL, CC BY-SA",
+   "limitations": [
+    "UNOSAT records this layer as 'Not yet field validated'. Preliminary satellite-based mapping, not ground truth."
+   ]
+  },
+  {
+   "id": "unosat-roads",
+   "file": "data/terrain/rasuwa-2026/unosat-roads.webp",
+   "evidence": "reference",
+   "color": "#ffd43b",
+   "on": false,
+   "name": "UNOSAT affected roads",
+   "attribution": "UNOSAT/UNITAR, event FL20260826NPL, CC BY-SA",
+   "limitations": [
+    "UNOSAT records this layer as 'Not yet field validated'. Preliminary satellite-based mapping, not ground truth.",
+    "Clipped to the UNOSAT analysis extent because the source contains stray vertices outside Nepal."
+   ]
+  },
+  {
+   "id": "rivers",
+   "file": "data/terrain/rasuwa-2026/rivers.webp",
+   "evidence": "reference",
+   "color": "#74c0fc",
+   "on": true,
+   "name": "Rivers (OSM)",
+   "attribution": "© OpenStreetMap contributors (ODbL), via HOT export on HDX",
+   "limitations": [
+    "Community mapping exported after the event; features may predate or postdate the disaster."
+   ]
+  },
+  {
+   "id": "coherence-t48",
+   "file": "data/terrain/rasuwa-2026/coherence-t48.webp",
+   "evidence": "observed",
+   "color": "#fc8961",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR stability, Track 48 (descending), 2026-08-16 to 2026-08-28",
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "Pairs are not alike: lengths 12, 24 days and radar modes 2000, 4000 in the file names. Longer pairs and different modes lower coherence by themselves.",
+    "One value per pair, nothing interpolated between pairs.",
+    "Provisional data."
+   ],
+   "maturity": "Provisional (P05023)",
+   "granule": "NISAR_L2_PR_GUNW_028_048_D_074_029_2000_SH_20260816T125812_20260816T125846_20260828T125812_20260828T125846_P05023_N_F_J_001"
+  },
+  {
+   "id": "coherence-t98",
+   "file": "data/terrain/rasuwa-2026/coherence-t98.webp",
+   "evidence": "observed",
+   "color": "#fc8961",
+   "on": false,
+   "group": "radar",
+   "name": "NISAR stability, Track 98 (ascending), 2026-08-19 to 2026-08-31",
+   "attribution": "NASA/JPL-Caltech/ISRO, NISAR; distributed by ASF DAAC",
+   "limitations": [
+    "Pairs are not alike: lengths 12, 24 days and radar modes 4000 in the file names. Longer pairs and different modes lower coherence by themselves.",
+    "One value per pair, nothing interpolated between pairs.",
+    "Provisional data."
+   ],
+   "maturity": "Provisional (P05023)",
+   "granule": "NISAR_L2_PR_GUNW_028_098_A_016_029_4000_SH_20260819T233918_20260819T233953_20260831T233918_20260831T233952_P05023_N_F_J_001"
+  }
+ ],
+ "tracks": [
+  {
+   "track": 48,
+   "orbit": "Descending",
+   "look": "Left",
+   "losToSensorEastNorth": [
+    -0.552,
+    0.167
+   ],
+   "incidenceDeg5to95": [
+    32.3,
+    38.2
+   ],
+   "pair": [
+    "2026-08-16",
+    "2026-08-28"
+   ],
+   "evidence": "derived"
+  },
+  {
+   "track": 98,
+   "orbit": "Ascending",
+   "look": "Left",
+   "losToSensorEastNorth": [
+    0.651,
+    0.166
+   ],
+   "incidenceDeg5to95": [
+    39.5,
+    44.8
+   ],
+   "pair": [
+    "2026-08-19",
+    "2026-08-31"
+   ],
+   "evidence": "derived"
+  }
+ ],
+ "places": [
+  {
+   "name": "Silintar",
+   "xM": 17905,
+   "yM": 50333
+  },
+  {
+   "name": "Shyaphru",
+   "xM": 91829,
+   "yM": 20349
+  },
+  {
+   "name": "Ghyalchok",
+   "xM": 35650,
+   "yM": 58582
+  },
+  {
+   "name": "Trishuli",
+   "xM": 72839,
+   "yM": 46730
+  }
+ ],
+ "markers": [
+  {
+   "name": "Landslide source (UNOSAT detachment zone)",
+   "xM": 110073,
+   "yM": 6682,
+   "evidence": "reference"
+  },
+  {
+   "name": "Barrier lakes (UNOSAT)",
+   "xM": 108003,
+   "yM": 4561,
+   "evidence": "reference"
+  }
+ ],
+ "placesLayer": {
+  "name": "Settlements (OSM)",
+  "attribution": "© OpenStreetMap contributors (ODbL), via HOT export on HDX",
+  "limitations": [
+   "Community mapping exported after the event; features may predate or postdate the disaster."
+  ],
+  "evidence": "reference"
+ }
+}

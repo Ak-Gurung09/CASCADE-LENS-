@@ -622,6 +622,13 @@ pre { font: 10.5px/1.4 var(--code); white-space: pre-wrap; color: var(--muted); 
 .sim3d-tabs button { flex: 1 1 auto; font-size: 10.5px; padding: 6px 10px; }
 .time-chip { font: 700 12px/1.4 var(--sans); color: var(--accent); }
 .terrain-panel p { font-size: 13px; color: var(--soft); }
+.model-layers { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.model-layers li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.model-layers li .check { flex: 1 1 200px; }
+.model-layers li p { flex-basis: 100%; margin: 0; }
+.terrain-panel .model-layers p.muted { font-size: 11.5px; color: var(--muted); }
+.model-layers .swatch, .terrain-panel p .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin: 0 6px 0 2px; vertical-align: -1px; }
+.row-gap { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* ---------- Motion: panel entrances, staggered content, chart draw-in, hover feedback ---------- */
 @keyframes slide-from-left { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
