@@ -50,6 +50,36 @@ function loadImage(url: string) {
   })
 }
 
+// Reads a file and reports how much has arrived. `expected` stands in when the server sends no length.
+async function fetchBytes(url: string, expected: number, progress: (done: number, total: number) => void) {
+  const r = await fetch(url)
+  if (!r.ok) throw new Error(`Could not load ${url} (HTTP ${r.status})`)
+  const total = Number(r.headers.get('content-length')) || expected
+  if (!r.body) { const b = await r.arrayBuffer(); progress(b.byteLength, b.byteLength); return b }
+  const reader = r.body.getReader()
+  const parts: Uint8Array[] = []
+  let done = 0
+  for (;;) {
+    const { value, done: end } = await reader.read()
+    if (end) break
+    parts.push(value)
+    done += value.byteLength
+    progress(done, Math.max(total, done))
+  }
+  const out = new Uint8Array(done)
+  let at = 0
+  for (const p of parts) { out.set(p, at); at += p.byteLength }
+  return out.buffer
+}
+
+async function fetchImage(url: string, progress: (done: number, total: number) => void) {
+  const b = await fetchBytes(url, 0, progress)
+  const src = URL.createObjectURL(new Blob([b]))
+  try { return await loadImage(src) } finally { setTimeout(() => URL.revokeObjectURL(src), 0) }
+}
+
+const twice = <T,>(job: () => Promise<T>) => job().catch(() => job())
+
 function label(text: string, colour: string, size = 1) {
   const c = document.createElement('canvas')
   const g = c.getContext('2d')!
@@ -100,28 +130,45 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
   const [exag, setExag] = useState(1.5)
   const [spin, setSpin] = useState(false)
   const [missing, setMissing] = useState<string[]>([])
+  const [got, setGot] = useState<Record<string, [number, number]>>({})
+  const [slow, setSlow] = useState(false)
+  const [attempt, setAttempt] = useState(0)
 
-  // The model description, its heights and every picture
+  // The model description, then its heights and the pictures shown at the start. Radar pictures wait until they are picked.
+  // Every file counts its bytes so the reader sees progress on a slow connection, and is tried twice before giving up.
   useEffect(() => {
     let live = true
+    setModel(null); setHeights(null); setImages({}); setFailure(null); setMissing([]); setGot({}); setSlow(false)
     const fail = (e: Error) => { if (live) setFailure(e.message) }
+    const slowTimer = setTimeout(() => { if (live) setSlow(true) }, 25000)
+    const track = (id: string) => (done: number, total: number) => { if (live) setGot((g) => ({ ...g, [id]: [done, total] })) }
     fetch(assetUrl(url)).then((r) => { if (!r.ok) throw new Error(`3D model request failed with HTTP ${r.status}`); return r.json() as Promise<Model3D> })
       .then((md) => {
         if (!live) return
         setModel(md)
         setOn(Object.fromEntries(md.layers.filter((l) => l.group !== 'radar').map((l) => [l.id, l.on])))
-        fetch(assetUrl(md.heights)).then((r) => { if (!r.ok) throw new Error(`Heights request failed with HTTP ${r.status}`); return r.arrayBuffer() })
+        const heightsBytes = md.width * md.height * 2
+        twice(() => fetchBytes(assetUrl(md.heights), heightsBytes, track('heights')))
           .then((b) => { if (live) setHeights(Float32Array.from(new Int16Array(b))) }).catch(fail)
-        // Each picture arrives on its own and is tried twice, so one slow file never holds back the rest.
-        // Without the terrain picture there is no model; a missing map layer is only marked as not loaded.
-        ;[['base', md.base], ...md.layers.map((l) => [l.id, l.file])].forEach(([id, f]) => {
-          loadImage(assetUrl(f)).catch(() => loadImage(assetUrl(f)))
+        ;[['base', md.base], ...md.layers.filter((l) => l.group !== 'radar').map((l) => [l.id, l.file])].forEach(([id, f]) => {
+          twice(() => fetchImage(assetUrl(f), track(id)))
             .then((i) => { if (live) setImages((all) => ({ ...all, [id]: i })) })
             .catch((e: Error) => { if (!live) return; if (id === 'base') fail(e); else setMissing((m) => [...m, id]) })
         })
       }).catch(fail)
+    return () => { live = false; clearTimeout(slowTimer) }
+  }, [url, attempt])
+
+  // A radar picture loads the first time it is picked
+  useEffect(() => {
+    const l = model?.layers.find((x) => x.id === radar)
+    if (!l || images[l.id] || missing.includes(l.id)) return
+    let live = true
+    twice(() => fetchImage(assetUrl(l.file), (done, total) => { if (live) setGot((g) => ({ ...g, [l.id]: [done, total] })) }))
+      .then((i) => { if (live) setImages((all) => ({ ...all, [l.id]: i })) })
+      .catch(() => { if (live) setMissing((m) => [...m, l.id]) })
     return () => { live = false }
-  }, [url])
+  }, [radar, model, images, missing])
 
   // Scene, camera, lights and the render loop live as long as the panel
   useEffect(() => {
@@ -288,14 +335,23 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
     sc.camera.position.copy(target).add(new THREE.Vector3(-7, 9 * exag + 12, 11))
   }
 
+  // Progress counts only what the model needs before it can show: heights, terrain picture and the layers that start switched on
+  const startIds = ['heights', 'base', ...(model?.layers.filter((l) => l.group !== 'radar' && l.on).map((l) => l.id) ?? [])]
+  const loadedMb = startIds.reduce((t, id) => t + (got[id]?.[0] ?? 0), 0) / 1e6
+  const totalMb = Math.max(loadedMb, startIds.reduce((t, id) => t + (got[id]?.[1] ?? 0), 0) / 1e6, model ? (model.width * model.height * 2) / 1e6 : 0)
   const refs = model?.layers.filter((l) => l.group !== 'radar') ?? []
   const radars = model?.layers.filter((l) => l.group === 'radar') ?? []
   const shownRadar = radars.find((l) => l.id === radar)
   return (
     <div className="terrain3d">
       <div className="terrain-canvas" ref={host} role="img" aria-label={`3D model of the ${model?.name ?? 'Rasuwa corridor'}, with UNOSAT maps and NISAR radar layers draped over the terrain`} />
-      {(!heights || !images.base) && !failure && <p className="terrain-status">Building the 3D model…</p>}
-      {failure && <p className="map-alert" role="alert">{failure}</p>}
+      {(!heights || !images.base) && !failure && (
+        <div className="terrain-status" role="status">
+          <p>Loading the 3D model{loadedMb > 0 ? `: ${loadedMb.toFixed(1)} of about ${totalMb.toFixed(1)} MB` : '…'}</p>
+          {slow && <><p className="small">This is taking a while because the connection to the site seems slow. It will keep loading, or you can try again.</p><button className="ghost" onClick={() => setAttempt((a) => a + 1)}>Try again</button></>}
+        </div>
+      )}
+      {failure && <div className="map-alert" role="alert"><p>{failure}</p><p className="small">The 3D files could not be downloaded. Check the connection and try again.</p><button className="ghost" onClick={() => setAttempt((a) => a + 1)}>Try again</button></div>}
       <section className="terrain-panel" aria-label="3D model controls">
         <p className="label">3D model</p>
         <h2>Rasuwa corridor in 3D</h2>
@@ -324,6 +380,7 @@ export function Rasuwa3D({ url, onExit }: { url: string; onExit: () => void }) {
             {radars.map((l) => <button key={l.id} role="tab" aria-selected={radar === l.id} className={radar === l.id ? 'on' : ''} onClick={() => setRadar(l.id)}>{l.id.replace('coherence-t', 'Track ')}</button>)}
           </div>
           {shownRadar && missing.includes(shownRadar.id) && <p className="muted small" role="status">This radar picture did not load. Reopen 3D to try again.</p>}
+          {shownRadar && !images[shownRadar.id] && !missing.includes(shownRadar.id) && <p className="muted small" role="status">Loading the radar picture{got[shownRadar.id] ? ` (${Math.round((100 * got[shownRadar.id][0]) / Math.max(1, got[shownRadar.id][1]))}%)` : '…'}</p>}
           {shownRadar && <div className="model-layers"><p className="small">{shownRadar.name} <EvidenceTag kind={shownRadar.evidence} compact /></p>
             <p className="muted small">Bright: the ground stayed the same between the two passes. Dark: it changed, or it is water or radar shadow. This pair spans the 26 August event, so a dark patch alone does not say what happened there.</p>
             {shownRadar.maturity && <p className="muted small">Product maturity: {shownRadar.maturity}.</p>}

@@ -24,7 +24,7 @@ PUBLIC = ROOT / "frontend/public/data"
 OUT = PUBLIC / "terrain/rasuwa-2026"
 CRS = "EPSG:32645"  # UTM 45N, the same grid the NISAR products use
 GRID_M = 120  # spacing of the 3D mesh
-IMG_M = 40  # pixel size of the draped pictures
+IMG_M = 50  # pixel size of the draped pictures: sharp enough at this scale, and small enough for slow connections
 
 m = json.loads((PUBLIC / "manifests/manifest.json").read_text(encoding="utf-8"))
 L = {l["id"]: l for l in m["layers"]}
@@ -69,7 +69,7 @@ stops = np.array([300, 900, 1600, 2600, 3600, 4600, 5400, 6500])
 cols = np.array([[96, 128, 76], [120, 146, 86], [150, 156, 104], [160, 146, 112], [146, 128, 108], [150, 144, 140], [214, 218, 224], [246, 248, 252]], float)
 tint = np.stack([np.interp(d, stops, cols[:, k]) for k in range(3)], -1)
 base = np.clip(tint * (0.35 + 0.75 * shade[..., None]), 0, 255).astype("uint8")
-Image.fromarray(base).save(OUT / "base.jpg", quality=86)
+Image.fromarray(base).save(OUT / "base.jpg", quality=80, optimize=True, progressive=True)
 
 
 def vector_png(layer_id, name, color, opacity, line_px=0):
