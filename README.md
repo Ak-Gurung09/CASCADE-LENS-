@@ -1,4 +1,4 @@
-# GAIA CascadeLens
+# GAIA CascadeLens (this is temporary protype)
 
 **Following change on Earth's surface, one radar observation at a time.**
 
